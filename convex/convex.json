@@ -1,0 +1,5 @@
+{
+  "node": {
+    "externalPackages": ["@workos-inc/node"]
+  }
+}
