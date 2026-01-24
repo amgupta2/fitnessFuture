@@ -22,8 +22,8 @@ export const getRecoveryScore = query({
     // Get sessions from last 7 days
     const recentSessions = await ctx.db
       .query("workoutSessions")
-      .withIndex("by_user_completed", (q) => q.eq("userId", args.userId))
-      .filter((q) =>
+      .withIndex("by_user_completed", (q: any) => q.eq("userId", args.userId))
+      .filter((q: any) =>
         q.and(
           q.neq(q.field("completedAt"), undefined),
           q.gte(q.field("completedAt"), sevenDaysAgo)
@@ -34,8 +34,8 @@ export const getRecoveryScore = query({
     // Get sessions from previous 7 days (7-14 days ago)
     const previousWeekSessions = await ctx.db
       .query("workoutSessions")
-      .withIndex("by_user_completed", (q) => q.eq("userId", args.userId))
-      .filter((q) =>
+      .withIndex("by_user_completed", (q: any) => q.eq("userId", args.userId))
+      .filter((q: any) =>
         q.and(
           q.neq(q.field("completedAt"), undefined),
           q.gte(q.field("completedAt"), fourteenDaysAgo),
@@ -46,11 +46,11 @@ export const getRecoveryScore = query({
 
     // Calculate metrics
     const currentVolume = recentSessions.reduce(
-      (sum, s) => sum + (s.totalVolume || 0),
+      (sum: number, s: any) => sum + (s.totalVolume || 0),
       0
     );
     const previousVolume = previousWeekSessions.reduce(
-      (sum, s) => sum + (s.totalVolume || 0),
+      (sum: number, s: any) => sum + (s.totalVolume || 0),
       0
     );
     const currentWorkouts = recentSessions.length;
@@ -80,8 +80,8 @@ export const getRecoveryScore = query({
     // Calculate PR count in last 7 days
     const prs = await ctx.db
       .query("personalRecords")
-      .withIndex("by_user", (q) => q.eq("userId", args.userId))
-      .filter((q) => q.gte(q.field("achievedAt"), sevenDaysAgo))
+      .withIndex("by_user", (q: any) => q.eq("userId", args.userId))
+      .filter((q: any) => q.gte(q.field("achievedAt"), sevenDaysAgo))
       .collect();
 
     // SCORING ALGORITHM
@@ -194,8 +194,8 @@ export const getMuscleGroupFatigue = query({
 
     const sessions = await ctx.db
       .query("workoutSessions")
-      .withIndex("by_user_completed", (q) => q.eq("userId", args.userId))
-      .filter((q) =>
+      .withIndex("by_user_completed", (q: any) => q.eq("userId", args.userId))
+      .filter((q: any) =>
         q.and(
           q.neq(q.field("completedAt"), undefined),
           q.gte(q.field("completedAt"), startDate)
@@ -209,27 +209,25 @@ export const getMuscleGroupFatigue = query({
     for (const session of sessions) {
       const sessionExercises = await ctx.db
         .query("sessionExercises")
-        .withIndex("by_session_order", (q) => q.eq("sessionId", session._id))
+        .withIndex("by_session_order", (q: any) => q.eq("sessionId", session._id))
         .collect();
 
       for (const sessionExercise of sessionExercises) {
-        // Try to find in exercise library
-        const exercise = await ctx.db
+        // Try to find in exercise library - fetch all and filter in memory
+        const allExercises = await ctx.db
           .query("exerciseLibrary")
-          .filter((q) =>
-            q.eq(
-              q.field("name").toLowerCase(),
-              sessionExercise.exerciseName.toLowerCase()
-            )
-          )
-          .first();
+          .collect();
+        
+        const exercise = allExercises.find(
+          (ex) => ex.name.toLowerCase() === sessionExercise.exerciseName.toLowerCase()
+        );
 
         const sets = await ctx.db
           .query("sets")
-          .withIndex("by_session_exercise", (q) =>
+          .withIndex("by_session_exercise", (q: any) =>
             q.eq("sessionExerciseId", sessionExercise._id)
           )
-          .filter((q) => q.eq(q.field("isWarmup"), false))
+          .filter((q: any) => q.eq(q.field("isWarmup"), false))
           .collect();
 
         const volume = sets.reduce((sum, s) => sum + s.weight * s.reps, 0);
@@ -273,8 +271,8 @@ export const needsDeload = query({
 
     const sessions = await ctx.db
       .query("workoutSessions")
-      .withIndex("by_user_completed", (q) => q.eq("userId", args.userId))
-      .filter((q) =>
+      .withIndex("by_user_completed", (q: any) => q.eq("userId", args.userId))
+      .filter((q: any) =>
         q.and(
           q.neq(q.field("completedAt"), undefined),
           q.gte(q.field("completedAt"), fourWeeksAgo)
@@ -285,13 +283,13 @@ export const needsDeload = query({
     // Check for declining performance (PRs)
     const recentPRs = await ctx.db
       .query("personalRecords")
-      .withIndex("by_user", (q) => q.eq("userId", args.userId))
-      .filter((q) => q.gte(q.field("achievedAt"), fourWeeksAgo))
+      .withIndex("by_user", (q: any) => q.eq("userId", args.userId))
+      .filter((q: any) => q.gte(q.field("achievedAt"), fourWeeksAgo))
       .collect();
 
     const totalSessions = sessions.length;
     const avgVolume =
-      sessions.reduce((sum, s) => sum + (s.totalVolume || 0), 0) /
+      sessions.reduce((sum: number, s: any) => sum + (s.totalVolume || 0), 0) /
       Math.max(totalSessions, 1);
 
     // Indicators for deload
@@ -307,7 +305,7 @@ export const needsDeload = query({
     // 2. No PRs in last 2 weeks
     const twoWeeksAgo = Date.now() - 14 * 24 * 60 * 60 * 1000;
     const recentPRCount = recentPRs.filter(
-      (pr) => pr.achievedAt >= twoWeeksAgo
+      (pr: any) => pr.achievedAt >= twoWeeksAgo
     ).length;
     if (recentPRCount === 0 && totalSessions >= 6) {
       indicators.push("No PRs in last 2 weeks despite consistent training");
@@ -323,8 +321,8 @@ export const needsDeload = query({
     // 4. Get recovery score
     const recovery = await ctx.db
       .query("workoutSessions")
-      .withIndex("by_user_completed", (q) => q.eq("userId", args.userId))
-      .filter((q) => q.neq(q.field("completedAt"), undefined))
+      .withIndex("by_user_completed", (q: any) => q.eq("userId", args.userId))
+      .filter((q: any) => q.neq(q.field("completedAt"), undefined))
       .order("desc")
       .first();
 

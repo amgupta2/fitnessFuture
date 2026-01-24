@@ -30,37 +30,37 @@ export const getProgressionSuggestion = query({
     // Get last 3 sessions for this exercise
     const recentSessions = await ctx.db
       .query("workoutSessions")
-      .withIndex("by_user_completed", (q) => q.eq("userId", args.userId))
-      .filter((q) => q.neq(q.field("completedAt"), undefined))
+      .withIndex("by_user_completed", (q: any) => q.eq("userId", args.userId))
+      .filter((q: any) => q.neq(q.field("completedAt"), undefined))
       .order("desc")
       .take(50); // Get more to filter
 
-    const exerciseHistory = [];
+    const exerciseHistory: any[] = [];
 
     for (const session of recentSessions) {
       const sessionExercises = await ctx.db
         .query("sessionExercises")
-        .withIndex("by_session_order", (q) => q.eq("sessionId", session._id))
+        .withIndex("by_session_order", (q: any) => q.eq("sessionId", session._id))
         .collect();
 
       const matching = sessionExercises.filter(
-        (se) =>
+        (se: any) =>
           se.exerciseName.toLowerCase() === args.exerciseName.toLowerCase()
       );
 
       for (const sessionExercise of matching) {
         const sets = await ctx.db
           .query("sets")
-          .withIndex("by_session_exercise", (q) =>
+          .withIndex("by_session_exercise", (q: any) =>
             q.eq("sessionExerciseId", sessionExercise._id)
           )
-          .filter((q) => q.eq(q.field("isWarmup"), false))
+          .filter((q: any) => q.eq(q.field("isWarmup"), false))
           .collect();
 
         if (sets.length > 0) {
           exerciseHistory.push({
             date: session.completedAt!,
-            sets: sets.map((s) => ({
+            sets: sets.map((s: any) => ({
               weight: s.weight,
               reps: s.reps,
               estimated1RM: calculate1RM(s.weight, s.reps),
@@ -87,15 +87,15 @@ export const getProgressionSuggestion = query({
     // Analyze progression pattern
     const lastSession = exerciseHistory[0];
     const avgWeight =
-      lastSession.sets.reduce((sum, s) => sum + s.weight, 0) /
+      lastSession.sets.reduce((sum: number, s: any) => sum + s.weight, 0) /
       lastSession.sets.length;
     const avgReps =
-      lastSession.sets.reduce((sum, s) => sum + s.reps, 0) /
+      lastSession.sets.reduce((sum: number, s: any) => sum + s.reps, 0) /
       lastSession.sets.length;
-    const maxReps = Math.max(...lastSession.sets.map((s) => s.reps));
-    const minReps = Math.min(...lastSession.sets.map((s) => s.reps));
+    const maxReps = Math.max(...lastSession.sets.map((s: any) => s.reps));
+    const minReps = Math.min(...lastSession.sets.map((s: any) => s.reps));
     const avgEstimated1RM =
-      lastSession.sets.reduce((sum, s) => sum + s.estimated1RM, 0) /
+      lastSession.sets.reduce((sum: number, s: any) => sum + s.estimated1RM, 0) /
       lastSession.sets.length;
 
     // Compare to previous session if available
@@ -103,7 +103,7 @@ export const getProgressionSuggestion = query({
     if (exerciseHistory.length >= 2) {
       const previousSession = exerciseHistory[1];
       const prevAvg1RM =
-        previousSession.sets.reduce((sum, s) => sum + s.estimated1RM, 0) /
+        previousSession.sets.reduce((sum: number, s: any) => sum + s.estimated1RM, 0) /
         previousSession.sets.length;
       improvement = ((avgEstimated1RM - prevAvg1RM) / prevAvg1RM) * 100;
     }
@@ -185,29 +185,29 @@ export const getOverloadIndicator = query({
     // Get last session with this exercise
     const recentSessions = await ctx.db
       .query("workoutSessions")
-      .withIndex("by_user_completed", (q) => q.eq("userId", args.userId))
-      .filter((q) => q.neq(q.field("completedAt"), undefined))
+      .withIndex("by_user_completed", (q: any) => q.eq("userId", args.userId))
+      .filter((q: any) => q.neq(q.field("completedAt"), undefined))
       .order("desc")
       .take(20);
 
     for (const session of recentSessions) {
       const sessionExercises = await ctx.db
         .query("sessionExercises")
-        .withIndex("by_session_order", (q) => q.eq("sessionId", session._id))
+        .withIndex("by_session_order", (q: any) => q.eq("sessionId", session._id))
         .collect();
 
       const matching = sessionExercises.filter(
-        (se) =>
+        (se: any) =>
           se.exerciseName.toLowerCase() === args.exerciseName.toLowerCase()
       );
 
       for (const sessionExercise of matching) {
         const sets = await ctx.db
           .query("sets")
-          .withIndex("by_session_exercise", (q) =>
+          .withIndex("by_session_exercise", (q: any) =>
             q.eq("sessionExerciseId", sessionExercise._id)
           )
-          .filter((q) => q.eq(q.field("isWarmup"), false))
+          .filter((q: any) => q.eq(q.field("isWarmup"), false))
           .collect();
 
         // Find the corresponding set number
@@ -261,31 +261,31 @@ export const getProgressionStreak = query({
       .order("desc")
       .take(20);
 
-    const sessionData = [];
+    const sessionData: any[] = [];
 
     for (const session of recentSessions) {
       const sessionExercises = await ctx.db
         .query("sessionExercises")
-        .withIndex("by_session_order", (q) => q.eq("sessionId", session._id))
+        .withIndex("by_session_order", (q: any) => q.eq("sessionId", session._id))
         .collect();
 
       const matching = sessionExercises.filter(
-        (se) =>
+        (se: any) =>
           se.exerciseName.toLowerCase() === args.exerciseName.toLowerCase()
       );
 
       for (const sessionExercise of matching) {
         const sets = await ctx.db
           .query("sets")
-          .withIndex("by_session_exercise", (q) =>
+          .withIndex("by_session_exercise", (q: any) =>
             q.eq("sessionExerciseId", sessionExercise._id)
           )
-          .filter((q) => q.eq(q.field("isWarmup"), false))
+          .filter((q: any) => q.eq(q.field("isWarmup"), false))
           .collect();
 
         if (sets.length > 0) {
           const avg1RM =
-            sets.reduce((sum, s) => sum + calculate1RM(s.weight, s.reps), 0) /
+            sets.reduce((sum: number, s: any) => sum + calculate1RM(s.weight, s.reps), 0) /
             sets.length;
           sessionData.push({ date: session.completedAt!, avg1RM });
         }
