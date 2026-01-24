@@ -562,7 +562,7 @@ export async function generateExerciseSubstitutions(
     equipment: string;
   }>;
 }> {
-  const model = genAI.getGenerativeModel({ model: MODEL_NAME });
+  const model = genAI.getGenerativeModel({ model: "gemini-3-flash-preview" });
 
   const prompt = `You are a strength and conditioning coach. A user needs to substitute an exercise.
 

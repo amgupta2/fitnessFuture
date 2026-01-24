@@ -415,7 +415,7 @@ export default function ChatInterface({ userId }: ChatInterfaceProps) {
               templates: result.templates,
             });
 
-            const summaryContent = `✅ **Templates Created!**\n\nI've created ${result.templates.length} workout template(s) for you:\n\n${result.templates
+            const summaryContent = `✅ **Templates Created!**\n\nI've created ${result.templates?.length ?? 0} workout template(s) for you:\n\n${result.templates
               .map(
                 (t, idx) =>
                   `**${idx + 1}. ${t.name}**\n${t.description || ""}\n- ${t.exercises.length} exercises\n- ${t.category} workout`
@@ -428,7 +428,7 @@ export default function ChatInterface({ userId }: ChatInterfaceProps) {
                   ? {
                       ...msg,
                       content: summaryContent,
-                      templatesGenerated: result.templates.length,
+                      templatesGenerated: result.templates?.length ?? 0,
                     }
                   : msg
               )
