@@ -318,22 +318,22 @@ export const getTrainingContextForAI = query({
       .map((stats: any) => ({
         name: stats.name,
         sets: Math.round(
-          stats.sets.reduce((a, b) => a + b, 0) / stats.sets.length
+          stats.sets.reduce((a: number, b: number) => a + b, 0) / stats.sets.length
         ),
         avgWeight: Math.round(
-          stats.weights.reduce((a, b) => a + b, 0) / stats.weights.length
+          stats.weights.reduce((a: number, b: number) => a + b, 0) / stats.weights.length
         ),
         avgReps: Math.round(
-          stats.reps.reduce((a, b) => a + b, 0) / stats.reps.length
+          stats.reps.reduce((a: number, b: number) => a + b, 0) / stats.reps.length
         ),
         lastPerformed: stats.lastPerformed,
       }))
-      .sort((a, b) => b.lastPerformed - a.lastPerformed) // Most recent first
+      .sort((a: any, b: any) => b.lastPerformed - a.lastPerformed) // Most recent first
       .slice(0, 10); // Top 10 exercises
 
     // Calculate total volume
     const totalVolume = recentSessions.reduce(
-      (sum, session) => sum + (session.totalVolume || 0),
+      (sum: number, session: any) => sum + (session.totalVolume || 0),
       0
     );
 
