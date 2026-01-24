@@ -6,14 +6,15 @@
 "use client";
 
 import { SessionData } from "@/lib/session";
-import { LogOut, User } from "lucide-react";
+import { LogOut, User, Menu } from "lucide-react";
 import { useState } from "react";
 
 interface HeaderProps {
   user: SessionData;
+  onOpenMobileMenu?: () => void;
 }
 
-export function Header({ user }: HeaderProps) {
+export function Header({ user, onOpenMobileMenu }: HeaderProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const handleLogout = async () => {
@@ -22,21 +23,31 @@ export function Header({ user }: HeaderProps) {
   };
 
   return (
-    <header className="h-16 bg-zinc-900 border-b border-zinc-800 flex items-center justify-between px-6">
+    <header className="h-16 bg-zinc-900 border-b border-zinc-800 flex items-center justify-between px-4 lg:px-6">
       <div className="flex items-center gap-4">
-        <h2 className="text-lg font-semibold">Welcome back, {user.name || user.email}</h2>
+        {/* Mobile menu button */}
+        <button
+          onClick={onOpenMobileMenu}
+          className="lg:hidden p-2 rounded-lg hover:bg-zinc-800 transition-colors"
+        >
+          <Menu className="w-6 h-6" />
+        </button>
+
+        <h2 className="text-base lg:text-lg font-semibold truncate">
+          Welcome back, {user.name || user.email}
+        </h2>
       </div>
 
       {/* User menu */}
       <div className="relative">
         <button
           onClick={() => setIsMenuOpen(!isMenuOpen)}
-          className="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-zinc-800 transition-colors"
+          className="flex items-center gap-3 px-2 lg:px-4 py-2 rounded-lg hover:bg-zinc-800 transition-colors"
         >
           <div className="w-8 h-8 bg-white text-black rounded-full flex items-center justify-center font-semibold">
             {user.name?.[0]?.toUpperCase() || user.email[0].toUpperCase()}
           </div>
-          <span className="text-sm text-zinc-400">{user.email}</span>
+          <span className="text-sm text-zinc-400 hidden sm:inline">{user.email}</span>
         </button>
 
         {/* Dropdown */}
