@@ -60,13 +60,13 @@ export default function WorkoutActivePage() {
   // Get progression suggestion for current exercise
   const progressionSuggestion = useQuery(
     api.progression.getProgressionSuggestion,
-    currentExercise && user
+    currentExercise && user && currentExercise.targetSets !== undefined
       ? {
           userId: user._id,
           exerciseName: currentExercise.exerciseName,
           targetSets: currentExercise.targetSets,
-          targetRepsMin: currentExercise.repsMin,
-          targetRepsMax: currentExercise.repsMax,
+          targetRepsMin: currentExercise.repsMin ?? 8,
+          targetRepsMax: currentExercise.repsMax ?? 12,
         }
       : "skip"
   );
