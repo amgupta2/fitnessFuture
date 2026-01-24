@@ -198,7 +198,7 @@ async function getBaseUserContext(ctx: any, userId: any) {
   // Get current templates
   const templates = await ctx.db
     .query("workoutTemplates")
-    .withIndex("by_user_active", (q) =>
+    .withIndex("by_user_active", (q: any) =>
       q.eq("userId", userId).eq("isActive", true)
     )
     .take(10);
