@@ -65,8 +65,8 @@ export default function WorkoutActivePage() {
           userId: user._id,
           exerciseName: currentExercise.exerciseName,
           targetSets: currentExercise.targetSets,
-          targetRepsMin: currentExercise.repsMin ?? 8,
-          targetRepsMax: currentExercise.repsMax ?? 12,
+          targetRepsMin: currentExercise.targetRepsMin ?? 8,
+          targetRepsMax: currentExercise.targetRepsMax ?? 12,
         }
       : "skip"
   );
