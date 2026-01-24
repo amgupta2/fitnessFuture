@@ -53,8 +53,8 @@ export const getConversationHistory = query({
     const limit = args.limit || 20;
 
     return await ctx.db
-      .query("aiInteractions")
-      .withIndex("by_user_created", (q) => q.eq("userId", args.userId))
+    .query("aiInteractions")
+    .withIndex("by_user_created", (q: any) => q.eq("userId", args.userId))
       .order("desc")
       .take(limit);
   },
@@ -205,17 +205,17 @@ async function getBaseUserContext(ctx: any, userId: any) {
 
   // Get exercises for each template
   const templatesWithExercises = await Promise.all(
-    templates.map(async (template) => {
+    templates.map(async (template: any) => {
       const exercises = await ctx.db
         .query("templateExercises")
-        .withIndex("by_template_order", (q) =>
+        .withIndex("by_template_order", (q: any) =>
           q.eq("templateId", template._id)
         )
         .collect();
 
       return {
         name: template.name,
-        exercises: exercises.map((e) => e.exerciseName),
+        exercises: exercises.map((e: any) => e.exerciseName),
       };
     })
   );
@@ -224,8 +224,8 @@ async function getBaseUserContext(ctx: any, userId: any) {
   const thirtyDaysAgo = Date.now() - 30 * 24 * 60 * 60 * 1000;
   const recentWorkouts = await ctx.db
     .query("workoutSessions")
-    .withIndex("by_user_completed", (q) => q.eq("userId", userId))
-    .filter((q) =>
+    .withIndex("by_user_completed", (q: any) => q.eq("userId", userId))
+    .filter((q: any) =>
       q.and(
         q.neq(q.field("completedAt"), undefined),
         q.gte(q.field("completedAt"), thirtyDaysAgo)
@@ -236,7 +236,7 @@ async function getBaseUserContext(ctx: any, userId: any) {
   return {
     experienceLevel: user.experienceLevel,
     currentTemplates: templatesWithExercises,
-    recentWorkouts: recentWorkouts.map((w) => ({
+    recentWorkouts: recentWorkouts.map((w: any) => ({
       templateName: w.templateName,
       completedAt: w.completedAt || 0,
     })),
@@ -281,16 +281,16 @@ export const getTrainingContextForAI = query({
     for (const session of recentSessions) {
       const sessionExercises = await ctx.db
         .query("sessionExercises")
-        .withIndex("by_session_order", (q) => q.eq("sessionId", session._id))
+        .withIndex("by_session_order", (q: any) => q.eq("sessionId", session._id))
         .collect();
 
       for (const sessionExercise of sessionExercises) {
         const sets = await ctx.db
           .query("sets")
-          .withIndex("by_session_exercise", (q) =>
+          .withIndex("by_session_exercise", (q: any) =>
             q.eq("sessionExerciseId", sessionExercise._id)
           )
-          .filter((q) => q.eq(q.field("isWarmup"), false)) // Exclude warmups
+          .filter((q: any) => q.eq(q.field("isWarmup"), false)) // Exclude warmups
           .collect();
 
         const exerciseName = sessionExercise.exerciseName;
@@ -307,15 +307,15 @@ export const getTrainingContextForAI = query({
 
         const stats = exerciseStats.get(exerciseName)!;
         stats.sets.push(sets.length);
-        stats.weights.push(...sets.map((s) => s.weight));
-        stats.reps.push(...sets.map((s) => s.reps));
+        stats.weights.push(...sets.map((s: any) => s.weight));
+        stats.reps.push(...sets.map((s: any) => s.reps));
         stats.lastPerformed = Math.max(stats.lastPerformed, session.completedAt || 0);
       }
     }
 
     // Aggregate exercise statistics
     const recentExercises = Array.from(exerciseStats.values())
-      .map((stats) => ({
+      .map((stats: any) => ({
         name: stats.name,
         sets: Math.round(
           stats.sets.reduce((a, b) => a + b, 0) / stats.sets.length
