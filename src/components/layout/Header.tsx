@@ -8,6 +8,7 @@
 import { SessionData } from "@/lib/session";
 import { LogOut, User, Menu } from "lucide-react";
 import { useState } from "react";
+import { ThemeToggle } from "./ThemeToggle";
 
 interface HeaderProps {
   user: SessionData;
@@ -28,7 +29,7 @@ export function Header({ user, onOpenMobileMenu }: HeaderProps) {
         {/* Mobile menu button */}
         <button
           onClick={onOpenMobileMenu}
-          className="lg:hidden p-2 rounded-lg hover:bg-zinc-800 transition-colors"
+          className="lg:hidden p-2 rounded-lg hover:bg-zinc-800 dark:hover:bg-zinc-800 hover:bg-gray-200 transition-colors"
         >
           <Menu className="w-6 h-6" />
         </button>
@@ -38,8 +39,12 @@ export function Header({ user, onOpenMobileMenu }: HeaderProps) {
         </h2>
       </div>
 
-      {/* User menu */}
-      <div className="relative">
+      {/* Theme toggle and User menu */}
+      <div className="flex items-center gap-2">
+        <ThemeToggle />
+        
+        {/* User menu */}
+        <div className="relative">
         <button
           onClick={() => setIsMenuOpen(!isMenuOpen)}
           className="flex items-center gap-3 px-2 lg:px-4 py-2 rounded-lg hover:bg-zinc-800 transition-colors"
@@ -74,6 +79,7 @@ export function Header({ user, onOpenMobileMenu }: HeaderProps) {
             </div>
           </div>
         )}
+        </div>
       </div>
     </header>
   );
