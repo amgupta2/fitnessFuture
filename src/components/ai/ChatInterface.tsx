@@ -143,6 +143,12 @@ export default function ChatInterface({ userId }: ChatInterfaceProps) {
       timestamp: Date.now(),
     };
 
+    // Capture history BEFORE adding current message — last 4 non-welcome messages
+    const conversationHistory = messages
+      .filter((m) => m.id !== "welcome")
+      .slice(-4)
+      .map((m) => ({ role: m.role as "user" | "assistant", content: m.content }));
+
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
     setIsLoading(true);
@@ -175,8 +181,8 @@ export default function ChatInterface({ userId }: ChatInterfaceProps) {
       // strength levels, exercise history, and current programming details.
       const requestBody =
         intentType === "question"
-          ? { question: userMessage.content, trainingContext }
-          : { userPrompt: userMessage.content, userContext: trainingContext };
+          ? { question: userMessage.content, trainingContext, conversationHistory }
+          : { userPrompt: userMessage.content, userContext: trainingContext, conversationHistory };
 
       const response = await fetch(endpoint, {
         method: "POST",
