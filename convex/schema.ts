@@ -33,6 +33,59 @@ export default defineSchema({
       v.literal("advanced")
     ),
 
+    // Fitness goals
+    primaryGoal: v.optional(v.union(
+      v.literal("strength"),
+      v.literal("hypertrophy"),
+      v.literal("endurance"),
+      v.literal("weight_loss"),
+      v.literal("general_fitness"),
+      v.literal("sport_performance")
+    )),
+
+    // Muscle focus from body diagram
+    targetMuscleGroups: v.optional(v.array(v.string())),
+
+    // Available equipment (multi-select)
+    availableEquipment: v.optional(v.array(v.union(
+      v.literal("barbell"),
+      v.literal("dumbbell"),
+      v.literal("machine"),
+      v.literal("cable"),
+      v.literal("bodyweight"),
+      v.literal("bands"),
+      v.literal("kettlebell"),
+      v.literal("other")
+    ))),
+
+    // Schedule
+    trainingDaysPerWeek: v.optional(v.number()),
+    sessionDurationMinutes: v.optional(v.number()),
+
+    // Physical profile
+    age: v.optional(v.number()),
+    bodyWeight: v.optional(v.number()),
+
+    // Limitations
+    injuries: v.optional(v.array(v.string())),
+
+    // Lifestyle
+    sleepQuality: v.optional(v.union(
+      v.literal("poor"),
+      v.literal("average"),
+      v.literal("good")
+    )),
+    stressLevel: v.optional(v.union(
+      v.literal("low"),
+      v.literal("moderate"),
+      v.literal("high")
+    )),
+    occupationType: v.optional(v.union(
+      v.literal("sedentary"),
+      v.literal("lightly_active"),
+      v.literal("physically_demanding")
+    )),
+
     // User preferences
     preferences: v.object({
       weightUnit: v.union(v.literal("kg"), v.literal("lbs")),

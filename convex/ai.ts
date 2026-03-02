@@ -235,6 +235,17 @@ async function getBaseUserContext(ctx: any, userId: any) {
 
   return {
     experienceLevel: user.experienceLevel,
+    primaryGoal: user.primaryGoal,
+    targetMuscleGroups: user.targetMuscleGroups,
+    availableEquipment: user.availableEquipment,
+    trainingDaysPerWeek: user.trainingDaysPerWeek,
+    sessionDurationMinutes: user.sessionDurationMinutes,
+    age: user.age,
+    bodyWeight: user.bodyWeight,
+    injuries: user.injuries,
+    sleepQuality: user.sleepQuality,
+    stressLevel: user.stressLevel,
+    occupationType: user.occupationType,
     currentTemplates: templatesWithExercises,
     recentWorkouts: recentWorkouts.map((w: any) => ({
       templateName: w.templateName,

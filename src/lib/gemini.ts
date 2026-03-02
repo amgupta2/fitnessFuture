@@ -88,6 +88,17 @@ IMPORTANT:
  */
 export interface UserContext {
   experienceLevel: "beginner" | "intermediate" | "advanced";
+  primaryGoal?: string;
+  targetMuscleGroups?: string[];
+  availableEquipment?: string[];
+  trainingDaysPerWeek?: number;
+  sessionDurationMinutes?: number;
+  age?: number;
+  bodyWeight?: number;
+  injuries?: string[];
+  sleepQuality?: string;
+  stressLevel?: string;
+  occupationType?: string;
   currentTemplates?: Array<{
     name: string;
     exercises: string[];
@@ -224,6 +235,17 @@ function buildContextPrompt(userPrompt: string, context: UserContext): string {
 
   prompt += `USER CONTEXT:\n`;
   prompt += `- Experience Level: ${context.experienceLevel}\n`;
+  if (context.primaryGoal) prompt += `- Primary Goal: ${context.primaryGoal}\n`;
+  if (context.targetMuscleGroups?.length) prompt += `- Priority Muscles: ${context.targetMuscleGroups.join(", ")}\n`;
+  if (context.availableEquipment?.length) prompt += `- Available Equipment: ${context.availableEquipment.join(", ")}\n`;
+  if (context.trainingDaysPerWeek) prompt += `- Training Days/Week: ${context.trainingDaysPerWeek}\n`;
+  if (context.sessionDurationMinutes) prompt += `- Session Duration: ${context.sessionDurationMinutes} minutes\n`;
+  if (context.age) prompt += `- Age: ${context.age}\n`;
+  if (context.bodyWeight) prompt += `- Body Weight: ${context.bodyWeight}\n`;
+  if (context.injuries?.length) prompt += `- Injuries/Limitations: ${context.injuries.join(", ")} — AVOID exercises that aggravate these\n`;
+  if (context.sleepQuality) prompt += `- Sleep Quality: ${context.sleepQuality}\n`;
+  if (context.stressLevel) prompt += `- Stress Level: ${context.stressLevel}\n`;
+  if (context.occupationType) prompt += `- Occupation: ${context.occupationType}\n`;
 
   if (context.currentTemplates && context.currentTemplates.length > 0) {
     prompt += `- Current Templates:\n`;
@@ -444,7 +466,13 @@ export async function generateTrainingAdvice(
 
     // Build context-aware prompt
     let contextInfo = `User Experience Level: ${trainingContext.experienceLevel}\n`;
-    
+    if (trainingContext.primaryGoal) contextInfo += `Primary Goal: ${trainingContext.primaryGoal}\n`;
+    if (trainingContext.availableEquipment?.length) contextInfo += `Available Equipment: ${trainingContext.availableEquipment.join(", ")}\n`;
+    if (trainingContext.injuries?.length) contextInfo += `Injuries/Limitations: ${trainingContext.injuries.join(", ")} — avoid aggravating these\n`;
+    if (trainingContext.targetMuscleGroups?.length) contextInfo += `Priority Muscles: ${trainingContext.targetMuscleGroups.join(", ")}\n`;
+    if (trainingContext.sleepQuality) contextInfo += `Sleep Quality: ${trainingContext.sleepQuality}\n`;
+    if (trainingContext.stressLevel) contextInfo += `Stress Level: ${trainingContext.stressLevel}\n`;
+
     if (trainingContext.currentTemplates && trainingContext.currentTemplates.length > 0) {
       contextInfo += `\nCurrent Program:\n`;
       trainingContext.currentTemplates.forEach(t => {
@@ -500,7 +528,13 @@ export async function* generateTrainingAdviceStream(
 
     // Build context-aware prompt (same as non-streaming)
     let contextInfo = `User Experience Level: ${trainingContext.experienceLevel}\n`;
-    
+    if (trainingContext.primaryGoal) contextInfo += `Primary Goal: ${trainingContext.primaryGoal}\n`;
+    if (trainingContext.availableEquipment?.length) contextInfo += `Available Equipment: ${trainingContext.availableEquipment.join(", ")}\n`;
+    if (trainingContext.injuries?.length) contextInfo += `Injuries/Limitations: ${trainingContext.injuries.join(", ")} — avoid aggravating these\n`;
+    if (trainingContext.targetMuscleGroups?.length) contextInfo += `Priority Muscles: ${trainingContext.targetMuscleGroups.join(", ")}\n`;
+    if (trainingContext.sleepQuality) contextInfo += `Sleep Quality: ${trainingContext.sleepQuality}\n`;
+    if (trainingContext.stressLevel) contextInfo += `Stress Level: ${trainingContext.stressLevel}\n`;
+
     if (trainingContext.currentTemplates && trainingContext.currentTemplates.length > 0) {
       contextInfo += `\nCurrent Program:\n`;
       trainingContext.currentTemplates.forEach(t => {

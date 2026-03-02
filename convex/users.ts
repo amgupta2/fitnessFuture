@@ -105,6 +105,45 @@ export const updateUserProfile = mutation({
         darkMode: v.boolean(),
       })
     ),
+    primaryGoal: v.optional(v.union(
+      v.literal("strength"),
+      v.literal("hypertrophy"),
+      v.literal("endurance"),
+      v.literal("weight_loss"),
+      v.literal("general_fitness"),
+      v.literal("sport_performance")
+    )),
+    targetMuscleGroups: v.optional(v.array(v.string())),
+    availableEquipment: v.optional(v.array(v.union(
+      v.literal("barbell"),
+      v.literal("dumbbell"),
+      v.literal("machine"),
+      v.literal("cable"),
+      v.literal("bodyweight"),
+      v.literal("bands"),
+      v.literal("kettlebell"),
+      v.literal("other")
+    ))),
+    trainingDaysPerWeek: v.optional(v.number()),
+    sessionDurationMinutes: v.optional(v.number()),
+    age: v.optional(v.number()),
+    bodyWeight: v.optional(v.number()),
+    injuries: v.optional(v.array(v.string())),
+    sleepQuality: v.optional(v.union(
+      v.literal("poor"),
+      v.literal("average"),
+      v.literal("good")
+    )),
+    stressLevel: v.optional(v.union(
+      v.literal("low"),
+      v.literal("moderate"),
+      v.literal("high")
+    )),
+    occupationType: v.optional(v.union(
+      v.literal("sedentary"),
+      v.literal("lightly_active"),
+      v.literal("physically_demanding")
+    )),
   },
   handler: async (ctx, args) => {
     const { userId, ...updates } = args;
@@ -120,7 +159,7 @@ export const updateUserProfile = mutation({
 
 /**
  * Complete user onboarding
- * Sets experience level and preferences
+ * Sets experience level, preferences, and new profile fields
  */
 export const completeOnboarding = mutation({
   args: {
@@ -131,6 +170,46 @@ export const completeOnboarding = mutation({
       v.literal("advanced")
     ),
     weightUnit: v.union(v.literal("kg"), v.literal("lbs")),
+    name: v.optional(v.string()),
+    primaryGoal: v.optional(v.union(
+      v.literal("strength"),
+      v.literal("hypertrophy"),
+      v.literal("endurance"),
+      v.literal("weight_loss"),
+      v.literal("general_fitness"),
+      v.literal("sport_performance")
+    )),
+    targetMuscleGroups: v.optional(v.array(v.string())),
+    availableEquipment: v.optional(v.array(v.union(
+      v.literal("barbell"),
+      v.literal("dumbbell"),
+      v.literal("machine"),
+      v.literal("cable"),
+      v.literal("bodyweight"),
+      v.literal("bands"),
+      v.literal("kettlebell"),
+      v.literal("other")
+    ))),
+    trainingDaysPerWeek: v.optional(v.number()),
+    sessionDurationMinutes: v.optional(v.number()),
+    age: v.optional(v.number()),
+    bodyWeight: v.optional(v.number()),
+    injuries: v.optional(v.array(v.string())),
+    sleepQuality: v.optional(v.union(
+      v.literal("poor"),
+      v.literal("average"),
+      v.literal("good")
+    )),
+    stressLevel: v.optional(v.union(
+      v.literal("low"),
+      v.literal("moderate"),
+      v.literal("high")
+    )),
+    occupationType: v.optional(v.union(
+      v.literal("sedentary"),
+      v.literal("lightly_active"),
+      v.literal("physically_demanding")
+    )),
   },
   handler: async (ctx, args) => {
     const user = await ctx.db
@@ -142,11 +221,13 @@ export const completeOnboarding = mutation({
       throw new Error("User not found");
     }
 
+    const { workosId, weightUnit, ...rest } = args;
+
     await ctx.db.patch(user._id, {
-      experienceLevel: args.experienceLevel,
+      ...rest,
       preferences: {
         ...user.preferences,
-        weightUnit: args.weightUnit,
+        weightUnit,
       },
       updatedAt: Date.now(),
     });
