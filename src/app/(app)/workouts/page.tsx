@@ -508,7 +508,7 @@ export default function WorkoutsPage() {
         </div>
 
         {/* Add Exercise Button */}
-        <div className="fixed bottom-6 right-6">
+        <div className="fixed bottom-20 right-6 lg:bottom-6">
           <button
             onClick={() => setShowAddExercise(true)}
             className="clip-corner-bottom bg-lime-400 text-black px-8 py-4 athletic-title text-xl hover:bg-lime-300 active:scale-95 transition-transform shadow-2xl"
@@ -1193,7 +1193,7 @@ export default function WorkoutsPage() {
       
       {/* Toast Notification */}
       {toast && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[80] animate-slide-in">
+        <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-[80] lg:bottom-6 animate-slide-in">
           <div className={`clip-corner px-6 py-4 athletic-body ${
             toast.type === "success" ? "bg-lime-400 text-black" : "bg-red-500 text-white"
           }`}>

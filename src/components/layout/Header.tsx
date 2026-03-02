@@ -8,7 +8,6 @@
 import { SessionData } from "@/lib/session";
 import { LogOut, User, Menu } from "lucide-react";
 import { useState } from "react";
-import { ThemeToggle } from "./ThemeToggle";
 
 interface HeaderProps {
   user: SessionData;
@@ -39,10 +38,8 @@ export function Header({ user, onOpenMobileMenu }: HeaderProps) {
         </h2>
       </div>
 
-      {/* Theme toggle and User menu */}
+      {/* User menu */}
       <div className="flex items-center gap-2">
-        <ThemeToggle />
-        
         {/* User menu */}
         <div className="relative">
         <button
