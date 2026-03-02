@@ -29,7 +29,7 @@ export function Header({ user, onOpenMobileMenu }: HeaderProps) {
         {/* Mobile menu button */}
         <button
           onClick={onOpenMobileMenu}
-          className="lg:hidden p-2 rounded-lg hover:bg-zinc-800 dark:hover:bg-zinc-800 hover:bg-gray-200 transition-colors"
+          className="lg:hidden p-2 rounded-lg hover:bg-zinc-800 transition-colors"
         >
           <Menu className="w-6 h-6" />
         </button>

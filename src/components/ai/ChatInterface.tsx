@@ -488,7 +488,7 @@ export default function ChatInterface({ userId }: ChatInterfaceProps) {
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-12rem)] max-w-4xl mx-auto">
+    <div className="flex flex-col max-w-4xl mx-auto" style={{ height: "calc(100dvh - 12rem)" }}>
       {/* Debug Toggle */}
       <div className="mb-2 flex justify-end">
         <button
@@ -648,7 +648,7 @@ export default function ChatInterface({ userId }: ChatInterfaceProps) {
         {messages.length === 1 && (
           <div className="mt-3 space-y-2">
             <p className="text-xs text-zinc-500">Program Generation:</p>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-2 max-w-full">
               <button
                 type="button"
                 onClick={() =>
@@ -656,7 +656,7 @@ export default function ChatInterface({ userId }: ChatInterfaceProps) {
                     "Create a 4-day Push/Pull/Legs split for intermediate lifter focusing on hypertrophy"
                   )
                 }
-                className="text-sm bg-zinc-800 text-zinc-300 px-3 py-1.5 rounded-full hover:bg-zinc-700 transition-colors"
+                className="text-sm bg-zinc-800 text-zinc-300 px-3 py-1.5 rounded-full hover:bg-zinc-700 transition-colors shrink-0"
               >
                 💪 4-day PPL split
               </button>
@@ -667,7 +667,7 @@ export default function ChatInterface({ userId }: ChatInterfaceProps) {
                     "I'm a beginner, create a 3-day full body program for strength"
                   )
                 }
-                className="text-sm bg-zinc-800 text-zinc-300 px-3 py-1.5 rounded-full hover:bg-zinc-700 transition-colors"
+                className="text-sm bg-zinc-800 text-zinc-300 px-3 py-1.5 rounded-full hover:bg-zinc-700 transition-colors shrink-0"
               >
                 🏋️ Beginner full-body
               </button>
@@ -678,32 +678,32 @@ export default function ChatInterface({ userId }: ChatInterfaceProps) {
                     "Design a 5-day bodybuilding split for advanced lifter"
                   )
                 }
-                className="text-sm bg-zinc-800 text-zinc-300 px-3 py-1.5 rounded-full hover:bg-zinc-700 transition-colors"
+                className="text-sm bg-zinc-800 text-zinc-300 px-3 py-1.5 rounded-full hover:bg-zinc-700 transition-colors shrink-0"
               >
                 🔥 Advanced bodybuilding
               </button>
             </div>
-            
+
             <p className="text-xs text-zinc-500 mt-3">Training Questions:</p>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-2 max-w-full">
               <button
                 type="button"
                 onClick={() => setInput("How do I improve my squat depth?")}
-                className="text-sm bg-zinc-800 text-zinc-300 px-3 py-1.5 rounded-full hover:bg-zinc-700 transition-colors"
+                className="text-sm bg-zinc-800 text-zinc-300 px-3 py-1.5 rounded-full hover:bg-zinc-700 transition-colors shrink-0"
               >
                 🤔 Improve squat depth
               </button>
               <button
                 type="button"
                 onClick={() => setInput("Why is my bench press stalling?")}
-                className="text-sm bg-zinc-800 text-zinc-300 px-3 py-1.5 rounded-full hover:bg-zinc-700 transition-colors"
+                className="text-sm bg-zinc-800 text-zinc-300 px-3 py-1.5 rounded-full hover:bg-zinc-700 transition-colors shrink-0"
               >
                 📊 Diagnose plateau
               </button>
               <button
                 type="button"
                 onClick={() => setInput("What muscles does deadlift target?")}
-                className="text-sm bg-zinc-800 text-zinc-300 px-3 py-1.5 rounded-full hover:bg-zinc-700 transition-colors"
+                className="text-sm bg-zinc-800 text-zinc-300 px-3 py-1.5 rounded-full hover:bg-zinc-700 transition-colors shrink-0"
               >
                 💪 Muscle breakdown
               </button>

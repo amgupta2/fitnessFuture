@@ -147,7 +147,10 @@ export default function WorkoutActivePage() {
   const targetSets = currentExercise?.targetSets || 3;
 
   return (
-    <div className="min-h-screen bg-black text-white pb-32">
+    <div
+      className="min-h-screen bg-black text-white"
+      style={{ paddingBottom: "calc(260px + env(safe-area-inset-bottom, 0px))" }}
+    >
       <style jsx global>{`
         @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Roboto+Condensed:wght@400;700&display=swap');
 
@@ -204,9 +207,15 @@ export default function WorkoutActivePage() {
         }
 
         .mega-input {
-          font-size: 48px;
+          font-size: 40px;
           text-align: center;
           -moz-appearance: textfield;
+        }
+
+        @media (min-width: 640px) {
+          .mega-input {
+            font-size: 48px;
+          }
         }
 
         .mega-input::-webkit-inner-spin-button,
@@ -372,7 +381,10 @@ export default function WorkoutActivePage() {
       )}
 
       {/* Header */}
-      <div className={`border-b-2 border-lime-400 bg-zinc-950 sticky top-0 z-30 ${isResting ? 'mt-24' : ''}`}>
+      <div
+        className="border-b-2 border-lime-400 bg-zinc-950 sticky top-0 z-30"
+        style={isResting ? { marginTop: "calc(6rem + env(safe-area-inset-top, 0px))" } : undefined}
+      >
         <div className="p-4">
           <div className="flex items-center justify-between mb-2">
             <h1 className="athletic-title text-xl">{activeSession.templateName}</h1>
@@ -388,7 +400,7 @@ export default function WorkoutActivePage() {
               <button
                 key={exercise._id}
                 onClick={() => setCurrentExerciseId(exercise._id)}
-                className={`athletic-body text-sm px-4 py-2 whitespace-nowrap transition-colors ${
+                className={`athletic-body text-sm px-4 py-3 whitespace-nowrap transition-colors min-h-[44px] ${
                   currentExerciseId === exercise._id
                     ? 'bg-lime-400 text-black'
                     : 'bg-zinc-900 text-zinc-400'
@@ -465,7 +477,10 @@ export default function WorkoutActivePage() {
           )}
 
           {/* Input Area */}
-          <div className="fixed bottom-0 left-0 right-0 bg-black border-t-2 border-lime-400 p-6">
+          <div
+            className="fixed bottom-0 left-0 right-0 bg-black border-t-2 border-lime-400 px-6 pt-4"
+            style={{ paddingBottom: "calc(1.5rem + env(safe-area-inset-bottom, 0px))" }}
+          >
             {/* Warmup Toggle */}
             <button
               onClick={() => setIsWarmup(!isWarmup)}

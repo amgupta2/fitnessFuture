@@ -1,6 +1,6 @@
 /**
  * App sidebar navigation
- * Main navigation menu
+ * Desktop: persistent sidebar. Mobile: slide-in drawer overlay.
  */
 
 "use client";
@@ -45,43 +45,42 @@ const navigation = [
 ];
 
 interface SidebarProps {
-  isMobileMenuOpen?: boolean;
-  onCloseMobileMenu?: () => void;
+  isMobileMenuOpen: boolean;
+  onCloseMobileMenu: () => void;
+}
+
+function NavLinks({ onLinkClick }: { onLinkClick?: () => void }) {
+  const pathname = usePathname();
+  return (
+    <>
+      {navigation.map((item) => {
+        const isActive = pathname === item.href;
+        const Icon = item.icon;
+        return (
+          <Link
+            key={item.name}
+            href={item.href}
+            onClick={onLinkClick}
+            className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors min-h-[48px] ${
+              isActive
+                ? "bg-white text-black font-semibold"
+                : "text-zinc-400 hover:text-white hover:bg-zinc-800"
+            }`}
+          >
+            <Icon className="w-5 h-5 shrink-0" />
+            <span>{item.name}</span>
+          </Link>
+        );
+      })}
+    </>
+  );
 }
 
 export function Sidebar({ isMobileMenuOpen, onCloseMobileMenu }: SidebarProps) {
-  const pathname = usePathname();
-
   return (
     <>
-      {/* Mobile overlay */}
-      {isMobileMenuOpen && (
-        <div
-          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
-          onClick={onCloseMobileMenu}
-        />
-      )}
-
-      {/* Sidebar */}
-      <div
-        className={`
-          fixed lg:static inset-y-0 left-0 z-50
-          w-64 bg-zinc-900 border-r border-zinc-800 flex flex-col
-          transform transition-transform duration-300 ease-in-out
-          lg:translate-x-0
-          ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"}
-        `}
-      >
-        {/* Mobile close button */}
-        <div className="lg:hidden absolute top-4 right-4">
-          <button
-            onClick={onCloseMobileMenu}
-            className="p-2 rounded-lg hover:bg-zinc-800 transition-colors"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
-
+      {/* Desktop Sidebar — always visible on lg+ */}
+      <div className="hidden lg:flex w-64 bg-zinc-900 border-r border-zinc-800 flex-col shrink-0">
         {/* Logo */}
         <div className="p-6 border-b border-zinc-800">
           <h1 className="text-xl font-bold">Next-Gen Fitness</h1>
@@ -89,26 +88,7 @@ export function Sidebar({ isMobileMenuOpen, onCloseMobileMenu }: SidebarProps) {
 
         {/* Navigation */}
         <nav className="flex-1 p-4 space-y-1">
-          {navigation.map((item) => {
-            const isActive = pathname === item.href;
-            const Icon = item.icon;
-
-            return (
-              <Link
-                key={item.name}
-                href={item.href}
-                onClick={onCloseMobileMenu}
-                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
-                  isActive
-                    ? "bg-white text-black font-semibold"
-                    : "text-zinc-400 hover:text-white hover:bg-zinc-800"
-                }`}
-              >
-                <Icon className="w-5 h-5" />
-                <span>{item.name}</span>
-              </Link>
-            );
-          })}
+          <NavLinks />
         </nav>
 
         {/* Footer */}
@@ -118,6 +98,48 @@ export function Sidebar({ isMobileMenuOpen, onCloseMobileMenu }: SidebarProps) {
           </p>
         </div>
       </div>
+
+      {/* Mobile Drawer Overlay — visible when isMobileMenuOpen */}
+      {isMobileMenuOpen && (
+        <div className="fixed inset-0 z-50 lg:hidden">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            onClick={onCloseMobileMenu}
+            aria-hidden="true"
+          />
+
+          {/* Drawer panel */}
+          <div className="absolute left-0 top-0 h-full w-72 bg-zinc-900 border-r border-zinc-800 flex flex-col shadow-2xl">
+            {/* Header with close button */}
+            <div className="flex items-center justify-between p-6 border-b border-zinc-800">
+              <h1 className="text-xl font-bold">Next-Gen Fitness</h1>
+              <button
+                onClick={onCloseMobileMenu}
+                className="p-2 rounded-lg hover:bg-zinc-800 transition-colors"
+                aria-label="Close menu"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Navigation */}
+            <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
+              <NavLinks onLinkClick={onCloseMobileMenu} />
+            </nav>
+
+            {/* Footer with safe area */}
+            <div
+              className="p-4 border-t border-zinc-800"
+              style={{ paddingBottom: "calc(1rem + env(safe-area-inset-bottom, 0px))" }}
+            >
+              <p className="text-xs text-zinc-600">
+                Where training data, intelligence, and coaching merge
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

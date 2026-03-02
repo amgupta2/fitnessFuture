@@ -1,14 +1,17 @@
 /**
  * Protected app layout
  * Sidebar navigation + main content area
+ * On mobile: bottom nav bar replaces sidebar
+ * On workout-active: full-screen, no nav
  */
 
 "use client";
 
 import { useEffect, useState } from "react";
-import { redirect, usePathname } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { Header } from "@/components/layout/Header";
+import { BottomNav } from "@/components/layout/BottomNav";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 
 export default function AppLayout({
@@ -45,27 +48,37 @@ export default function AppLayout({
     );
   }
 
+  // Workout active page is full-screen — hide all navigation chrome
+  const isWorkoutActive = pathname === "/workout-active";
+
   return (
     <div className="flex h-screen bg-black text-white">
-      {/* Sidebar */}
-      <Sidebar
-        isMobileMenuOpen={isMobileMenuOpen}
-        onCloseMobileMenu={() => setIsMobileMenuOpen(false)}
-      />
-
-      {/* Main content */}
-      <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Header */}
-        <Header
-          user={{ workosId: user._id, name: user.name || undefined, email: user.email, accessToken: "" }}
-          onOpenMobileMenu={() => setIsMobileMenuOpen(true)}
+      {/* Sidebar — desktop always-visible + mobile drawer */}
+      {!isWorkoutActive && (
+        <Sidebar
+          isMobileMenuOpen={isMobileMenuOpen}
+          onCloseMobileMenu={() => setIsMobileMenuOpen(false)}
         />
+      )}
 
-        {/* Page content */}
-        <main className="flex-1 overflow-y-auto bg-zinc-950">
+      {/* Main content column */}
+      <div className="flex-1 flex flex-col overflow-hidden min-w-0">
+        {/* Header — hidden on workout-active (has its own header) */}
+        {!isWorkoutActive && (
+          <Header
+            user={{ workosId: user._id, name: user.name || undefined, email: user.email, accessToken: "" }}
+            onOpenMobileMenu={() => setIsMobileMenuOpen(true)}
+          />
+        )}
+
+        {/* Page content — pb-16 on mobile clears the bottom nav bar */}
+        <main className={`flex-1 overflow-y-auto bg-zinc-950 ${!isWorkoutActive ? "pb-16 lg:pb-0" : ""}`}>
           {children}
         </main>
       </div>
+
+      {/* Bottom Navigation — mobile only, not on workout-active */}
+      {!isWorkoutActive && <BottomNav />}
     </div>
   );
 }
