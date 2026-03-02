@@ -188,14 +188,15 @@ export const getUserContextForAI = query({
 });
 
 /**
- * Helper function to get base user context
+ * Build the single unified rich context used by ALL AI modes.
+ * Includes: full user profile, programming details (sets/reps/rest),
+ * exercise performance history, estimated 1RMs from PRs, and volume metrics.
  */
 async function getBaseUserContext(ctx: any, userId: any) {
-  // Get user
   const user = await ctx.db.get(userId);
   if (!user) return null;
 
-  // Get current templates
+  // ── Current templates with full exercise parameters ──────────────────────
   const templates = await ctx.db
     .query("workoutTemplates")
     .withIndex("by_user_active", (q: any) =>
@@ -203,7 +204,6 @@ async function getBaseUserContext(ctx: any, userId: any) {
     )
     .take(10);
 
-  // Get exercises for each template
   const templatesWithExercises = await Promise.all(
     templates.map(async (template: any) => {
       const exercises = await ctx.db
@@ -215,14 +215,21 @@ async function getBaseUserContext(ctx: any, userId: any) {
 
       return {
         name: template.name,
-        exercises: exercises.map((e: any) => e.exerciseName),
+        exercises: exercises.map((e: any) => ({
+          name: e.exerciseName,
+          sets: e.targetSets,
+          repsMin: e.targetRepsMin,
+          repsMax: e.targetRepsMax,
+          rest: e.restSeconds,
+          notes: e.notes,
+        })),
       };
     })
   );
 
-  // Get recent workouts (last 30 days)
+  // ── Recent sessions (single query used for all downstream aggregations) ───
   const thirtyDaysAgo = Date.now() - 30 * 24 * 60 * 60 * 1000;
-  const recentWorkouts = await ctx.db
+  const recentSessions = await ctx.db
     .query("workoutSessions")
     .withIndex("by_user_completed", (q: any) => q.eq("userId", userId))
     .filter((q: any) =>
@@ -233,7 +240,85 @@ async function getBaseUserContext(ctx: any, userId: any) {
     )
     .collect();
 
+  // ── Aggregate per-exercise stats from the session log ────────────────────
+  const exerciseStats = new Map<string, {
+    sets: number[];
+    weights: number[];
+    reps: number[];
+    lastPerformed: number;
+  }>();
+
+  for (const session of recentSessions) {
+    const sessionExercises = await ctx.db
+      .query("sessionExercises")
+      .withIndex("by_session_order", (q: any) => q.eq("sessionId", session._id))
+      .collect();
+
+    for (const se of sessionExercises) {
+      const sets = await ctx.db
+        .query("sets")
+        .withIndex("by_session_exercise", (q: any) =>
+          q.eq("sessionExerciseId", se._id)
+        )
+        .filter((q: any) => q.eq(q.field("isWarmup"), false))
+        .collect();
+
+      if (sets.length === 0) continue;
+
+      const name = se.exerciseName;
+      if (!exerciseStats.has(name)) {
+        exerciseStats.set(name, {
+          sets: [],
+          weights: [],
+          reps: [],
+          lastPerformed: session.completedAt || 0,
+        });
+      }
+      const stat = exerciseStats.get(name)!;
+      stat.sets.push(sets.length);
+      stat.weights.push(...sets.map((s: any) => s.weight));
+      stat.reps.push(...sets.map((s: any) => s.reps));
+      stat.lastPerformed = Math.max(stat.lastPerformed, session.completedAt || 0);
+    }
+  }
+
+  const recentExercises = Array.from(exerciseStats.entries())
+    .map(([name, stat]) => ({
+      name,
+      sets: Math.round(stat.sets.reduce((a, b) => a + b, 0) / stat.sets.length),
+      avgWeight: Math.round(stat.weights.reduce((a, b) => a + b, 0) / stat.weights.length),
+      avgReps: Math.round(stat.reps.reduce((a, b) => a + b, 0) / stat.reps.length),
+      lastPerformed: stat.lastPerformed,
+    }))
+    .sort((a, b) => b.lastPerformed - a.lastPerformed)
+    .slice(0, 10);
+
+  const totalVolume = recentSessions.reduce(
+    (sum: number, s: any) => sum + (s.totalVolume || 0),
+    0
+  );
+  const trainingFrequency = Math.round((recentSessions.length / 4) * 10) / 10;
+
+  // ── Personal Records — current estimated 1RMs ─────────────────────────────
+  const currentPRs = await ctx.db
+    .query("personalRecords")
+    .withIndex("by_user_current", (q: any) =>
+      q.eq("userId", userId).eq("isCurrent", true)
+    )
+    .filter((q: any) => q.eq(q.field("recordType"), "estimated_1rm"))
+    .collect();
+
+  const personalRecords = currentPRs
+    .sort((a: any, b: any) => b.achievedAt - a.achievedAt)
+    .slice(0, 10)
+    .map((pr: any) => ({
+      exerciseName: pr.exerciseName,
+      estimated1RM: Math.round(pr.value),
+    }));
+
   return {
+    // Profile
+    weightUnit: user.preferences.weightUnit as "kg" | "lbs",
     experienceLevel: user.experienceLevel,
     primaryGoal: user.primaryGoal,
     targetMuscleGroups: user.targetMuscleGroups,
@@ -246,116 +331,31 @@ async function getBaseUserContext(ctx: any, userId: any) {
     sleepQuality: user.sleepQuality,
     stressLevel: user.stressLevel,
     occupationType: user.occupationType,
+    // Programming
     currentTemplates: templatesWithExercises,
-    recentWorkouts: recentWorkouts.map((w: any) => ({
+    // History summary
+    recentWorkouts: recentSessions.map((w: any) => ({
       templateName: w.templateName,
       completedAt: w.completedAt || 0,
     })),
+    // Performance analytics
+    recentExercises,
+    totalVolume: Math.round(totalVolume),
+    trainingFrequency,
+    // Strength levels
+    personalRecords,
   };
 }
 
 /**
- * Get enhanced training context for AI trainer mode
- * Includes workout history, recent performance, and exercise statistics
+ * Get full training context for AI trainer mode.
+ * Now delegates entirely to getBaseUserContext which includes all analytics.
  */
 export const getTrainingContextForAI = query({
   args: {
     userId: v.id("users"),
   },
   handler: async (ctx, args) => {
-    // Get base context using helper
-    const baseContext = await getBaseUserContext(ctx, args.userId);
-    if (!baseContext) return null;
-
-    // Get recent completed sessions (last 30 days)
-    const thirtyDaysAgo = Date.now() - 30 * 24 * 60 * 60 * 1000;
-    const recentSessions = await ctx.db
-      .query("workoutSessions")
-      .withIndex("by_user_completed", (q) => q.eq("userId", args.userId))
-      .filter((q) =>
-        q.and(
-          q.neq(q.field("completedAt"), undefined),
-          q.gte(q.field("completedAt"), thirtyDaysAgo)
-        )
-      )
-      .collect();
-
-    // Get exercise-level statistics
-    const exerciseStats = new Map<string, {
-      name: string;
-      sets: number[];
-      weights: number[];
-      reps: number[];
-      lastPerformed: number;
-    }>();
-
-    for (const session of recentSessions) {
-      const sessionExercises = await ctx.db
-        .query("sessionExercises")
-        .withIndex("by_session_order", (q: any) => q.eq("sessionId", session._id))
-        .collect();
-
-      for (const sessionExercise of sessionExercises) {
-        const sets = await ctx.db
-          .query("sets")
-          .withIndex("by_session_exercise", (q: any) =>
-            q.eq("sessionExerciseId", sessionExercise._id)
-          )
-          .filter((q: any) => q.eq(q.field("isWarmup"), false)) // Exclude warmups
-          .collect();
-
-        const exerciseName = sessionExercise.exerciseName;
-        
-        if (!exerciseStats.has(exerciseName)) {
-          exerciseStats.set(exerciseName, {
-            name: exerciseName,
-            sets: [],
-            weights: [],
-            reps: [],
-            lastPerformed: session.completedAt || 0,
-          });
-        }
-
-        const stats = exerciseStats.get(exerciseName)!;
-        stats.sets.push(sets.length);
-        stats.weights.push(...sets.map((s: any) => s.weight));
-        stats.reps.push(...sets.map((s: any) => s.reps));
-        stats.lastPerformed = Math.max(stats.lastPerformed, session.completedAt || 0);
-      }
-    }
-
-    // Aggregate exercise statistics
-    const recentExercises = Array.from(exerciseStats.values())
-      .map((stats: any) => ({
-        name: stats.name,
-        sets: Math.round(
-          stats.sets.reduce((a: number, b: number) => a + b, 0) / stats.sets.length
-        ),
-        avgWeight: Math.round(
-          stats.weights.reduce((a: number, b: number) => a + b, 0) / stats.weights.length
-        ),
-        avgReps: Math.round(
-          stats.reps.reduce((a: number, b: number) => a + b, 0) / stats.reps.length
-        ),
-        lastPerformed: stats.lastPerformed,
-      }))
-      .sort((a: any, b: any) => b.lastPerformed - a.lastPerformed) // Most recent first
-      .slice(0, 10); // Top 10 exercises
-
-    // Calculate total volume
-    const totalVolume = recentSessions.reduce(
-      (sum: number, session: any) => sum + (session.totalVolume || 0),
-      0
-    );
-
-    // Calculate training frequency
-    const trainingFrequency = recentSessions.length / 4; // Sessions per week (over 4 weeks)
-
-    return {
-      ...baseContext,
-      recentExercises,
-      totalVolume,
-      trainingFrequency: Math.round(trainingFrequency * 10) / 10, // 1 decimal place
-    };
+    return await getBaseUserContext(ctx, args.userId);
   },
 });

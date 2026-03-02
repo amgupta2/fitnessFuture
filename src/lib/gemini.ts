@@ -84,10 +84,14 @@ IMPORTANT:
 - Include progression notes where helpful`;
 
 /**
- * User context for personalization
+ * Unified user context — used by BOTH programmer and trainer modes.
+ * All fields are optional except experienceLevel so the functions degrade
+ * gracefully when called without a full profile (e.g. new users).
  */
 export interface UserContext {
+  // ── Core profile ──────────────────────────────────────────────────────────
   experienceLevel: "beginner" | "intermediate" | "advanced";
+  weightUnit?: "kg" | "lbs";
   primaryGoal?: string;
   targetMuscleGroups?: string[];
   availableEquipment?: string[];
@@ -99,15 +103,46 @@ export interface UserContext {
   sleepQuality?: string;
   stressLevel?: string;
   occupationType?: string;
+
+  // ── Current programming (with full parameters) ───────────────────────────
   currentTemplates?: Array<{
     name: string;
-    exercises: string[];
+    exercises: Array<{
+      name: string;
+      sets?: number;
+      repsMin?: number;
+      repsMax?: number;
+      rest?: number;
+      notes?: string;
+    }>;
   }>;
   recentWorkouts?: Array<{
     templateName: string;
     completedAt: number;
   }>;
+
+  // ── Performance analytics (last 30 days) ─────────────────────────────────
+  recentExercises?: Array<{
+    name: string;
+    sets: number;
+    avgWeight: number;
+    avgReps: number;
+    lastPerformed: number;
+  }>;
+  totalVolume?: number;
+  trainingFrequency?: number;
+
+  // ── Strength levels ───────────────────────────────────────────────────────
+  personalRecords?: Array<{
+    exerciseName: string;
+    estimated1RM: number;
+  }>;
 }
+
+/**
+ * TrainingContext is identical to UserContext — kept as alias for backwards compat.
+ */
+export type TrainingContext = UserContext;
 
 /**
  * AI response format
@@ -228,40 +263,98 @@ export async function generateWorkoutProgram(
 }
 
 /**
- * Build context-aware prompt with user data
+ * Build the shared athlete profile block used in both programmer and trainer prompts.
+ * Includes all profile fields, strength levels, exercise history, and current programming.
  */
-function buildContextPrompt(userPrompt: string, context: UserContext): string {
-  let prompt = `${WORKOUT_PROGRAMMER_SYSTEM_PROMPT}\n\n`;
+function buildAthleteProfile(context: UserContext): string {
+  const unit = context.weightUnit ?? "lbs";
+  let p = "";
 
-  prompt += `USER CONTEXT:\n`;
-  prompt += `- Experience Level: ${context.experienceLevel}\n`;
-  if (context.primaryGoal) prompt += `- Primary Goal: ${context.primaryGoal}\n`;
-  if (context.targetMuscleGroups?.length) prompt += `- Priority Muscles: ${context.targetMuscleGroups.join(", ")}\n`;
-  if (context.availableEquipment?.length) prompt += `- Available Equipment: ${context.availableEquipment.join(", ")}\n`;
-  if (context.trainingDaysPerWeek) prompt += `- Training Days/Week: ${context.trainingDaysPerWeek}\n`;
-  if (context.sessionDurationMinutes) prompt += `- Session Duration: ${context.sessionDurationMinutes} minutes\n`;
-  if (context.age) prompt += `- Age: ${context.age}\n`;
-  if (context.bodyWeight) prompt += `- Body Weight: ${context.bodyWeight}\n`;
-  if (context.injuries?.length) prompt += `- Injuries/Limitations: ${context.injuries.join(", ")} — AVOID exercises that aggravate these\n`;
-  if (context.sleepQuality) prompt += `- Sleep Quality: ${context.sleepQuality}\n`;
-  if (context.stressLevel) prompt += `- Stress Level: ${context.stressLevel}\n`;
-  if (context.occupationType) prompt += `- Occupation: ${context.occupationType}\n`;
+  // ── Profile ──────────────────────────────────────────────────────────────
+  p += `=== ATHLETE PROFILE ===\n`;
+  p += `Experience: ${context.experienceLevel}\n`;
+  p += `Weight unit: ${unit} — use ${unit} for ALL weight suggestions\n`;
+  if (context.primaryGoal) p += `Primary goal: ${context.primaryGoal}\n`;
+  if (context.trainingDaysPerWeek) p += `Availability: ${context.trainingDaysPerWeek} days/week\n`;
+  if (context.sessionDurationMinutes) p += `Session length: ${context.sessionDurationMinutes} min\n`;
+  if (context.availableEquipment?.length)
+    p += `Equipment: ${context.availableEquipment.join(", ")}\n`;
+  if (context.targetMuscleGroups?.length)
+    p += `Priority muscles: ${context.targetMuscleGroups.join(", ")}\n`;
+  if (context.injuries?.length)
+    p += `⚠️ Injuries/limitations: ${context.injuries.join(", ")} — NEVER prescribe exercises that directly load these structures\n`;
+  if (context.age || context.bodyWeight) {
+    const parts: string[] = [];
+    if (context.age) parts.push(`age ${context.age}`);
+    if (context.bodyWeight) parts.push(`bodyweight ${context.bodyWeight} ${unit}`);
+    p += `Physical: ${parts.join(", ")}\n`;
+  }
+  if (context.sleepQuality || context.stressLevel || context.occupationType) {
+    const parts: string[] = [];
+    if (context.sleepQuality) parts.push(`sleep ${context.sleepQuality}`);
+    if (context.stressLevel) parts.push(`stress ${context.stressLevel}`);
+    if (context.occupationType) parts.push(`occupation ${context.occupationType}`);
+    p += `Lifestyle: ${parts.join(" | ")}\n`;
+  }
 
-  if (context.currentTemplates && context.currentTemplates.length > 0) {
-    prompt += `- Current Templates:\n`;
-    context.currentTemplates.forEach(t => {
-      prompt += `  * ${t.name}: ${t.exercises.join(", ")}\n`;
+  // ── Strength levels (from PRs) ────────────────────────────────────────────
+  if (context.personalRecords && context.personalRecords.length > 0) {
+    p += `\n=== CURRENT STRENGTH LEVELS (estimated 1RM) ===\n`;
+    context.personalRecords.forEach(pr => {
+      p += `- ${pr.exerciseName}: ${pr.estimated1RM} ${unit}\n`;
     });
   }
 
-  if (context.recentWorkouts && context.recentWorkouts.length > 0) {
-    prompt += `- Recent Activity: ${context.recentWorkouts.length} workouts in last 30 days\n`;
+  // ── Recent performance ────────────────────────────────────────────────────
+  if (context.recentExercises && context.recentExercises.length > 0) {
+    p += `\n=== RECENT PERFORMANCE (last 30 days, working sets only) ===\n`;
+    context.recentExercises.forEach(e => {
+      p += `- ${e.name}: ${e.sets} sets × ${e.avgReps} reps @ ${e.avgWeight} ${unit}\n`;
+    });
+  }
+  if (context.trainingFrequency) {
+    p += `Training frequency: ${context.trainingFrequency} sessions/week\n`;
+  }
+  if (context.totalVolume) {
+    p += `Monthly volume: ~${Math.round(context.totalVolume / 1000)}K ${unit}\n`;
   }
 
-  prompt += `\nUSER REQUEST:\n${userPrompt}\n\n`;
-  prompt += `RESPONSE (JSON only, no markdown):`;
+  // ── Current program ───────────────────────────────────────────────────────
+  if (context.currentTemplates && context.currentTemplates.length > 0) {
+    p += `\n=== CURRENT PROGRAM (build on or replace as needed — do not duplicate) ===\n`;
+    context.currentTemplates.forEach(t => {
+      p += `${t.name}:\n`;
+      t.exercises.forEach(e => {
+        const reps =
+          e.repsMin && e.repsMax
+            ? `${e.repsMin}-${e.repsMax}`
+            : e.repsMin ?? e.repsMax ?? "?";
+        const rest = e.rest ? ` | ${e.rest}s rest` : "";
+        const notes = e.notes ? ` [${e.notes}]` : "";
+        p += `  • ${e.name}: ${e.sets ?? "?"} × ${reps} reps${rest}${notes}\n`;
+      });
+    });
+  } else if (context.recentWorkouts && context.recentWorkouts.length > 0) {
+    p += `\nRecent sessions: ${context.recentWorkouts.length} workouts in last 30 days\n`;
+  }
 
-  return prompt;
+  return p;
+}
+
+/**
+ * Build context-aware prompt for workout program generation.
+ */
+function buildContextPrompt(userPrompt: string, context: UserContext): string {
+  return [
+    WORKOUT_PROGRAMMER_SYSTEM_PROMPT,
+    "",
+    buildAthleteProfile(context),
+    "",
+    `=== USER REQUEST ===`,
+    userPrompt,
+    "",
+    `RESPONSE (JSON only, no markdown):`,
+  ].join("\n");
 }
 
 /**
@@ -433,20 +526,7 @@ Target muscles: [Primary muscles] (primary), [Secondary muscles] (secondary)
 
 For visual demos, search YouTube for: '[specific search term]' or '[channel name]'"`;
 
-/**
- * Enhanced user context for training advice
- */
-export interface TrainingContext extends UserContext {
-  recentExercises?: Array<{
-    name: string;
-    sets: number;
-    avgWeight: number;
-    avgReps: number;
-    lastPerformed: number;
-  }>;
-  totalVolume?: number;
-  trainingFrequency?: number;
-}
+// TrainingContext is defined above as: export type TrainingContext = UserContext
 
 /**
  * Generate training advice (for follow-up questions)
@@ -464,42 +544,7 @@ export async function generateTrainingAdvice(
       },
     });
 
-    // Build context-aware prompt
-    let contextInfo = `User Experience Level: ${trainingContext.experienceLevel}\n`;
-    if (trainingContext.primaryGoal) contextInfo += `Primary Goal: ${trainingContext.primaryGoal}\n`;
-    if (trainingContext.availableEquipment?.length) contextInfo += `Available Equipment: ${trainingContext.availableEquipment.join(", ")}\n`;
-    if (trainingContext.injuries?.length) contextInfo += `Injuries/Limitations: ${trainingContext.injuries.join(", ")} — avoid aggravating these\n`;
-    if (trainingContext.targetMuscleGroups?.length) contextInfo += `Priority Muscles: ${trainingContext.targetMuscleGroups.join(", ")}\n`;
-    if (trainingContext.sleepQuality) contextInfo += `Sleep Quality: ${trainingContext.sleepQuality}\n`;
-    if (trainingContext.stressLevel) contextInfo += `Stress Level: ${trainingContext.stressLevel}\n`;
-
-    if (trainingContext.currentTemplates && trainingContext.currentTemplates.length > 0) {
-      contextInfo += `\nCurrent Program:\n`;
-      trainingContext.currentTemplates.forEach(t => {
-        contextInfo += `- ${t.name}: ${t.exercises.join(", ")}\n`;
-      });
-    }
-
-    if (trainingContext.recentExercises && trainingContext.recentExercises.length > 0) {
-      contextInfo += `\nRecent Performance:\n`;
-      trainingContext.recentExercises.slice(0, 5).forEach(e => {
-        contextInfo += `- ${e.name}: ${e.sets} sets × ${e.avgReps} reps @ ${e.avgWeight}lbs\n`;
-      });
-    }
-
-    if (trainingContext.trainingFrequency) {
-      contextInfo += `\nTraining Frequency: ${trainingContext.trainingFrequency} sessions/week\n`;
-    }
-
-    const prompt = `${TRAINING_COACH_SYSTEM_PROMPT}
-
-USER CONTEXT:
-${contextInfo}
-
-USER QUESTION:
-${question}
-
-RESPONSE:`;
+    const prompt = `${TRAINING_COACH_SYSTEM_PROMPT}\n\n${buildAthleteProfile(trainingContext)}\n\n=== ATHLETE'S QUESTION ===\n${question}\n\nRESPONSE:`;
 
     const result = await model.generateContent(prompt);
     const response = await result.response;
@@ -526,42 +571,7 @@ export async function* generateTrainingAdviceStream(
       },
     });
 
-    // Build context-aware prompt (same as non-streaming)
-    let contextInfo = `User Experience Level: ${trainingContext.experienceLevel}\n`;
-    if (trainingContext.primaryGoal) contextInfo += `Primary Goal: ${trainingContext.primaryGoal}\n`;
-    if (trainingContext.availableEquipment?.length) contextInfo += `Available Equipment: ${trainingContext.availableEquipment.join(", ")}\n`;
-    if (trainingContext.injuries?.length) contextInfo += `Injuries/Limitations: ${trainingContext.injuries.join(", ")} — avoid aggravating these\n`;
-    if (trainingContext.targetMuscleGroups?.length) contextInfo += `Priority Muscles: ${trainingContext.targetMuscleGroups.join(", ")}\n`;
-    if (trainingContext.sleepQuality) contextInfo += `Sleep Quality: ${trainingContext.sleepQuality}\n`;
-    if (trainingContext.stressLevel) contextInfo += `Stress Level: ${trainingContext.stressLevel}\n`;
-
-    if (trainingContext.currentTemplates && trainingContext.currentTemplates.length > 0) {
-      contextInfo += `\nCurrent Program:\n`;
-      trainingContext.currentTemplates.forEach(t => {
-        contextInfo += `- ${t.name}: ${t.exercises.join(", ")}\n`;
-      });
-    }
-
-    if (trainingContext.recentExercises && trainingContext.recentExercises.length > 0) {
-      contextInfo += `\nRecent Performance:\n`;
-      trainingContext.recentExercises.slice(0, 5).forEach(e => {
-        contextInfo += `- ${e.name}: ${e.sets} sets × ${e.avgReps} reps @ ${e.avgWeight}lbs\n`;
-      });
-    }
-
-    if (trainingContext.trainingFrequency) {
-      contextInfo += `\nTraining Frequency: ${trainingContext.trainingFrequency} sessions/week\n`;
-    }
-
-    const prompt = `${TRAINING_COACH_SYSTEM_PROMPT}
-
-USER CONTEXT:
-${contextInfo}
-
-USER QUESTION:
-${question}
-
-RESPONSE:`;
+    const prompt = `${TRAINING_COACH_SYSTEM_PROMPT}\n\n${buildAthleteProfile(trainingContext)}\n\n=== ATHLETE'S QUESTION ===\n${question}\n\nRESPONSE:`;
 
     const result = await model.generateContentStream(prompt);
     

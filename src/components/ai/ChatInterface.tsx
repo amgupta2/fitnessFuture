@@ -41,8 +41,8 @@ export default function ChatInterface({ userId }: ChatInterfaceProps) {
   const [showRawStream, setShowRawStream] = useState(false); // Debug mode
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Convex queries and mutations
-  const userContext = useQuery(api.ai.getUserContextForAI, { userId });
+  // Single unified rich context used by both programmer and trainer modes.
+  // getUserContextForAI is no longer needed — getTrainingContextForAI returns the full profile.
   const trainingContext = useQuery(api.ai.getTrainingContextForAI, { userId });
   const saveInteraction = useMutation(api.ai.saveInteraction);
   const createTemplates = useMutation(api.ai.createTemplatesFromAI);
@@ -134,7 +134,7 @@ export default function ChatInterface({ userId }: ChatInterfaceProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!input.trim() || isLoading || !userContext || !trainingContext) return;
+    if (!input.trim() || isLoading || !trainingContext) return;
 
     const userMessage: Message = {
       id: `user-${Date.now()}`,
@@ -171,10 +171,12 @@ export default function ChatInterface({ userId }: ChatInterfaceProps) {
           ? "/api/ai/advice-stream"
           : "/api/ai/generate-stream";
       
+      // Both modes now use the same rich trainingContext — programmer gets
+      // strength levels, exercise history, and current programming details.
       const requestBody =
         intentType === "question"
           ? { question: userMessage.content, trainingContext }
-          : { userPrompt: userMessage.content, userContext };
+          : { userPrompt: userMessage.content, userContext: trainingContext };
 
       const response = await fetch(endpoint, {
         method: "POST",
@@ -300,7 +302,7 @@ export default function ChatInterface({ userId }: ChatInterfaceProps) {
                   prompt: userMessage.content,
                   response: finalContent,
                   contextData: {
-                    experienceLevel: userContext.experienceLevel,
+                    experienceLevel: trainingContext.experienceLevel,
                   },
                 });
               }
@@ -341,7 +343,7 @@ export default function ChatInterface({ userId }: ChatInterfaceProps) {
                     templateIds: templateIds.map(
                       (id) => id as Id<"workoutTemplates">
                     ),
-                    experienceLevel: userContext.experienceLevel,
+                    experienceLevel: trainingContext.experienceLevel,
                   },
                 });
                 }
@@ -403,7 +405,7 @@ export default function ChatInterface({ userId }: ChatInterfaceProps) {
               prompt: userMessage.content,
               response: finalContent,
               contextData: {
-                experienceLevel: userContext.experienceLevel,
+                experienceLevel: trainingContext.experienceLevel,
               },
             });
           }
@@ -444,7 +446,7 @@ export default function ChatInterface({ userId }: ChatInterfaceProps) {
                 templateIds: templateIds.map(
                   (id) => id as Id<"workoutTemplates">
                 ),
-                experienceLevel: userContext.experienceLevel,
+                experienceLevel: trainingContext.experienceLevel,
               },
             });
           }
@@ -632,12 +634,12 @@ export default function ChatInterface({ userId }: ChatInterfaceProps) {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Ask a question or describe your workout goals..."
-            disabled={isLoading || !userContext || !trainingContext}
+            disabled={isLoading || !trainingContext}
             className="flex-1 bg-zinc-800 text-white border border-zinc-700 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
           />
           <button
             type="submit"
-            disabled={!input.trim() || isLoading || !userContext || !trainingContext}
+            disabled={!input.trim() || isLoading || !trainingContext}
             className="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             {isLoading ? "..." : "Send"}
