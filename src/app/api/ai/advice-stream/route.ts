@@ -5,12 +5,15 @@
 
 import { NextRequest } from "next/server";
 import { generateTrainingAdviceStream } from "@/lib/gemini";
-import type { TrainingContext } from "@/lib/gemini";
+import type { TrainingContext, ConversationTurn } from "@/lib/gemini";
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { question, trainingContext } = body;
+    const { question, trainingContext, conversationHistory } = body;
+    const history: ConversationTurn[] = Array.isArray(conversationHistory)
+      ? conversationHistory.slice(0, 4) // enforce cap at route boundary
+      : [];
 
     // Validate inputs
     if (!question || typeof question !== "string") {
@@ -34,7 +37,8 @@ export async function POST(request: NextRequest) {
         try {
           const generator = generateTrainingAdviceStream(
             question,
-            trainingContext as TrainingContext
+            trainingContext as TrainingContext,
+            history
           );
 
           // Stream text chunks

@@ -363,6 +363,27 @@ export default defineSchema({
     .index("by_user_week", ["userId", "weekStartDate"]),
 
   // ============================================
+  // FORM ANALYSIS
+  // ============================================
+
+  /**
+   * FormAnalyses - AI video form-check results
+   * Stores the full analysis text and extracted metadata per video submission.
+   */
+  formAnalyses: defineTable({
+    userId: v.id("users"),
+    exerciseName: v.string(),
+    analysis: v.string(),
+    formScore: v.optional(v.number()),
+    issuesFound: v.optional(v.array(v.string())),
+    videoFileName: v.string(),
+    createdAt: v.number(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_user_exercise", ["userId", "exerciseName"])
+    .index("by_user_created", ["userId", "createdAt"]),
+
+  // ============================================
   // AI INTEGRATION
   // ============================================
 

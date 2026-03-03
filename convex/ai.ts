@@ -197,12 +197,13 @@ async function getBaseUserContext(ctx: any, userId: any) {
   if (!user) return null;
 
   // ── Current templates with full exercise parameters ──────────────────────
+  // Cap at 5 templates — keeps prompt under ~600 tokens for this section
   const templates = await ctx.db
     .query("workoutTemplates")
     .withIndex("by_user_active", (q: any) =>
       q.eq("userId", userId).eq("isActive", true)
     )
-    .take(10);
+    .take(5);
 
   const templatesWithExercises = await Promise.all(
     templates.map(async (template: any) => {
@@ -213,9 +214,10 @@ async function getBaseUserContext(ctx: any, userId: any) {
         )
         .collect();
 
+      // Cap at 6 exercises per template (~20 tokens each)
       return {
         name: template.name,
-        exercises: exercises.map((e: any) => ({
+        exercises: exercises.slice(0, 6).map((e: any) => ({
           name: e.exerciseName,
           sets: e.targetSets,
           repsMin: e.targetRepsMin,
@@ -291,7 +293,7 @@ async function getBaseUserContext(ctx: any, userId: any) {
       lastPerformed: stat.lastPerformed,
     }))
     .sort((a, b) => b.lastPerformed - a.lastPerformed)
-    .slice(0, 10);
+    .slice(0, 7); // cap at 7 — ~15 tokens each
 
   const totalVolume = recentSessions.reduce(
     (sum: number, s: any) => sum + (s.totalVolume || 0),
@@ -310,7 +312,7 @@ async function getBaseUserContext(ctx: any, userId: any) {
 
   const personalRecords = currentPRs
     .sort((a: any, b: any) => b.achievedAt - a.achievedAt)
-    .slice(0, 10)
+    .slice(0, 7) // cap at 7 — covers main compound lifts
     .map((pr: any) => ({
       exerciseName: pr.exerciseName,
       estimated1RM: Math.round(pr.value),

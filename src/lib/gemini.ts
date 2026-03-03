@@ -170,7 +170,8 @@ export interface WorkoutProgramResponse {
  */
 export async function* generateWorkoutProgramStream(
   userPrompt: string,
-  userContext: UserContext
+  userContext: UserContext,
+  history: ConversationTurn[] = []
 ): AsyncGenerator<string, WorkoutProgramResponse, undefined> {
   try {
     const model = genAI.getGenerativeModel({
@@ -184,7 +185,7 @@ export async function* generateWorkoutProgramStream(
     });
 
     // Build context-aware prompt
-    const contextPrompt = buildContextPrompt(userPrompt, userContext);
+    const contextPrompt = buildContextPrompt(userPrompt, userContext, history);
 
     const result = await model.generateContentStream(contextPrompt);
     
@@ -222,7 +223,8 @@ export async function* generateWorkoutProgramStream(
  */
 export async function generateWorkoutProgram(
   userPrompt: string,
-  userContext: UserContext
+  userContext: UserContext,
+  history: ConversationTurn[] = []
 ): Promise<WorkoutProgramResponse> {
   try {
     const model = genAI.getGenerativeModel({
@@ -236,7 +238,7 @@ export async function generateWorkoutProgram(
     });
 
     // Build context-aware prompt
-    const contextPrompt = buildContextPrompt(userPrompt, userContext);
+    const contextPrompt = buildContextPrompt(userPrompt, userContext, history);
 
     const result = await model.generateContent(contextPrompt);
     const response = await result.response;
@@ -260,6 +262,32 @@ export async function generateWorkoutProgram(
       ],
     };
   }
+}
+
+export interface ConversationTurn {
+  role: "user" | "assistant";
+  content: string;
+}
+
+/**
+ * Format recent conversation turns into a prompt block.
+ * Strips markdown/emoji noise from assistant messages so the model
+ * doesn't get confused by its own formatting artifacts.
+ */
+function buildHistoryBlock(history: ConversationTurn[]): string {
+  if (!history.length) return "";
+
+  const lines = history.map(turn => {
+    const label = turn.role === "user" ? "[USER]" : "[COACH]";
+    // Truncate very long assistant messages (template summaries etc.) to 300 chars
+    const content =
+      turn.role === "assistant" && turn.content.length > 300
+        ? turn.content.slice(0, 300) + "…"
+        : turn.content;
+    return `${label}: ${content}`;
+  });
+
+  return `=== CONVERSATION HISTORY (most recent first — use for continuity) ===\n${lines.join("\n")}\n`;
 }
 
 /**
@@ -344,17 +372,15 @@ function buildAthleteProfile(context: UserContext): string {
 /**
  * Build context-aware prompt for workout program generation.
  */
-function buildContextPrompt(userPrompt: string, context: UserContext): string {
-  return [
-    WORKOUT_PROGRAMMER_SYSTEM_PROMPT,
-    "",
-    buildAthleteProfile(context),
-    "",
-    `=== USER REQUEST ===`,
-    userPrompt,
-    "",
-    `RESPONSE (JSON only, no markdown):`,
-  ].join("\n");
+function buildContextPrompt(
+  userPrompt: string,
+  context: UserContext,
+  history: ConversationTurn[] = []
+): string {
+  const parts = [WORKOUT_PROGRAMMER_SYSTEM_PROMPT, "", buildAthleteProfile(context)];
+  if (history.length) parts.push("", buildHistoryBlock(history));
+  parts.push("", `=== USER REQUEST ===`, userPrompt, "", `RESPONSE (JSON only, no markdown):`);
+  return parts.join("\n");
 }
 
 /**
@@ -533,7 +559,8 @@ For visual demos, search YouTube for: '[specific search term]' or '[channel name
  */
 export async function generateTrainingAdvice(
   question: string,
-  trainingContext: TrainingContext
+  trainingContext: TrainingContext,
+  history: ConversationTurn[] = []
 ): Promise<string> {
   try {
     const model = genAI.getGenerativeModel({
@@ -544,7 +571,8 @@ export async function generateTrainingAdvice(
       },
     });
 
-    const prompt = `${TRAINING_COACH_SYSTEM_PROMPT}\n\n${buildAthleteProfile(trainingContext)}\n\n=== ATHLETE'S QUESTION ===\n${question}\n\nRESPONSE:`;
+    const historyBlock = history.length ? `\n\n${buildHistoryBlock(history)}` : "";
+    const prompt = `${TRAINING_COACH_SYSTEM_PROMPT}\n\n${buildAthleteProfile(trainingContext)}${historyBlock}\n\n=== ATHLETE'S QUESTION ===\n${question}\n\nRESPONSE:`;
 
     const result = await model.generateContent(prompt);
     const response = await result.response;
@@ -560,7 +588,8 @@ export async function generateTrainingAdvice(
  */
 export async function* generateTrainingAdviceStream(
   question: string,
-  trainingContext: TrainingContext
+  trainingContext: TrainingContext,
+  history: ConversationTurn[] = []
 ): AsyncGenerator<string, string, undefined> {
   try {
     const model = genAI.getGenerativeModel({
@@ -571,7 +600,8 @@ export async function* generateTrainingAdviceStream(
       },
     });
 
-    const prompt = `${TRAINING_COACH_SYSTEM_PROMPT}\n\n${buildAthleteProfile(trainingContext)}\n\n=== ATHLETE'S QUESTION ===\n${question}\n\nRESPONSE:`;
+    const historyBlock = history.length ? `\n\n${buildHistoryBlock(history)}` : "";
+    const prompt = `${TRAINING_COACH_SYSTEM_PROMPT}\n\n${buildAthleteProfile(trainingContext)}${historyBlock}\n\n=== ATHLETE'S QUESTION ===\n${question}\n\nRESPONSE:`;
 
     const result = await model.generateContentStream(prompt);
     
@@ -587,6 +617,275 @@ export async function* generateTrainingAdviceStream(
   } catch (error) {
     console.error("Gemini API error:", error);
     return "I encountered an error processing your question. Please try again.";
+  }
+}
+
+// ============================================================================
+// FORM CHECK — Video analysis via Gemini multimodal
+// ============================================================================
+
+export type SupportedFormCheckExercise =
+  | "barbell_back_squat"
+  | "barbell_bench_press"
+  | "conventional_deadlift"
+  | "barbell_row"
+  | "overhead_press";
+
+export const FORM_CHECK_EXERCISES: Record<
+  SupportedFormCheckExercise,
+  { label: string; prompt: string }
+> = {
+  barbell_back_squat: {
+    label: "Barbell Back Squat",
+    prompt: `EXERCISE: Barbell Back Squat
+
+Analyze the following form checkpoints and provide specific feedback:
+
+DESCENT PHASE:
+- Hip hinge initiation (hips break before knees?)
+- Depth (hip crease relative to knee — at or below parallel?)
+- Knee tracking (over toes, not caving inward?)
+- Spine angle (neutral? excessive forward lean?)
+
+BOTTOM POSITION:
+- Butt wink (posterior pelvic tilt at bottom?)
+- Weight distribution (mid-foot? heels rising?)
+- Thoracic extension maintained?
+
+ASCENT PHASE:
+- Drive pattern (hips and shoulders rise together, or hips shoot back?)
+- Knee cave on ascent?
+- Bar path (vertical over mid-foot?)
+- Lockout (full hip and knee extension?)
+
+GENERAL:
+- Bracing quality (visible valsalva / belt use?)
+- Tempo (controlled eccentric?)
+- Bar position (high bar vs low bar — is it stable on the shelf?)
+- Stance width and foot angle`,
+  },
+  barbell_bench_press: {
+    label: "Barbell Bench Press",
+    prompt: `EXERCISE: Barbell Bench Press
+
+Analyze the following form checkpoints and provide specific feedback:
+
+SETUP:
+- Back arch (slight natural arch, retracted scapulae?)
+- Foot placement (flat on floor, driving into ground?)
+- Grip width (forearms vertical at bottom?)
+- Shoulder blade retraction and depression?
+
+DESCENT (ECCENTRIC):
+- Bar path (slight diagonal from lockout to lower chest?)
+- Elbow tuck angle (~45-75 degrees, not flared at 90?)
+- Touch point (at or below nipple line?)
+- Tempo (controlled, not dropping the bar?)
+
+PRESS (CONCENTRIC):
+- Drive pattern (leg drive engagement?)
+- Bar path (slight J-curve back toward face?)
+- Lockout (elbows fully extended, not hyperextended?)
+- Butt stays on bench throughout?
+
+GENERAL:
+- Wrist alignment (straight, not bent back?)
+- Breathing pattern (inhale on descent, exhale on press?)
+- Spotter positioning if visible
+- Symmetry (bar level throughout, no side tilting?)`,
+  },
+  conventional_deadlift: {
+    label: "Conventional Deadlift",
+    prompt: `EXERCISE: Conventional Deadlift
+
+Analyze the following form checkpoints and provide specific feedback:
+
+SETUP:
+- Foot position (hip-width, mid-foot under bar?)
+- Hip hinge (hips higher than knees, lower than shoulders?)
+- Grip (just outside knees, arms straight?)
+- Spine position (neutral from cervical to lumbar?)
+- Shoulder position (over or slightly in front of bar?)
+
+PULL (CONCENTRIC):
+- Initiation (pushing floor away, not pulling with back?)
+- Bar path (vertical, staying close to body?)
+- Back angle (consistent until bar passes knees?)
+- Hip and knee extension timing (not stiff-legging it?)
+- Upper back rounding (minimal?)
+
+LOCKOUT:
+- Full hip extension (glutes squeezed?)
+- Shoulders back (not hyperextending lumbar?)
+- Knees fully locked?
+
+DESCENT (ECCENTRIC):
+- Hip hinge first (not squatting the bar down?)
+- Bar stays close to body?
+- Controlled descent?
+
+GENERAL:
+- Bracing and breathing (valsalva before each rep?)
+- Grip type (double overhand, mixed, hook — any issues?)
+- Shin position (not excessive forward travel?)`,
+  },
+  barbell_row: {
+    label: "Barbell Bent-Over Row",
+    prompt: `EXERCISE: Barbell Bent-Over Row
+
+Analyze the following form checkpoints and provide specific feedback:
+
+SETUP:
+- Hip hinge angle (torso roughly 30-45 degrees from horizontal?)
+- Knee bend (slight, for stability?)
+- Grip width and type (overhand vs underhand?)
+- Spine neutral throughout?
+
+PULL (CONCENTRIC):
+- Row path (pulling toward lower chest / upper abdomen?)
+- Elbow drive (behind the body, squeezing shoulder blades?)
+- Torso stability (no excessive "heaving" or momentum?)
+- Full range of motion (full scapular retraction at top?)
+
+LOWERING (ECCENTRIC):
+- Controlled descent (not dropping the weight?)
+- Full stretch at bottom (arms extended, scapulae protracted?)
+
+GENERAL:
+- Body English (excessive swinging or momentum?)
+- Head position (neutral, not cranking neck up?)
+- Lower back stress (any rounding under load?)
+- Breathing pattern`,
+  },
+  overhead_press: {
+    label: "Overhead Press (Barbell)",
+    prompt: `EXERCISE: Overhead Press (Barbell)
+
+Analyze the following form checkpoints and provide specific feedback:
+
+SETUP:
+- Rack position (bar resting on front deltoids / upper chest?)
+- Grip width (just outside shoulders?)
+- Elbow position (slightly in front of bar?)
+- Stance (hip-width, stable base?)
+
+PRESS (CONCENTRIC):
+- Bar path (straight vertical line, head moves back to clear?)
+- Head through (moving head forward once bar clears?)
+- Core bracing (no excessive lean-back?)
+- Full lockout overhead (bar over mid-foot, biceps by ears?)
+
+LOWERING (ECCENTRIC):
+- Controlled descent back to rack position?
+- Head clears the bar path?
+
+GENERAL:
+- Lower back position (no excessive arching / turning it into an incline press?)
+- Wrist alignment (straight, bar sits on heel of palm?)
+- Breathing pattern (breath before press, exhale at top?)
+- Rib flare (ribs staying down, core tight?)
+- Knee involvement (no push-press unless intentional?)`,
+  },
+};
+
+const FORM_CHECK_SYSTEM_PROMPT = `You are an elite biomechanics analyst and strength coach specializing in movement assessment. You are reviewing a video of an athlete performing a lift.
+
+YOUR TASK:
+Analyze the athlete's exercise form in the video against the provided checklist. Be specific, practical, and reference what you actually see in the video.
+
+OUTPUT FORMAT (use this exact structure in markdown):
+
+## Form Score: X/10
+
+### Summary
+[1-2 sentence overall assessment]
+
+### What You're Doing Well
+[Bullet list of 2-4 things the athlete is doing correctly]
+
+### Issues Found
+[For each issue:]
+- **[Issue name]** (Timestamp: ~Xs) — [Severity: NEEDS WORK or CRITICAL]
+  [Specific description of what you see vs what it should look like]
+  *Fix:* [1-2 sentence actionable correction]
+
+### Key Corrections (Priority Order)
+1. [Most important fix with specific cue]
+2. [Second most important fix]
+3. [Third if applicable]
+
+### Drill Recommendations
+[1-2 drills or accessory exercises to address the main issues]
+
+RULES:
+- Only comment on what is VISIBLE in the video. If the camera angle doesn't show something, say so instead of guessing.
+- Be encouraging but honest — safety-critical issues must be flagged clearly.
+- Reference approximate timestamps when pointing out specific moments.
+- Tailor advice to the athlete's apparent experience level based on load and movement quality.
+- Keep the total response concise (under 500 words).`;
+
+/**
+ * Analyze exercise form from a video using Gemini multimodal.
+ * Accepts base64 video data and streams the analysis back.
+ */
+export async function* analyzeExerciseFormStream(
+  base64Video: string,
+  mimeType: string,
+  exercise: SupportedFormCheckExercise,
+  userContext?: UserContext
+): AsyncGenerator<string, string, undefined> {
+  try {
+    const model = genAI.getGenerativeModel({
+      model: "gemini-3-flash-preview",
+      generationConfig: {
+        temperature: 0.4,
+        maxOutputTokens: 4096,
+      },
+    });
+
+    const exerciseInfo = FORM_CHECK_EXERCISES[exercise];
+    let prompt = `${FORM_CHECK_SYSTEM_PROMPT}\n\n${exerciseInfo.prompt}\n`;
+
+    if (userContext) {
+      const unit = userContext.weightUnit ?? "lbs";
+      prompt += `\nATHLETE CONTEXT:\n- Experience: ${userContext.experienceLevel}\n`;
+      if (userContext.injuries?.length) {
+        prompt += `- Known injuries: ${userContext.injuries.join(", ")}\n`;
+      }
+      if (userContext.personalRecords?.length) {
+        const relevant = userContext.personalRecords.find(
+          (pr) => pr.exerciseName.toLowerCase().includes(exerciseInfo.label.split(" ")[1]?.toLowerCase() ?? "")
+        );
+        if (relevant) {
+          prompt += `- Estimated 1RM for this lift: ${relevant.estimated1RM} ${unit}\n`;
+        }
+      }
+    }
+
+    prompt += `\nAnalyze the video now. Score each checkpoint as GOOD / NEEDS WORK / CRITICAL.`;
+
+    const result = await model.generateContentStream([
+      {
+        inlineData: {
+          data: base64Video,
+          mimeType,
+        },
+      },
+      { text: prompt },
+    ]);
+
+    let fullText = "";
+
+    for await (const chunk of result.stream) {
+      const chunkText = chunk.text();
+      fullText += chunkText;
+      yield chunkText;
+    }
+
+    return fullText;
+  } catch (error) {
+    console.error("Form check Gemini API error:", error);
+    return "I encountered an error analyzing the video. Please ensure the video is clear and try again.";
   }
 }
 

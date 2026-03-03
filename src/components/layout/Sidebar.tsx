@@ -12,6 +12,7 @@ import {
   Dumbbell,
   BarChart3,
   Brain,
+  ScanLine,
   Settings,
   X,
 } from "lucide-react";
@@ -36,6 +37,11 @@ const navigation = [
     name: "AI Coach",
     href: "/ai",
     icon: Brain,
+  },
+  {
+    name: "Form Check",
+    href: "/form-check",
+    icon: ScanLine,
   },
   {
     name: "Settings",

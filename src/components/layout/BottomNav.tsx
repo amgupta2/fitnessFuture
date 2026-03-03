@@ -13,15 +13,16 @@ import {
   Dumbbell,
   BarChart3,
   Brain,
+  ScanLine,
   Settings,
 } from "lucide-react";
 
 const navigation = [
-  { name: "Home",      href: "/dashboard",  icon: LayoutDashboard },
-  { name: "Workouts",  href: "/workouts",   icon: Dumbbell },
-  { name: "Analytics", href: "/analytics",  icon: BarChart3 },
-  { name: "AI",        href: "/ai",         icon: Brain },
-  { name: "Settings",  href: "/settings",   icon: Settings },
+  { name: "Home",      href: "/dashboard",   icon: LayoutDashboard },
+  { name: "Workouts",  href: "/workouts",    icon: Dumbbell },
+  { name: "Form",      href: "/form-check",  icon: ScanLine },
+  { name: "AI",        href: "/ai",          icon: Brain },
+  { name: "More",      href: "/settings",    icon: Settings },
 ];
 
 export function BottomNav() {

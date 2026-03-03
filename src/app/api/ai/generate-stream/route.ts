@@ -5,12 +5,15 @@
 
 import { NextRequest } from "next/server";
 import { generateWorkoutProgramStream } from "@/lib/gemini";
-import type { UserContext } from "@/lib/gemini";
+import type { UserContext, ConversationTurn } from "@/lib/gemini";
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { userPrompt, userContext } = body;
+    const { userPrompt, userContext, conversationHistory } = body;
+    const history: ConversationTurn[] = Array.isArray(conversationHistory)
+      ? conversationHistory.slice(0, 4) // enforce cap at route boundary
+      : [];
 
     // Validate inputs
     if (!userPrompt || typeof userPrompt !== "string") {
@@ -34,7 +37,8 @@ export async function POST(request: NextRequest) {
         try {
           const generator = generateWorkoutProgramStream(
             userPrompt,
-            userContext as UserContext
+            userContext as UserContext,
+            history
           );
 
           // Stream chunks

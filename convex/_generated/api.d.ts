@@ -11,6 +11,7 @@
 import type * as ai from "../ai.js";
 import type * as analytics from "../analytics.js";
 import type * as exercises from "../exercises.js";
+import type * as formAnalysis from "../formAnalysis.js";
 import type * as progression from "../progression.js";
 import type * as recovery from "../recovery.js";
 import type * as sessions from "../sessions.js";
@@ -28,6 +29,7 @@ declare const fullApi: ApiFromModules<{
   ai: typeof ai;
   analytics: typeof analytics;
   exercises: typeof exercises;
+  formAnalysis: typeof formAnalysis;
   progression: typeof progression;
   recovery: typeof recovery;
   sessions: typeof sessions;
