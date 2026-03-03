@@ -363,6 +363,62 @@ export default defineSchema({
     .index("by_user_week", ["userId", "weekStartDate"]),
 
   // ============================================
+  // NUTRITION TRACKING
+  // ============================================
+
+  /**
+   * NutritionTargets - Daily calorie and macro goals per user.
+   * Separate from `users` so target history is preserved.
+   */
+  nutritionTargets: defineTable({
+    userId: v.id("users"),
+    dailyCalories: v.number(),
+    proteinGrams: v.number(),
+    carbsGrams: v.number(),
+    fatGrams: v.number(),
+    method: v.union(v.literal("ai_suggested"), v.literal("manual")),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_user", ["userId"]),
+
+  /**
+   * MealLogs - Individual meal entries logged by the user.
+   * Each row is one meal (breakfast/lunch/dinner/snack) with itemised foods.
+   */
+  mealLogs: defineTable({
+    userId: v.id("users"),
+    date: v.string(),                                    // "YYYY-MM-DD"
+    mealType: v.union(
+      v.literal("breakfast"),
+      v.literal("lunch"),
+      v.literal("dinner"),
+      v.literal("snack")
+    ),
+    items: v.array(v.object({
+      name: v.string(),
+      quantity: v.optional(v.string()),
+      calories: v.number(),
+      proteinGrams: v.number(),
+      carbsGrams: v.number(),
+      fatGrams: v.number(),
+    })),
+    totalCalories: v.number(),
+    totalProtein: v.number(),
+    totalCarbs: v.number(),
+    totalFat: v.number(),
+    source: v.union(
+      v.literal("photo"),
+      v.literal("text"),
+      v.literal("manual")
+    ),
+    notes: v.optional(v.string()),
+    createdAt: v.number(),
+  })
+    .index("by_user_date", ["userId", "date"])
+    .index("by_user", ["userId"]),
+
+  // ============================================
   // FORM ANALYSIS
   // ============================================
 

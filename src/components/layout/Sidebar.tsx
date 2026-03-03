@@ -10,6 +10,7 @@ import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
   Dumbbell,
+  UtensilsCrossed,
   BarChart3,
   Brain,
   ScanLine,
@@ -27,6 +28,11 @@ const navigation = [
     name: "Workouts",
     href: "/workouts",
     icon: Dumbbell,
+  },
+  {
+    name: "Nutrition",
+    href: "/nutrition",
+    icon: UtensilsCrossed,
   },
   {
     name: "Analytics",

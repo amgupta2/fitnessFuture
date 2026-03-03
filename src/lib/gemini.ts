@@ -137,6 +137,17 @@ export interface UserContext {
     exerciseName: string;
     estimated1RM: number;
   }>;
+
+  // ── Nutrition (optional — present when user has set targets & logged meals)
+  todayNutrition?: {
+    calories: number;
+    protein: number;
+    carbs: number;
+    fat: number;
+    target: { calories: number; protein: number; carbs: number; fat: number };
+  };
+  weeklyNutritionAdherence?: number;
+  proteinPerKg?: number;
 }
 
 /**
@@ -364,6 +375,23 @@ function buildAthleteProfile(context: UserContext): string {
     });
   } else if (context.recentWorkouts && context.recentWorkouts.length > 0) {
     p += `\nRecent sessions: ${context.recentWorkouts.length} workouts in last 30 days\n`;
+  }
+
+  // ── Nutrition status ─────────────────────────────────────────────────────
+  if (context.todayNutrition) {
+    const n = context.todayNutrition;
+    const t = n.target;
+    p += `\n=== NUTRITION STATUS (today) ===\n`;
+    p += `Calories: ${n.calories} / ${t.calories} kcal\n`;
+    p += `Protein: ${n.protein}g / ${t.protein}g\n`;
+    p += `Carbs: ${n.carbs}g / ${t.carbs}g\n`;
+    p += `Fat: ${n.fat}g / ${t.fat}g\n`;
+    if (context.proteinPerKg) {
+      p += `Protein per kg bodyweight: ${context.proteinPerKg.toFixed(1)} g/kg\n`;
+    }
+    if (context.weeklyNutritionAdherence != null) {
+      p += `Weekly calorie adherence: ${Math.round(context.weeklyNutritionAdherence * 100)}%\n`;
+    }
   }
 
   return p;
@@ -617,6 +645,183 @@ export async function* generateTrainingAdviceStream(
   } catch (error) {
     console.error("Gemini API error:", error);
     return "I encountered an error processing your question. Please try again.";
+  }
+}
+
+// ============================================================================
+// NUTRITION — Food photo & text analysis via Gemini
+// ============================================================================
+
+export interface NutritionItem {
+  name: string;
+  quantity?: string;
+  calories: number;
+  proteinGrams: number;
+  carbsGrams: number;
+  fatGrams: number;
+}
+
+export interface NutritionAnalysisResult {
+  items: NutritionItem[];
+  totalCalories: number;
+  totalProtein: number;
+  totalCarbs: number;
+  totalFat: number;
+}
+
+const NUTRITION_ANALYSIS_PROMPT = `You are a sports nutrition expert. Analyze the food provided and return a JSON breakdown of every distinct food item with estimated macronutrients.
+
+RULES:
+- Estimate portion sizes from visual cues (plate size, hand comparison) or stated quantities.
+- Use USDA-level accuracy where possible; round to nearest whole number.
+- If a food item is ambiguous, pick the most common preparation.
+- Include sauces, dressings, oils, and beverages visible in the image or described.
+
+Return ONLY valid JSON (no markdown, no code fences):
+{
+  "items": [
+    {
+      "name": "Grilled Chicken Breast",
+      "quantity": "200g",
+      "calories": 330,
+      "proteinGrams": 62,
+      "carbsGrams": 0,
+      "fatGrams": 7
+    }
+  ],
+  "totalCalories": 330,
+  "totalProtein": 62,
+  "totalCarbs": 0,
+  "totalFat": 7
+}`;
+
+/**
+ * Analyze a food photo and return structured nutrition data.
+ */
+export async function analyzeNutritionFromPhoto(
+  base64Image: string,
+  mimeType: string
+): Promise<NutritionAnalysisResult> {
+  const model = genAI.getGenerativeModel({
+    model: "gemini-3-flash-preview",
+    generationConfig: { temperature: 0.3, maxOutputTokens: 2048 },
+  });
+
+  const result = await model.generateContent([
+    { inlineData: { data: base64Image, mimeType } },
+    { text: `${NUTRITION_ANALYSIS_PROMPT}\n\nAnalyze the food in this image.` },
+  ]);
+
+  const text = result.response.text();
+  return parseNutritionJSON(text);
+}
+
+/**
+ * Analyze a natural-language food description and return structured nutrition data.
+ */
+export async function analyzeNutritionFromText(
+  description: string
+): Promise<NutritionAnalysisResult> {
+  const model = genAI.getGenerativeModel({
+    model: "gemini-3-flash-preview",
+    generationConfig: { temperature: 0.3, maxOutputTokens: 2048 },
+  });
+
+  const result = await model.generateContent(
+    `${NUTRITION_ANALYSIS_PROMPT}\n\nFood description:\n${description}`
+  );
+
+  const text = result.response.text();
+  return parseNutritionJSON(text);
+}
+
+/**
+ * Suggest daily calorie and macro targets based on user profile.
+ */
+export async function suggestNutritionTargets(profile: {
+  bodyWeight?: number;
+  age?: number;
+  primaryGoal?: string;
+  experienceLevel: string;
+  trainingDaysPerWeek?: number;
+  weightUnit?: string;
+}): Promise<{
+  dailyCalories: number;
+  proteinGrams: number;
+  carbsGrams: number;
+  fatGrams: number;
+}> {
+  const model = genAI.getGenerativeModel({
+    model: "gemini-3-flash-preview",
+    generationConfig: { temperature: 0.2, maxOutputTokens: 512 },
+  });
+
+  const unit = profile.weightUnit ?? "lbs";
+  const prompt = `You are a sports dietitian. Given the athlete profile below, calculate recommended daily calorie and macronutrient targets.
+
+Profile:
+- Body weight: ${profile.bodyWeight ?? "unknown"} ${unit}
+- Age: ${profile.age ?? "unknown"}
+- Goal: ${profile.primaryGoal ?? "general fitness"}
+- Experience: ${profile.experienceLevel}
+- Training days/week: ${profile.trainingDaysPerWeek ?? 3}
+
+Use Mifflin-St Jeor for BMR (assume male if gender unknown), apply an activity multiplier (1.55 for moderate, 1.725 for active), then adjust:
+- Hypertrophy/strength: +200-300 kcal surplus, protein 1.6-2.2 g/kg
+- Weight loss: -400-500 kcal deficit, protein 2.0-2.4 g/kg to preserve muscle
+- General fitness: maintenance, protein 1.4-1.8 g/kg
+
+Return ONLY valid JSON:
+{ "dailyCalories": 2500, "proteinGrams": 180, "carbsGrams": 280, "fatGrams": 75 }`;
+
+  try {
+    const result = await model.generateContent(prompt);
+    const text = result.response.text();
+    const cleaned = text.replace(/```(?:json)?\n?/g, "").replace(/```$/g, "").trim();
+    const start = cleaned.indexOf("{");
+    const end = cleaned.lastIndexOf("}");
+    if (start !== -1 && end !== -1) {
+      return JSON.parse(cleaned.substring(start, end + 1));
+    }
+    throw new Error("No JSON found");
+  } catch {
+    // Sensible fallback based on a 175 lb / 80 kg active individual
+    return { dailyCalories: 2400, proteinGrams: 160, carbsGrams: 270, fatGrams: 75 };
+  }
+}
+
+function parseNutritionJSON(text: string): NutritionAnalysisResult {
+  try {
+    let cleaned = text.trim();
+    if (cleaned.startsWith("```")) {
+      cleaned = cleaned.replace(/^```(?:json)?\n?/, "").replace(/\n?```$/, "");
+    }
+    const start = cleaned.indexOf("{");
+    const end = cleaned.lastIndexOf("}");
+    if (start !== -1 && end !== -1) {
+      cleaned = cleaned.substring(start, end + 1);
+    }
+    const parsed = JSON.parse(cleaned);
+
+    const items: NutritionItem[] = (parsed.items || []).map((item: any) => ({
+      name: item.name || "Unknown food",
+      quantity: item.quantity,
+      calories: Math.round(Number(item.calories) || 0),
+      proteinGrams: Math.round(Number(item.proteinGrams) || 0),
+      carbsGrams: Math.round(Number(item.carbsGrams) || 0),
+      fatGrams: Math.round(Number(item.fatGrams) || 0),
+    }));
+
+    return {
+      items,
+      totalCalories: items.reduce((s, i) => s + i.calories, 0),
+      totalProtein: items.reduce((s, i) => s + i.proteinGrams, 0),
+      totalCarbs: items.reduce((s, i) => s + i.carbsGrams, 0),
+      totalFat: items.reduce((s, i) => s + i.fatGrams, 0),
+    };
+  } catch (error) {
+    console.error("Nutrition JSON parse error:", error, text);
+    return { items: [], totalCalories: 0, totalProtein: 0, totalCarbs: 0, totalFat: 0 };
   }
 }
 

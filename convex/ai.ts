@@ -318,6 +318,78 @@ async function getBaseUserContext(ctx: any, userId: any) {
       estimated1RM: Math.round(pr.value),
     }));
 
+  // ── Nutrition context ──────────────────────────────────────────────────────
+  const nutritionTargetsRow = await ctx.db
+    .query("nutritionTargets")
+    .withIndex("by_user", (q: any) => q.eq("userId", userId))
+    .first();
+
+  let todayNutrition: any = undefined;
+  let weeklyNutritionAdherence: number | undefined = undefined;
+  let proteinPerKg: number | undefined = undefined;
+
+  if (nutritionTargetsRow) {
+    const todayStr = new Date().toISOString().slice(0, 10);
+    const todayMeals = await ctx.db
+      .query("mealLogs")
+      .withIndex("by_user_date", (q: any) =>
+        q.eq("userId", userId).eq("date", todayStr)
+      )
+      .collect();
+
+    const todayCals = todayMeals.reduce((s: number, m: any) => s + m.totalCalories, 0);
+    const todayP = todayMeals.reduce((s: number, m: any) => s + m.totalProtein, 0);
+    const todayC = todayMeals.reduce((s: number, m: any) => s + m.totalCarbs, 0);
+    const todayF = todayMeals.reduce((s: number, m: any) => s + m.totalFat, 0);
+
+    todayNutrition = {
+      calories: todayCals,
+      protein: todayP,
+      carbs: todayC,
+      fat: todayF,
+      target: {
+        calories: nutritionTargetsRow.dailyCalories,
+        protein: nutritionTargetsRow.proteinGrams,
+        carbs: nutritionTargetsRow.carbsGrams,
+        fat: nutritionTargetsRow.fatGrams,
+      },
+    };
+
+    // Weekly adherence: count days in the last 7 where calories were within 10% of target
+    const today = new Date();
+    let daysOnTarget = 0;
+    let daysWithData = 0;
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(today);
+      d.setDate(d.getDate() - i);
+      const dateStr = d.toISOString().slice(0, 10);
+      const dayMeals = await ctx.db
+        .query("mealLogs")
+        .withIndex("by_user_date", (q: any) =>
+          q.eq("userId", userId).eq("date", dateStr)
+        )
+        .collect();
+      if (dayMeals.length > 0) {
+        daysWithData++;
+        const dayCals = dayMeals.reduce((s: number, m: any) => s + m.totalCalories, 0);
+        if (Math.abs(dayCals - nutritionTargetsRow.dailyCalories) <= nutritionTargetsRow.dailyCalories * 0.1) {
+          daysOnTarget++;
+        }
+      }
+    }
+    weeklyNutritionAdherence = daysWithData > 0 ? daysOnTarget / daysWithData : undefined;
+
+    // Protein per kg
+    if (user.bodyWeight) {
+      const bwKg = user.preferences.weightUnit === "lbs"
+        ? user.bodyWeight * 0.4536
+        : user.bodyWeight;
+      if (bwKg > 0) {
+        proteinPerKg = Math.round((todayP / bwKg) * 10) / 10;
+      }
+    }
+  }
+
   return {
     // Profile
     weightUnit: user.preferences.weightUnit as "kg" | "lbs",
@@ -346,6 +418,10 @@ async function getBaseUserContext(ctx: any, userId: any) {
     trainingFrequency,
     // Strength levels
     personalRecords,
+    // Nutrition
+    todayNutrition,
+    weeklyNutritionAdherence,
+    proteinPerKg,
   };
 }
 
