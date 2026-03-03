@@ -4,6 +4,7 @@ import { useState, useRef } from "react";
 import {
   X,
   Camera,
+  ImageIcon,
   MessageSquare,
   PenLine,
   Loader2,
@@ -75,6 +76,7 @@ export function LogMealModal({
   const [manualF, setManualF] = useState("");
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
 
   if (!isOpen) return null;
 
@@ -114,7 +116,7 @@ export function LogMealModal({
 
       const data = await res.json();
       if (!data.items || data.items.length === 0) {
-        throw new Error("Could not identify any food items. Try a clearer photo.");
+        throw new Error("No food items detected. Try a well-lit photo with the food clearly visible.");
       }
       setItems(data.items);
       setStep("review");
@@ -143,7 +145,7 @@ export function LogMealModal({
 
       const data = await res.json();
       if (!data.items || data.items.length === 0) {
-        throw new Error("Could not parse any food items. Try being more specific.");
+        throw new Error("Could not parse food items. Try being more specific (e.g., '200g chicken breast, 1 cup rice').");
       }
       setItems(data.items);
       setStep("review");
@@ -263,32 +265,54 @@ export function LogMealModal({
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
           {step === "input" && tab === "photo" && (
             <>
-              <button
-                onClick={() => fileInputRef.current?.click()}
-                disabled={isAnalyzing}
-                className="w-full border-2 border-dashed border-zinc-700 hover:border-zinc-500 rounded-xl p-8 text-center transition-colors disabled:opacity-50"
-              >
-                {isAnalyzing ? (
+              {isAnalyzing ? (
+                <div className="w-full border-2 border-dashed border-zinc-700 rounded-xl p-8 text-center">
                   <div className="flex flex-col items-center gap-2">
                     <Loader2 className="w-8 h-8 animate-spin text-lime-400" />
                     <p className="text-sm text-zinc-400">Analyzing your meal...</p>
                   </div>
-                ) : (
-                  <div className="flex flex-col items-center gap-2">
-                    <Camera className="w-8 h-8 text-zinc-500" />
-                    <p className="text-sm text-zinc-300">Take a photo or upload</p>
-                    <p className="text-xs text-zinc-600">JPEG, PNG, WebP — max 10 MB</p>
-                  </div>
-                )}
-              </button>
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    onClick={() => cameraInputRef.current?.click()}
+                    className="flex flex-col items-center gap-2 border-2 border-dashed border-zinc-700 hover:border-lime-500/50 rounded-xl p-6 text-center transition-colors group"
+                  >
+                    <Camera className="w-7 h-7 text-zinc-500 group-hover:text-lime-400 transition-colors" />
+                    <p className="text-sm font-medium text-zinc-300">Take Photo</p>
+                    <p className="text-[10px] text-zinc-600">Open camera</p>
+                  </button>
+                  <button
+                    onClick={() => fileInputRef.current?.click()}
+                    className="flex flex-col items-center gap-2 border-2 border-dashed border-zinc-700 hover:border-lime-500/50 rounded-xl p-6 text-center transition-colors group"
+                  >
+                    <ImageIcon className="w-7 h-7 text-zinc-500 group-hover:text-lime-400 transition-colors" />
+                    <p className="text-sm font-medium text-zinc-300">Choose Photo</p>
+                    <p className="text-[10px] text-zinc-600">From camera roll</p>
+                  </button>
+                </div>
+              )}
+              <p className="text-xs text-zinc-600 text-center">JPEG, PNG, WebP — max 10 MB</p>
               <input
-                ref={fileInputRef}
+                ref={cameraInputRef}
                 type="file"
                 accept="image/jpeg,image/png,image/webp,image/heic"
                 capture="environment"
                 onChange={(e) => {
                   const file = e.target.files?.[0];
                   if (file) analyzePhoto(file);
+                  e.target.value = "";
+                }}
+                className="hidden"
+              />
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/webp,image/heic"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) analyzePhoto(file);
+                  e.target.value = "";
                 }}
                 className="hidden"
               />

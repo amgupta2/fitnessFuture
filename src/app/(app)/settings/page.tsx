@@ -63,6 +63,8 @@ export default function SettingsPage() {
   const [equipment, setEquipment] = useState<Equipment[]>([]);
   const [age, setAge] = useState<string>("");
   const [bodyWeight, setBodyWeight] = useState<string>("");
+  const [height, setHeight] = useState<string>("");
+  const [gender, setGender] = useState<"male" | "female" | "prefer_not_to_say" | null>(null);
   const [injuries, setInjuries] = useState<string[]>([]);
   const [injuryInput, setInjuryInput] = useState("");
   const [sleepQuality, setSleepQuality] = useState<SleepQuality | null>(null);
@@ -86,6 +88,8 @@ export default function SettingsPage() {
       if (user.availableEquipment) setEquipment(user.availableEquipment as Equipment[]);
       if (user.age) setAge(String(user.age));
       if (user.bodyWeight) setBodyWeight(String(user.bodyWeight));
+      if (user.height) setHeight(String(user.height));
+      if (user.gender) setGender(user.gender as "male" | "female" | "prefer_not_to_say");
       if (user.injuries) setInjuries(user.injuries);
       if (user.sleepQuality) setSleepQuality(user.sleepQuality as SleepQuality);
       if (user.stressLevel) setStressLevel(user.stressLevel as StressLevel);
@@ -134,6 +138,8 @@ export default function SettingsPage() {
         availableEquipment: equipment.length > 0 ? equipment : undefined,
         age: age ? parseInt(age, 10) : undefined,
         bodyWeight: bodyWeight ? parseFloat(bodyWeight) : undefined,
+        height: height ? parseFloat(height) : undefined,
+        gender: gender ?? undefined,
         injuries: injuries.length > 0 ? injuries : undefined,
         sleepQuality: sleepQuality ?? undefined,
         stressLevel: stressLevel ?? undefined,
@@ -353,34 +359,77 @@ export default function SettingsPage() {
 
           {/* ── Physical Profile ─────────────────────── */}
           <SectionCard icon={<User className="w-4 h-4 text-lime-400" />} title="Physical Profile">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-4">
               <div>
-                <label className="block text-xs text-zinc-500 athletic-body uppercase tracking-wider mb-2">
-                  Age
+                <label className="block text-xs text-zinc-500 athletic-body uppercase tracking-wider mb-3">
+                  Gender
                 </label>
-                <input
-                  type="number"
-                  min="13"
-                  max="100"
-                  value={age}
-                  onChange={(e) => setAge(e.target.value)}
-                  placeholder="e.g. 28"
-                  className="w-full bg-zinc-950 border border-zinc-700 px-3 py-3 text-white placeholder-zinc-600 focus:outline-none focus:border-lime-400 transition-colors text-sm"
-                />
+                <p className="text-[10px] text-zinc-600 -mt-2 mb-2">
+                  Used for accurate BMR &amp; nutrition calculations
+                </p>
+                <div className="grid grid-cols-3 gap-2">
+                  {([
+                    { value: "male" as const, label: "Male" },
+                    { value: "female" as const, label: "Female" },
+                    { value: "prefer_not_to_say" as const, label: "Prefer not to say" },
+                  ]).map((o) => (
+                    <button
+                      key={o.value}
+                      onClick={() => setGender(o.value)}
+                      className={`py-3 px-3 border-2 text-xs transition-all athletic-body text-center ${
+                        gender === o.value
+                          ? "border-lime-400 bg-lime-400/10 text-white"
+                          : "border-zinc-700 text-zinc-400 hover:border-zinc-600"
+                      }`}
+                    >
+                      {o.label}
+                    </button>
+                  ))}
+                </div>
               </div>
-              <div>
-                <label className="block text-xs text-zinc-500 athletic-body uppercase tracking-wider mb-2">
-                  Body Weight
-                </label>
-                <input
-                  type="number"
-                  min="30"
-                  max="400"
-                  value={bodyWeight}
-                  onChange={(e) => setBodyWeight(e.target.value)}
-                  placeholder="lbs / kg"
-                  className="w-full bg-zinc-950 border border-zinc-700 px-3 py-3 text-white placeholder-zinc-600 focus:outline-none focus:border-lime-400 transition-colors text-sm"
-                />
+              <div className="grid grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-xs text-zinc-500 athletic-body uppercase tracking-wider mb-2">
+                    Age
+                  </label>
+                  <input
+                    type="number"
+                    min="13"
+                    max="100"
+                    value={age}
+                    onChange={(e) => setAge(e.target.value)}
+                    placeholder="e.g. 28"
+                    className="w-full bg-zinc-950 border border-zinc-700 px-3 py-3 text-white placeholder-zinc-600 focus:outline-none focus:border-lime-400 transition-colors text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-zinc-500 athletic-body uppercase tracking-wider mb-2">
+                    Height (cm)
+                  </label>
+                  <input
+                    type="number"
+                    min="100"
+                    max="250"
+                    value={height}
+                    onChange={(e) => setHeight(e.target.value)}
+                    placeholder="e.g. 175"
+                    className="w-full bg-zinc-950 border border-zinc-700 px-3 py-3 text-white placeholder-zinc-600 focus:outline-none focus:border-lime-400 transition-colors text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-zinc-500 athletic-body uppercase tracking-wider mb-2">
+                    Body Weight
+                  </label>
+                  <input
+                    type="number"
+                    min="30"
+                    max="400"
+                    value={bodyWeight}
+                    onChange={(e) => setBodyWeight(e.target.value)}
+                    placeholder="lbs / kg"
+                    className="w-full bg-zinc-950 border border-zinc-700 px-3 py-3 text-white placeholder-zinc-600 focus:outline-none focus:border-lime-400 transition-colors text-sm"
+                  />
+                </div>
               </div>
             </div>
           </SectionCard>

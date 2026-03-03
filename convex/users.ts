@@ -128,6 +128,12 @@ export const updateUserProfile = mutation({
     sessionDurationMinutes: v.optional(v.number()),
     age: v.optional(v.number()),
     bodyWeight: v.optional(v.number()),
+    height: v.optional(v.number()),
+    gender: v.optional(v.union(
+      v.literal("male"),
+      v.literal("female"),
+      v.literal("prefer_not_to_say")
+    )),
     injuries: v.optional(v.array(v.string())),
     sleepQuality: v.optional(v.union(
       v.literal("poor"),
@@ -194,6 +200,12 @@ export const completeOnboarding = mutation({
     sessionDurationMinutes: v.optional(v.number()),
     age: v.optional(v.number()),
     bodyWeight: v.optional(v.number()),
+    height: v.optional(v.number()),
+    gender: v.optional(v.union(
+      v.literal("male"),
+      v.literal("female"),
+      v.literal("prefer_not_to_say")
+    )),
     injuries: v.optional(v.array(v.string())),
     sleepQuality: v.optional(v.union(
       v.literal("poor"),

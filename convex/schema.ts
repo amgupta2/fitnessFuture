@@ -65,6 +65,12 @@ export default defineSchema({
     // Physical profile
     age: v.optional(v.number()),
     bodyWeight: v.optional(v.number()),
+    height: v.optional(v.number()),  // in cm (stored canonical, converted for display)
+    gender: v.optional(v.union(
+      v.literal("male"),
+      v.literal("female"),
+      v.literal("prefer_not_to_say")
+    )),
 
     // Limitations
     injuries: v.optional(v.array(v.string())),

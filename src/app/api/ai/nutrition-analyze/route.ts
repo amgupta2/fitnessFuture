@@ -50,8 +50,16 @@ export async function POST(request: NextRequest) {
       const arrayBuffer = await imageFile.arrayBuffer();
       const base64 = Buffer.from(arrayBuffer).toString("base64");
 
-      const result = await analyzeNutritionFromPhoto(base64, mimeType);
-      return Response.json(result);
+      try {
+        const result = await analyzeNutritionFromPhoto(base64, mimeType);
+        return Response.json(result);
+      } catch (analysisError: any) {
+        console.error("Photo analysis error:", analysisError?.message);
+        return Response.json(
+          { error: analysisError?.message || "Failed to analyze photo" },
+          { status: 422 }
+        );
+      }
     }
 
     // ── Text / targets mode (JSON) ──────────────────────────────────────────
@@ -69,12 +77,20 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const result = await analyzeNutritionFromText(body.description);
-    return Response.json(result);
-  } catch (error) {
+    try {
+      const result = await analyzeNutritionFromText(body.description);
+      return Response.json(result);
+    } catch (analysisError: any) {
+      console.error("Text analysis error:", analysisError?.message);
+      return Response.json(
+        { error: analysisError?.message || "Failed to analyze food description" },
+        { status: 422 }
+      );
+    }
+  } catch (error: any) {
     console.error("Nutrition analyze API error:", error);
     return Response.json(
-      { error: "Failed to analyze nutrition" },
+      { error: error?.message || "Failed to analyze nutrition" },
       { status: 500 }
     );
   }

@@ -134,9 +134,12 @@ export default function NutritionPage() {
             userProfile={{
               bodyWeight: user.bodyWeight,
               age: user.age,
+              height: user.height,
+              gender: user.gender,
               primaryGoal: user.primaryGoal,
               experienceLevel: user.experienceLevel,
               trainingDaysPerWeek: user.trainingDaysPerWeek,
+              occupationType: user.occupationType,
               weightUnit: user.preferences?.weightUnit,
             }}
             onSave={handleSaveTargets}

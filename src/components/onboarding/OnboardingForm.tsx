@@ -88,6 +88,8 @@ export function OnboardingForm({ workosId }: OnboardingFormProps) {
   // Step 6 — Profile + Lifestyle
   const [age, setAge] = useState<string>("");
   const [bodyWeight, setBodyWeight] = useState<string>("");
+  const [height, setHeight] = useState<string>("");
+  const [gender, setGender] = useState<"male" | "female" | "prefer_not_to_say" | null>(null);
   const [injuries, setInjuries] = useState<string[]>([]);
   const [injuryInput, setInjuryInput] = useState("");
   const [sleepQuality, setSleepQuality] = useState<SleepQuality | null>(null);
@@ -154,6 +156,8 @@ export function OnboardingForm({ workosId }: OnboardingFormProps) {
         sessionDurationMinutes: sessionDurationMinutes ?? undefined,
         age: age ? parseInt(age, 10) : undefined,
         bodyWeight: bodyWeight ? parseFloat(bodyWeight) : undefined,
+        height: height ? parseFloat(height) : undefined,
+        gender: gender ?? undefined,
         injuries: injuries.length > 0 ? injuries : undefined,
         sleepQuality: sleepQuality ?? undefined,
         stressLevel: stressLevel ?? undefined,
@@ -216,6 +220,8 @@ export function OnboardingForm({ workosId }: OnboardingFormProps) {
           <StepLifestyle
             age={age}
             bodyWeight={bodyWeight}
+            height={height}
+            gender={gender}
             injuries={injuries}
             injuryInput={injuryInput}
             sleepQuality={sleepQuality}
@@ -223,6 +229,8 @@ export function OnboardingForm({ workosId }: OnboardingFormProps) {
             occupationType={occupationType}
             onAge={setAge}
             onBodyWeight={setBodyWeight}
+            onHeight={setHeight}
+            onGender={setGender}
             onInjuryPreset={toggleInjuryPreset}
             onInjuryInput={setInjuryInput}
             onAddInjury={addCustomInjury}
@@ -646,6 +654,8 @@ function StepMuscles({
 function StepLifestyle({
   age,
   bodyWeight,
+  height,
+  gender,
   injuries,
   injuryInput,
   sleepQuality,
@@ -653,6 +663,8 @@ function StepLifestyle({
   occupationType,
   onAge,
   onBodyWeight,
+  onHeight,
+  onGender,
   onInjuryPreset,
   onInjuryInput,
   onAddInjury,
@@ -663,6 +675,8 @@ function StepLifestyle({
 }: {
   age: string;
   bodyWeight: string;
+  height: string;
+  gender: "male" | "female" | "prefer_not_to_say" | null;
   injuries: string[];
   injuryInput: string;
   sleepQuality: SleepQuality | null;
@@ -670,6 +684,8 @@ function StepLifestyle({
   occupationType: OccupationType | null;
   onAge: (v: string) => void;
   onBodyWeight: (v: string) => void;
+  onHeight: (v: string) => void;
+  onGender: (v: "male" | "female" | "prefer_not_to_say") => void;
   onInjuryPreset: (v: string) => void;
   onInjuryInput: (v: string) => void;
   onAddInjury: () => void;
@@ -685,12 +701,42 @@ function StepLifestyle({
           PROFILE & LIFESTYLE
         </h2>
         <p className="text-zinc-400 text-sm mt-1">
-          Optional — helps calibrate recovery and volume recommendations.
+          Optional — helps calibrate recovery, volume, and nutrition recommendations.
         </p>
       </div>
 
-      {/* Age + Body weight */}
-      <div className="grid grid-cols-2 gap-3">
+      {/* Gender */}
+      <div className="space-y-1">
+        <span className="text-xs text-zinc-500 athletic-body uppercase tracking-wider">
+          Gender
+        </span>
+        <p className="text-[10px] text-zinc-600 mb-1">
+          Used for accurate BMR &amp; nutrition calculations
+        </p>
+        <div className="flex gap-2">
+          {([
+            { value: "male" as const, label: "Male" },
+            { value: "female" as const, label: "Female" },
+            { value: "prefer_not_to_say" as const, label: "Prefer not to say" },
+          ]).map((o) => (
+            <button
+              key={o.value}
+              type="button"
+              onClick={() => onGender(o.value)}
+              className={`flex-1 py-2 text-xs font-medium border-2 transition-all athletic-body ${
+                gender === o.value
+                  ? "border-lime-400 bg-lime-400/10 text-lime-400"
+                  : "border-zinc-800 text-zinc-500 hover:border-zinc-700"
+              }`}
+            >
+              {o.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Age + Body weight + Height */}
+      <div className="grid grid-cols-3 gap-3">
         <div className="space-y-1">
           <label className="text-xs text-zinc-500 athletic-body uppercase tracking-wider">
             Age
@@ -702,6 +748,20 @@ function StepLifestyle({
             value={age}
             onChange={(e) => onAge(e.target.value)}
             placeholder="e.g. 28"
+            className="w-full bg-zinc-900 border border-zinc-700 px-3 py-2 text-white placeholder-zinc-600 focus:outline-none focus:border-lime-400 transition-colors text-sm"
+          />
+        </div>
+        <div className="space-y-1">
+          <label className="text-xs text-zinc-500 athletic-body uppercase tracking-wider">
+            Height (cm)
+          </label>
+          <input
+            type="number"
+            min="100"
+            max="250"
+            value={height}
+            onChange={(e) => onHeight(e.target.value)}
+            placeholder="e.g. 175"
             className="w-full bg-zinc-900 border border-zinc-700 px-3 py-2 text-white placeholder-zinc-600 focus:outline-none focus:border-lime-400 transition-colors text-sm"
           />
         </div>

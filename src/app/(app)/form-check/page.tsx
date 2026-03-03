@@ -166,6 +166,7 @@ export default function FormCheckPage() {
   const [showHistory, setShowHistory] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
   const resultRef = useRef<HTMLDivElement>(null);
 
   const saveFormAnalysis = useMutation(api.formAnalysis.saveFormAnalysis);
@@ -343,6 +344,7 @@ export default function FormCheckPage() {
     setValidationError(null);
     setSavedId(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
+    if (cameraInputRef.current) cameraInputRef.current.value = "";
   };
 
   if (!user) {
@@ -427,37 +429,73 @@ export default function FormCheckPage() {
           {/* Video upload area */}
           <div className="p-5">
             {!videoFile ? (
-              <div
-                onDragOver={(e) => e.preventDefault()}
-                onDrop={handleDrop}
-                onClick={() => fileInputRef.current?.click()}
-                className="border-2 border-dashed border-zinc-700 hover:border-zinc-500 rounded-xl p-10 text-center cursor-pointer transition-colors group"
-              >
-                <div className="flex flex-col items-center gap-3">
-                  <div className="w-14 h-14 rounded-full bg-zinc-800 group-hover:bg-zinc-700 flex items-center justify-center transition-colors">
-                    <Upload className="w-6 h-6 text-zinc-400" />
+              <div className="space-y-3">
+                {/* Desktop: single drag-and-drop zone */}
+                <div
+                  onDragOver={(e) => e.preventDefault()}
+                  onDrop={handleDrop}
+                  onClick={() => fileInputRef.current?.click()}
+                  className="hidden sm:flex border-2 border-dashed border-zinc-700 hover:border-zinc-500 rounded-xl p-10 text-center cursor-pointer transition-colors group"
+                >
+                  <div className="flex flex-col items-center gap-3 w-full">
+                    <div className="w-14 h-14 rounded-full bg-zinc-800 group-hover:bg-zinc-700 flex items-center justify-center transition-colors">
+                      <Upload className="w-6 h-6 text-zinc-400" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-zinc-300">
+                        Drop your video here or click to browse
+                      </p>
+                      <p className="text-sm text-zinc-500 mt-1">
+                        MP4, WebM, or MOV &middot; Max 20 MB &middot; Max 30 seconds
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="font-medium text-zinc-300">
-                      Drop your video here or tap to browse
-                    </p>
-                    <p className="text-sm text-zinc-500 mt-1">
-                      MP4, WebM, or MOV &middot; Max 20 MB &middot; Max 30 seconds
-                    </p>
-                  </div>
-                  {/* Mobile camera capture */}
-                  <p className="text-xs text-zinc-600 mt-1 sm:hidden">
-                    Or record directly from your camera
-                  </p>
                 </div>
+
+                {/* Mobile: two distinct buttons */}
+                <div className="grid grid-cols-2 gap-3 sm:hidden">
+                  <button
+                    onClick={() => cameraInputRef.current?.click()}
+                    className="flex flex-col items-center gap-2 border-2 border-dashed border-zinc-700 hover:border-lime-500/50 rounded-xl p-6 text-center transition-colors group"
+                  >
+                    <Video className="w-7 h-7 text-zinc-500 group-hover:text-lime-400 transition-colors" />
+                    <p className="text-sm font-medium text-zinc-300">Record Video</p>
+                    <p className="text-[10px] text-zinc-600">Open camera</p>
+                  </button>
+                  <button
+                    onClick={() => fileInputRef.current?.click()}
+                    className="flex flex-col items-center gap-2 border-2 border-dashed border-zinc-700 hover:border-lime-500/50 rounded-xl p-6 text-center transition-colors group"
+                  >
+                    <Upload className="w-7 h-7 text-zinc-500 group-hover:text-lime-400 transition-colors" />
+                    <p className="text-sm font-medium text-zinc-300">Choose Video</p>
+                    <p className="text-[10px] text-zinc-600">From camera roll</p>
+                  </button>
+                </div>
+
+                <p className="text-xs text-zinc-600 text-center sm:hidden">
+                  MP4, WebM, or MOV &middot; Max 20 MB &middot; Max 30 seconds
+                </p>
+
                 <input
-                  ref={fileInputRef}
+                  ref={cameraInputRef}
                   type="file"
                   accept="video/mp4,video/webm,video/quicktime,video/x-m4v"
                   capture="environment"
                   onChange={(e) => {
                     const file = e.target.files?.[0];
                     if (file) handleFileSelect(file);
+                    e.target.value = "";
+                  }}
+                  className="hidden"
+                />
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="video/mp4,video/webm,video/quicktime,video/x-m4v"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) handleFileSelect(file);
+                    e.target.value = "";
                   }}
                   className="hidden"
                 />

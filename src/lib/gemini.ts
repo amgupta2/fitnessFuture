@@ -707,13 +707,40 @@ export async function analyzeNutritionFromPhoto(
     generationConfig: { temperature: 0.3, maxOutputTokens: 2048 },
   });
 
-  const result = await model.generateContent([
-    { inlineData: { data: base64Image, mimeType } },
-    { text: `${NUTRITION_ANALYSIS_PROMPT}\n\nAnalyze the food in this image.` },
-  ]);
+  let text: string;
+  try {
+    const result = await model.generateContent({
+      contents: [{
+        role: "user",
+        parts: [
+          { inlineData: { data: base64Image, mimeType } },
+          { text: `${NUTRITION_ANALYSIS_PROMPT}\n\nAnalyze the food in this image. Return ONLY valid JSON.` },
+        ],
+      }],
+    });
 
-  const text = result.response.text();
-  return parseNutritionJSON(text);
+    text = result.response.text();
+  } catch (err: any) {
+    console.error("Gemini photo analysis API error:", err?.message || err);
+    throw new Error(
+      err?.message?.includes("SAFETY")
+        ? "Image was blocked by safety filters. Please try a different photo."
+        : `AI analysis failed: ${err?.message || "Unknown error"}`
+    );
+  }
+
+  if (!text || text.trim().length === 0) {
+    throw new Error("AI returned an empty response. Please try a different photo.");
+  }
+
+  const parsed = parseNutritionJSON(text);
+  if (parsed.items.length === 0) {
+    console.error("Gemini returned non-parseable nutrition response:", text.substring(0, 500));
+    throw new Error(
+      "Could not extract nutrition data from AI response. Please try a clearer, well-lit photo of your food."
+    );
+  }
+  return parsed;
 }
 
 /**
@@ -727,23 +754,42 @@ export async function analyzeNutritionFromText(
     generationConfig: { temperature: 0.3, maxOutputTokens: 2048 },
   });
 
-  const result = await model.generateContent(
-    `${NUTRITION_ANALYSIS_PROMPT}\n\nFood description:\n${description}`
-  );
+  let text: string;
+  try {
+    const result = await model.generateContent(
+      `${NUTRITION_ANALYSIS_PROMPT}\n\nFood description:\n${description}\n\nReturn ONLY valid JSON.`
+    );
+    text = result.response.text();
+  } catch (err: any) {
+    console.error("Gemini text nutrition analysis error:", err?.message || err);
+    throw new Error(`AI analysis failed: ${err?.message || "Unknown error"}`);
+  }
 
-  const text = result.response.text();
-  return parseNutritionJSON(text);
+  if (!text || text.trim().length === 0) {
+    throw new Error("AI returned an empty response. Try being more specific about what you ate.");
+  }
+
+  const parsed = parseNutritionJSON(text);
+  if (parsed.items.length === 0) {
+    console.error("Gemini returned non-parseable nutrition text response:", text.substring(0, 500));
+    throw new Error("Could not parse food items from the description. Try being more specific (e.g., '200g chicken breast, 1 cup rice').");
+  }
+  return parsed;
 }
 
 /**
  * Suggest daily calorie and macro targets based on user profile.
+ * Uses Mifflin-St Jeor with gender-specific constants, height, and activity level.
  */
 export async function suggestNutritionTargets(profile: {
   bodyWeight?: number;
   age?: number;
+  height?: number;
+  gender?: string;
   primaryGoal?: string;
-  experienceLevel: string;
+  experienceLevel?: string;
   trainingDaysPerWeek?: number;
+  occupationType?: string;
   weightUnit?: string;
 }): Promise<{
   dailyCalories: number;
@@ -757,21 +803,57 @@ export async function suggestNutritionTargets(profile: {
   });
 
   const unit = profile.weightUnit ?? "lbs";
-  const prompt = `You are a sports dietitian. Given the athlete profile below, calculate recommended daily calorie and macronutrient targets.
+  const genderLabel = profile.gender === "female" ? "female"
+    : profile.gender === "male" ? "male"
+    : "unknown (assume male for calculations)";
 
-Profile:
-- Body weight: ${profile.bodyWeight ?? "unknown"} ${unit}
+  const activityDesc = profile.occupationType === "physically_demanding"
+    ? "physically demanding job + training"
+    : profile.occupationType === "lightly_active"
+    ? "lightly active job + training"
+    : "sedentary job + training";
+
+  const goalMap: Record<string, string> = {
+    strength: "Strength — maximize 1RM on compound lifts. Moderate surplus, high protein.",
+    hypertrophy: "Hypertrophy — build muscle size. Moderate surplus, high protein, higher carbs.",
+    endurance: "Endurance — improve stamina. Maintenance to slight surplus, moderate protein, high carbs.",
+    weight_loss: "Weight loss — burn fat while preserving muscle. Caloric deficit, very high protein.",
+    general_fitness: "General fitness — balanced health. Maintenance calories, moderate macros.",
+    sport_performance: "Sport performance — athletic power. Slight surplus, high protein, high carbs.",
+  };
+  const goalDesc = goalMap[profile.primaryGoal ?? ""] ?? "General fitness — balanced health and wellness.";
+
+  const prompt = `You are a sports dietitian. Calculate precise daily calorie and macronutrient targets for this athlete.
+
+ATHLETE PROFILE:
+- Gender: ${genderLabel}
 - Age: ${profile.age ?? "unknown"}
-- Goal: ${profile.primaryGoal ?? "general fitness"}
-- Experience: ${profile.experienceLevel}
+- Height: ${profile.height ? `${profile.height} cm` : "unknown"}
+- Body weight: ${profile.bodyWeight ?? "unknown"} ${unit}
 - Training days/week: ${profile.trainingDaysPerWeek ?? 3}
+- Activity context: ${activityDesc}
+- Experience: ${profile.experienceLevel ?? "beginner"}
 
-Use Mifflin-St Jeor for BMR (assume male if gender unknown), apply an activity multiplier (1.55 for moderate, 1.725 for active), then adjust:
-- Hypertrophy/strength: +200-300 kcal surplus, protein 1.6-2.2 g/kg
-- Weight loss: -400-500 kcal deficit, protein 2.0-2.4 g/kg to preserve muscle
-- General fitness: maintenance, protein 1.4-1.8 g/kg
+FITNESS GOAL: ${goalDesc}
 
-Return ONLY valid JSON:
+CALCULATION METHOD:
+1. Mifflin-St Jeor BMR:
+   - Male: (10 × weight_kg) + (6.25 × height_cm) − (5 × age) + 5
+   - Female: (10 × weight_kg) + (6.25 × height_cm) − (5 × age) − 161
+   - Convert lbs to kg (÷ 2.205) if needed
+2. Activity multiplier based on training frequency + occupation:
+   - Sedentary + 2-3 days: 1.4-1.55
+   - Sedentary + 4-5 days: 1.55-1.7
+   - Active job + training: 1.7-1.9
+   - Physical labor + training: 1.9+
+3. Goal adjustment:
+   - Hypertrophy/strength: +200-300 kcal surplus, protein 1.6-2.2 g/kg
+   - Weight loss: −400-500 kcal deficit, protein 2.0-2.4 g/kg
+   - Endurance/sport: maintenance to +100, protein 1.4-2.0 g/kg, carbs 5-7 g/kg
+   - General fitness: maintenance, protein 1.4-1.8 g/kg
+4. Fat: 0.8-1.2 g/kg, remaining calories from carbs
+
+Return ONLY valid JSON (no explanation):
 { "dailyCalories": 2500, "proteinGrams": 180, "carbsGrams": 280, "fatGrams": 75 }`;
 
   try {
@@ -785,7 +867,6 @@ Return ONLY valid JSON:
     }
     throw new Error("No JSON found");
   } catch {
-    // Sensible fallback based on a 175 lb / 80 kg active individual
     return { dailyCalories: 2400, proteinGrams: 160, carbsGrams: 270, fatGrams: 75 };
   }
 }
@@ -793,24 +874,35 @@ Return ONLY valid JSON:
 function parseNutritionJSON(text: string): NutritionAnalysisResult {
   try {
     let cleaned = text.trim();
-    if (cleaned.startsWith("```")) {
-      cleaned = cleaned.replace(/^```(?:json)?\n?/, "").replace(/\n?```$/, "");
-    }
+
+    // Strip markdown code fences in various formats
+    cleaned = cleaned.replace(/^```(?:json|JSON)?\s*\n?/gm, "").replace(/\n?\s*```$/gm, "");
+    cleaned = cleaned.trim();
+
+    // Extract the JSON object (find outermost { ... })
     const start = cleaned.indexOf("{");
     const end = cleaned.lastIndexOf("}");
-    if (start !== -1 && end !== -1) {
-      cleaned = cleaned.substring(start, end + 1);
+    if (start === -1 || end === -1 || end <= start) {
+      console.error("No JSON object found in response:", cleaned.substring(0, 300));
+      return { items: [], totalCalories: 0, totalProtein: 0, totalCarbs: 0, totalFat: 0 };
     }
+
+    cleaned = cleaned.substring(start, end + 1);
     const parsed = JSON.parse(cleaned);
 
-    const items: NutritionItem[] = (parsed.items || []).map((item: any) => ({
-      name: item.name || "Unknown food",
-      quantity: item.quantity,
-      calories: Math.round(Number(item.calories) || 0),
-      proteinGrams: Math.round(Number(item.proteinGrams) || 0),
-      carbsGrams: Math.round(Number(item.carbsGrams) || 0),
-      fatGrams: Math.round(Number(item.fatGrams) || 0),
-    }));
+    // Handle both array-at-root and object-with-items response shapes
+    const rawItems = Array.isArray(parsed) ? parsed : (parsed.items || parsed.foods || []);
+
+    const items: NutritionItem[] = rawItems
+      .filter((item: any) => item && (item.name || item.food || item.item))
+      .map((item: any) => ({
+        name: item.name || item.food || item.item || "Unknown food",
+        quantity: item.quantity || item.serving || item.portion,
+        calories: Math.round(Number(item.calories || item.kcal || item.energy) || 0),
+        proteinGrams: Math.round(Number(item.proteinGrams || item.protein) || 0),
+        carbsGrams: Math.round(Number(item.carbsGrams || item.carbs || item.carbohydrates) || 0),
+        fatGrams: Math.round(Number(item.fatGrams || item.fat || item.fats) || 0),
+      }));
 
     return {
       items,
@@ -820,7 +912,7 @@ function parseNutritionJSON(text: string): NutritionAnalysisResult {
       totalFat: items.reduce((s, i) => s + i.fatGrams, 0),
     };
   } catch (error) {
-    console.error("Nutrition JSON parse error:", error, text);
+    console.error("Nutrition JSON parse error:", error, "Raw text:", text.substring(0, 500));
     return { items: [], totalCalories: 0, totalProtein: 0, totalCarbs: 0, totalFat: 0 };
   }
 }

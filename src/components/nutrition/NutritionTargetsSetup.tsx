@@ -1,17 +1,22 @@
 "use client";
 
 import { useState } from "react";
-import { Loader2, Sparkles } from "lucide-react";
+import { Loader2, Sparkles, Target, AlertCircle } from "lucide-react";
+
+interface UserProfile {
+  bodyWeight?: number;
+  age?: number;
+  height?: number;
+  gender?: string;
+  primaryGoal?: string;
+  experienceLevel: string;
+  trainingDaysPerWeek?: number;
+  occupationType?: string;
+  weightUnit?: string;
+}
 
 interface NutritionTargetsSetupProps {
-  userProfile: {
-    bodyWeight?: number;
-    age?: number;
-    primaryGoal?: string;
-    experienceLevel: string;
-    trainingDaysPerWeek?: number;
-    weightUnit?: string;
-  };
+  userProfile: UserProfile;
   onSave: (targets: {
     dailyCalories: number;
     proteinGrams: number;
@@ -21,6 +26,47 @@ interface NutritionTargetsSetupProps {
   }) => void;
 }
 
+const GOAL_LABELS: Record<string, { label: string; desc: string; emoji: string }> = {
+  strength: { label: "Strength", desc: "Moderate caloric surplus with high protein to fuel heavy compound lifts.", emoji: "⚡" },
+  hypertrophy: { label: "Hypertrophy", desc: "Surplus calories with high protein and carbs to maximize muscle growth.", emoji: "💪" },
+  endurance: { label: "Endurance", desc: "Maintenance calories with higher carbs for sustained energy output.", emoji: "🏃" },
+  weight_loss: { label: "Weight Loss", desc: "Caloric deficit with very high protein to preserve lean muscle mass.", emoji: "🔥" },
+  general_fitness: { label: "General Fitness", desc: "Balanced maintenance calories with moderate, well-rounded macros.", emoji: "🎯" },
+  sport_performance: { label: "Sport Performance", desc: "Slight surplus with high protein and carbs for explosive power.", emoji: "🏆" },
+};
+
+function ProfileCompleteness({ profile }: { profile: UserProfile }) {
+  const fields = [
+    { key: "bodyWeight", label: "Body weight" },
+    { key: "height", label: "Height" },
+    { key: "age", label: "Age" },
+    { key: "gender", label: "Gender" },
+    { key: "primaryGoal", label: "Fitness goal" },
+    { key: "trainingDaysPerWeek", label: "Training frequency" },
+    { key: "occupationType", label: "Activity level" },
+  ];
+
+  const missing = fields.filter((f) => {
+    const val = profile[f.key as keyof UserProfile];
+    return val === undefined || val === null || val === "";
+  });
+
+  if (missing.length === 0) return null;
+
+  return (
+    <div className="flex items-start gap-2 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs">
+      <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+      <div>
+        <p className="font-medium mb-1">Fill in your profile for more accurate targets</p>
+        <p className="text-amber-500/70">
+          Missing: {missing.map((m) => m.label).join(", ")}. 
+          Update in <a href="/settings" className="underline hover:text-amber-300">Settings</a>.
+        </p>
+      </div>
+    </div>
+  );
+}
+
 export function NutritionTargetsSetup({ userProfile, onSave }: NutritionTargetsSetupProps) {
   const [calories, setCalories] = useState("");
   const [protein, setProtein] = useState("");
@@ -28,6 +74,8 @@ export function NutritionTargetsSetup({ userProfile, onSave }: NutritionTargetsS
   const [fat, setFat] = useState("");
   const [loading, setLoading] = useState(false);
   const [suggested, setSuggested] = useState(false);
+
+  const goal = GOAL_LABELS[userProfile.primaryGoal ?? ""] ?? GOAL_LABELS.general_fitness;
 
   const handleAISuggest = async () => {
     setLoading(true);
@@ -72,9 +120,29 @@ export function NutritionTargetsSetup({ userProfile, onSave }: NutritionTargetsS
       <div>
         <h2 className="text-lg font-semibold mb-1">Set Your Nutrition Targets</h2>
         <p className="text-sm text-zinc-400">
-          Daily calorie and macro goals to fuel your training. You can adjust these anytime.
+          Daily calorie and macro goals personalized to your training. Adjust anytime.
         </p>
       </div>
+
+      {/* Goal context card */}
+      <div className="bg-zinc-800/50 border border-zinc-700/50 rounded-xl p-4">
+        <div className="flex items-center gap-2 mb-1.5">
+          <Target className="w-4 h-4 text-lime-400" />
+          <span className="text-xs text-zinc-500 uppercase tracking-wider font-medium">Your Goal</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-lg">{goal.emoji}</span>
+          <span className="font-semibold text-white">{goal.label}</span>
+        </div>
+        <p className="text-xs text-zinc-400 mt-1">{goal.desc}</p>
+        {!userProfile.primaryGoal && (
+          <p className="text-[10px] text-zinc-600 mt-2">
+            No goal set — <a href="/settings" className="underline hover:text-zinc-400">update in Settings</a> for better recommendations.
+          </p>
+        )}
+      </div>
+
+      <ProfileCompleteness profile={userProfile} />
 
       <button
         onClick={handleAISuggest}
@@ -84,7 +152,7 @@ export function NutritionTargetsSetup({ userProfile, onSave }: NutritionTargetsS
         {loading ? (
           <>
             <Loader2 className="w-4 h-4 animate-spin" />
-            Calculating...
+            Calculating targets for {goal.label.toLowerCase()}...
           </>
         ) : (
           <>
@@ -93,6 +161,14 @@ export function NutritionTargetsSetup({ userProfile, onSave }: NutritionTargetsS
           </>
         )}
       </button>
+
+      {suggested && (
+        <p className="text-xs text-lime-400/70 text-center -mt-2">
+          Tailored for your {goal.label.toLowerCase()} goal
+          {userProfile.bodyWeight ? ` at ${userProfile.bodyWeight} ${userProfile.weightUnit ?? "lbs"}` : ""}
+          {userProfile.height ? `, ${userProfile.height} cm` : ""}
+        </p>
+      )}
 
       <div className="grid grid-cols-2 gap-3">
         <div className="col-span-2">
