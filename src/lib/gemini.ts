@@ -147,7 +147,26 @@ export interface UserContext {
     target: { calories: number; protein: number; carbs: number; fat: number };
   };
   weeklyNutritionAdherence?: number;
+  weeklyNutritionAvg?: {
+    avgCalories: number;
+    avgProtein: number;
+    avgCarbs: number;
+    avgFat: number;
+    daysTracked: number;
+  };
   proteinPerKg?: number;
+
+  // ── Progression signals ───────────────────────────────────────────────────
+  plateauAlerts?: Array<{
+    exerciseName: string;
+    weeksSinceLastPR: number;
+  }>;
+  recentFormAnalyses?: Array<{
+    exerciseName: string;
+    formScore: number | null;
+    issuesFound: string[];
+    daysAgo: number;
+  }>;
 }
 
 /**
@@ -381,17 +400,36 @@ function buildAthleteProfile(context: UserContext): string {
   if (context.todayNutrition) {
     const n = context.todayNutrition;
     const t = n.target;
-    p += `\n=== NUTRITION STATUS (today) ===\n`;
-    p += `Calories: ${n.calories} / ${t.calories} kcal\n`;
-    p += `Protein: ${n.protein}g / ${t.protein}g\n`;
-    p += `Carbs: ${n.carbs}g / ${t.carbs}g\n`;
-    p += `Fat: ${n.fat}g / ${t.fat}g\n`;
+    p += `\n=== NUTRITION STATUS ===\n`;
+    p += `Today: ${n.calories} / ${t.calories} kcal | ${n.protein}g / ${t.protein}g protein | ${n.carbs}g / ${t.carbs}g carbs | ${n.fat}g / ${t.fat}g fat\n`;
     if (context.proteinPerKg) {
       p += `Protein per kg bodyweight: ${context.proteinPerKg.toFixed(1)} g/kg\n`;
+    }
+    if (context.weeklyNutritionAvg) {
+      const w = context.weeklyNutritionAvg;
+      p += `7-day avg (${w.daysTracked}/7 days tracked): ${w.avgCalories} kcal | ${w.avgProtein}g protein | ${w.avgCarbs}g carbs | ${w.avgFat}g fat\n`;
     }
     if (context.weeklyNutritionAdherence != null) {
       p += `Weekly calorie adherence: ${Math.round(context.weeklyNutritionAdherence * 100)}%\n`;
     }
+  }
+
+  // ── Plateau alerts ────────────────────────────────────────────────────────
+  if (context.plateauAlerts && context.plateauAlerts.length > 0) {
+    p += `\n=== PLATEAU ALERTS ===\n`;
+    context.plateauAlerts.forEach(a => {
+      p += `- ${a.exerciseName}: no new strength PR in ${a.weeksSinceLastPR} weeks\n`;
+    });
+  }
+
+  // ── Form check history ────────────────────────────────────────────────────
+  if (context.recentFormAnalyses && context.recentFormAnalyses.length > 0) {
+    p += `\n=== RECENT FORM CHECK HISTORY ===\n`;
+    context.recentFormAnalyses.forEach(f => {
+      const score = f.formScore != null ? ` | score ${f.formScore}/100` : "";
+      const issues = f.issuesFound.length ? ` | issues: ${f.issuesFound.join(", ")}` : "";
+      p += `- ${f.exerciseName} (${f.daysAgo}d ago)${score}${issues}\n`;
+    });
   }
 
   return p;

@@ -318,6 +318,35 @@ async function getBaseUserContext(ctx: any, userId: any) {
       estimated1RM: Math.round(pr.value),
     }));
 
+  // ── Plateau detection ─────────────────────────────────────────────────────
+  // Flag exercises trained recently whose last PR is older than 3 weeks
+  const threeWeeksAgo = Date.now() - 21 * 24 * 60 * 60 * 1000;
+  const recentExerciseNames = new Set(recentExercises.map((e: any) => e.name));
+  const plateauAlerts = currentPRs
+    .filter((pr: any) =>
+      recentExerciseNames.has(pr.exerciseName) && pr.achievedAt < threeWeeksAgo
+    )
+    .slice(0, 5)
+    .map((pr: any) => ({
+      exerciseName: pr.exerciseName,
+      weeksSinceLastPR: Math.round(
+        (Date.now() - pr.achievedAt) / (7 * 24 * 60 * 60 * 1000)
+      ),
+    }));
+
+  // ── Recent form analyses ──────────────────────────────────────────────────
+  const rawFormAnalyses = await ctx.db
+    .query("formAnalyses")
+    .withIndex("by_user_created", (q: any) => q.eq("userId", userId))
+    .order("desc")
+    .take(3);
+  const recentFormAnalyses = rawFormAnalyses.map((f: any) => ({
+    exerciseName: f.exerciseName,
+    formScore: f.formScore ?? null,
+    issuesFound: ((f.issuesFound ?? []) as string[]).slice(0, 3),
+    daysAgo: Math.round((Date.now() - f.createdAt) / (24 * 60 * 60 * 1000)),
+  }));
+
   // ── Nutrition context ──────────────────────────────────────────────────────
   const nutritionTargetsRow = await ctx.db
     .query("nutritionTargets")
@@ -326,6 +355,7 @@ async function getBaseUserContext(ctx: any, userId: any) {
 
   let todayNutrition: any = undefined;
   let weeklyNutritionAdherence: number | undefined = undefined;
+  let weeklyNutritionAvg: any = undefined;
   let proteinPerKg: number | undefined = undefined;
 
   if (nutritionTargetsRow) {
@@ -355,10 +385,11 @@ async function getBaseUserContext(ctx: any, userId: any) {
       },
     };
 
-    // Weekly adherence: count days in the last 7 where calories were within 10% of target
+    // Weekly adherence + 7-day macro averages
     const today = new Date();
     let daysOnTarget = 0;
     let daysWithData = 0;
+    let weeklyTotalCals = 0, weeklyTotalP = 0, weeklyTotalC = 0, weeklyTotalF = 0;
     for (let i = 0; i < 7; i++) {
       const d = new Date(today);
       d.setDate(d.getDate() - i);
@@ -372,12 +403,28 @@ async function getBaseUserContext(ctx: any, userId: any) {
       if (dayMeals.length > 0) {
         daysWithData++;
         const dayCals = dayMeals.reduce((s: number, m: any) => s + m.totalCalories, 0);
+        const dayP = dayMeals.reduce((s: number, m: any) => s + m.totalProtein, 0);
+        const dayC = dayMeals.reduce((s: number, m: any) => s + m.totalCarbs, 0);
+        const dayF = dayMeals.reduce((s: number, m: any) => s + m.totalFat, 0);
+        weeklyTotalCals += dayCals;
+        weeklyTotalP += dayP;
+        weeklyTotalC += dayC;
+        weeklyTotalF += dayF;
         if (Math.abs(dayCals - nutritionTargetsRow.dailyCalories) <= nutritionTargetsRow.dailyCalories * 0.1) {
           daysOnTarget++;
         }
       }
     }
     weeklyNutritionAdherence = daysWithData > 0 ? daysOnTarget / daysWithData : undefined;
+    if (daysWithData > 0) {
+      weeklyNutritionAvg = {
+        avgCalories: Math.round(weeklyTotalCals / daysWithData),
+        avgProtein: Math.round(weeklyTotalP / daysWithData),
+        avgCarbs: Math.round(weeklyTotalC / daysWithData),
+        avgFat: Math.round(weeklyTotalF / daysWithData),
+        daysTracked: daysWithData,
+      };
+    }
 
     // Protein per kg
     if (user.bodyWeight) {
@@ -421,7 +468,11 @@ async function getBaseUserContext(ctx: any, userId: any) {
     // Nutrition
     todayNutrition,
     weeklyNutritionAdherence,
+    weeklyNutritionAvg,
     proteinPerKg,
+    // Progression signals
+    plateauAlerts,
+    recentFormAnalyses,
   };
 }
 
