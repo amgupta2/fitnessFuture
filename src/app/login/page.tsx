@@ -80,11 +80,11 @@ export default async function LoginPage() {
         <LoginForm />
 
         {/* Feature pills */}
-        <div className="flex flex-wrap justify-center gap-2 mt-8">
+        <div className="grid grid-cols-2 gap-2 mt-8 max-w-[280px] mx-auto">
           {["AI Coaching", "Progress Analytics", "Nutrition Tracking", "Form Analysis"].map((feat) => (
             <span
               key={feat}
-              className="text-[10px] font-semibold tracking-[0.12em] uppercase px-3 py-1.5 rounded-full border"
+              className="text-[10px] font-semibold tracking-[0.12em] uppercase px-3 py-1.5 rounded-full border text-center"
               style={{
                 color: "var(--text-2)",
                 borderColor: "var(--border)",
