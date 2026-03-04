@@ -21,7 +21,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "Next-Gen Fitness",
+  title: "UniFit",
   description: "Where training data, intelligence, and coaching merge",
 };
 

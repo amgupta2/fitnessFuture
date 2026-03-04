@@ -95,7 +95,7 @@ export function Sidebar({ isMobileMenuOpen, onCloseMobileMenu }: SidebarProps) {
       <div className="hidden lg:flex w-64 bg-zinc-900 border-r border-zinc-800 flex-col shrink-0">
         {/* Logo */}
         <div className="p-6 border-b border-zinc-800">
-          <h1 className="text-xl font-bold">Next-Gen Fitness</h1>
+          <h1 className="text-xl font-bold">UniFit</h1>
         </div>
 
         {/* Navigation */}
@@ -125,7 +125,7 @@ export function Sidebar({ isMobileMenuOpen, onCloseMobileMenu }: SidebarProps) {
           <div className="absolute left-0 top-0 h-full w-72 bg-zinc-900 border-r border-zinc-800 flex flex-col shadow-2xl">
             {/* Header with close button */}
             <div className="flex items-center justify-between p-6 border-b border-zinc-800">
-              <h1 className="text-xl font-bold">Next-Gen Fitness</h1>
+              <h1 className="text-xl font-bold">UniFit</h1>
               <button
                 onClick={onCloseMobileMenu}
                 className="p-2 rounded-lg hover:bg-zinc-800 transition-colors"
