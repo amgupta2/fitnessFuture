@@ -14,7 +14,7 @@ export function ThemeToggle() {
   return (
     <button
       onClick={toggleTheme}
-      className="p-2 rounded-lg hover:bg-[var(--surface-2)] dark:hover:bg-[var(--surface-2)] hover:bg-gray-200 transition-colors"
+      className="p-2 rounded-lg hover:bg-[var(--surface-2)] dark:hover:bg-[var(--surface-2)] hover:bg-[var(--surface-2)] transition-colors"
       title={isDark ? "Switch to light mode" : "Switch to dark mode"}
     >
       {isDark ? (

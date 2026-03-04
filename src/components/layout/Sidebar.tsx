@@ -94,18 +94,18 @@ function NavLinks({ onLinkClick }: { onLinkClick?: () => void }) {
             style={{
               animationDelay: `${i * 30}ms`,
               background: isActive ? "var(--accent-muted)" : "transparent",
-              color: isActive ? "var(--accent)" : "var(--text-2)",
+              color: isActive ? "var(--accent)" : "var(--text-1)",
             }}
             onMouseEnter={(e) => {
               if (!isActive) {
-                (e.currentTarget as HTMLElement).style.background = "var(--surface-2)";
+                (e.currentTarget as HTMLElement).style.background = "var(--surface-3)";
                 (e.currentTarget as HTMLElement).style.color = "var(--text-1)";
               }
             }}
             onMouseLeave={(e) => {
               if (!isActive) {
                 (e.currentTarget as HTMLElement).style.background = "transparent";
-                (e.currentTarget as HTMLElement).style.color = "var(--text-2)";
+                (e.currentTarget as HTMLElement).style.color = "var(--text-1)";
               }
             }}
           >
@@ -119,11 +119,11 @@ function NavLinks({ onLinkClick }: { onLinkClick?: () => void }) {
 
             <Icon
               className="w-[17px] h-[17px] shrink-0 transition-transform duration-200 group-hover:scale-110"
-              style={{ color: isActive ? "var(--accent)" : "inherit" }}
+              style={{ color: isActive ? "var(--accent)" : "var(--text-2)" }}
             />
             <span
               className="text-[13.5px] font-semibold tracking-[0.01em]"
-              style={{ fontFamily: "var(--font-body)" }}
+              style={{ fontFamily: "var(--font-body)", color: isActive ? "var(--accent)" : "var(--text-1)" }}
             >
               {item.name}
             </span>

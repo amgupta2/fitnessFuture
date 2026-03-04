@@ -140,7 +140,7 @@ export function BottomNav() {
                 key={item.name}
                 href={item.href}
                 className="flex-1 flex flex-col items-center justify-center py-2.5 gap-[5px] min-h-[58px] transition-all duration-200 relative cursor-pointer"
-                style={{ color: isActive ? "var(--accent)" : "var(--text-3)" }}
+                style={{ color: isActive ? "var(--accent)" : "var(--text-2)" }}
               >
                 {/* Active pill background */}
                 {isActive && (

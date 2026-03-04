@@ -28,7 +28,7 @@ interface ProgressionChartProps {
 export function ProgressionChart({ data, exerciseName }: ProgressionChartProps) {
   if (data.length === 0) {
     return (
-      <div className="flex items-center justify-center h-64 text-gray-500">
+      <div className="flex items-center justify-center h-64 text-[var(--text-2)]">
         No progression data available for {exerciseName}
       </div>
     );

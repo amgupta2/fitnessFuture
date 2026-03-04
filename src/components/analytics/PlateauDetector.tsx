@@ -1,5 +1,7 @@
 "use client";
 
+import { TrendingUp, AlertTriangle } from "lucide-react";
+
 interface Plateau {
   exerciseName: string;
   sessionsCount: number;
@@ -18,9 +20,22 @@ export function PlateauDetector({ plateaus }: PlateauDetectorProps) {
   if (plateaus.length === 0) {
     return (
       <div className="text-center py-8">
-        <div className="text-green-400 text-4xl mb-2">🎯</div>
-        <p className="text-gray-300 font-medium">No plateaus detected!</p>
-        <p className="text-sm text-gray-500 mt-1">
+        <div
+          className="w-12 h-12 rounded-2xl flex items-center justify-center mx-auto mb-3"
+          style={{ background: "rgba(16,185,129,0.12)", border: "1px solid rgba(16,185,129,0.2)" }}
+        >
+          <TrendingUp className="w-6 h-6" style={{ color: "var(--success)" }} />
+        </div>
+        <p
+          className="font-bold text-[15px] mb-1"
+          style={{ color: "var(--text-1)", fontFamily: "var(--font-brand)" }}
+        >
+          No Plateaus Detected
+        </p>
+        <p
+          className="text-[12px]"
+          style={{ color: "var(--text-2)", fontFamily: "var(--font-body)" }}
+        >
           You're making consistent progress across all exercises
         </p>
       </div>
@@ -29,50 +44,80 @@ export function PlateauDetector({ plateaus }: PlateauDetectorProps) {
 
   return (
     <div className="space-y-3">
-      <div className="text-sm text-gray-400 mb-4">
-        <p>
-          Exercises with less than 2.5% improvement over recent sessions may
-          need a change in programming.
-        </p>
-      </div>
+      <p
+        className="text-[12px] leading-relaxed mb-4"
+        style={{ color: "var(--text-2)", fontFamily: "var(--font-body)" }}
+      >
+        Exercises with less than 2.5% improvement over recent sessions may need a change in programming.
+      </p>
       {plateaus.map((plateau) => (
         <div
           key={plateau.exerciseName}
-          className="bg-gray-800 rounded-lg p-4 border border-yellow-500/30"
+          className="rounded-xl p-4 border"
+          style={{
+            background: "var(--surface-2)",
+            borderColor: "rgba(251,191,36,0.25)",
+            boxShadow: "inset 0 1px 0 rgba(255,255,255,0.03)",
+          }}
         >
-          <div className="flex justify-between items-start mb-2">
-            <h4 className="font-medium text-white">{plateau.exerciseName}</h4>
-            <span className="inline-block px-2 py-1 text-xs bg-yellow-500/20 text-yellow-400 rounded">
+          <div className="flex justify-between items-start mb-3">
+            <h4
+              className="font-bold text-[14px]"
+              style={{ color: "var(--text-1)", fontFamily: "var(--font-brand)", letterSpacing: "0.03em" }}
+            >
+              {plateau.exerciseName}
+            </h4>
+            <span
+              className="inline-flex items-center gap-1 px-2.5 py-1 text-[10px] font-bold rounded-lg uppercase tracking-wider"
+              style={{
+                background: "rgba(251,191,36,0.12)",
+                color: "#FBBF24",
+                fontFamily: "var(--font-body)",
+              }}
+            >
+              <AlertTriangle className="w-3 h-3" />
               Plateau
             </span>
           </div>
-          <div className="grid grid-cols-2 gap-3 text-sm">
-            <div>
-              <p className="text-gray-500">Sessions</p>
-              <p className="text-white">{plateau.sessionsCount}</p>
-            </div>
-            <div>
-              <p className="text-gray-500">Improvement</p>
-              <p className="text-white">{plateau.improvement}%</p>
-            </div>
-            <div>
-              <p className="text-gray-500">First 1RM</p>
-              <p className="text-white">{plateau.first1RM} lbs</p>
-            </div>
-            <div>
-              <p className="text-gray-500">Last 1RM</p>
-              <p className="text-white">{plateau.last1RM} lbs</p>
-            </div>
+          <div className="grid grid-cols-2 gap-2.5">
+            {[
+              { label: "Sessions", value: plateau.sessionsCount },
+              { label: "Improvement", value: `${plateau.improvement}%` },
+              { label: "First 1RM", value: `${plateau.first1RM} lbs` },
+              { label: "Last 1RM", value: `${plateau.last1RM} lbs` },
+            ].map(({ label, value }) => (
+              <div
+                key={label}
+                className="rounded-lg p-2.5"
+                style={{ background: "var(--surface-3)" }}
+              >
+                <p
+                  className="text-[10px] font-bold uppercase tracking-wider mb-1"
+                  style={{ color: "var(--text-2)", fontFamily: "var(--font-body)" }}
+                >
+                  {label}
+                </p>
+                <p
+                  className="text-[13px] font-bold"
+                  style={{ color: "var(--text-1)", fontFamily: "var(--font-brand)" }}
+                >
+                  {value}
+                </p>
+              </div>
+            ))}
           </div>
-          <div className="mt-3 pt-3 border-t border-gray-700">
-            <p className="text-xs text-gray-400">
-              Period: {new Date(plateau.firstDate).toLocaleDateString()} -{" "}
-              {new Date(plateau.lastDate).toLocaleDateString()}
-            </p>
+          <div
+            className="mt-3 pt-3 border-t text-[10px] font-medium"
+            style={{
+              borderColor: "var(--border)",
+              color: "var(--text-2)",
+              fontFamily: "var(--font-body)",
+            }}
+          >
+            {new Date(plateau.firstDate).toLocaleDateString()} — {new Date(plateau.lastDate).toLocaleDateString()}
           </div>
         </div>
       ))}
     </div>
   );
 }
-

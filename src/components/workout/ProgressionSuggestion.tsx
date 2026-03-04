@@ -54,9 +54,9 @@ export function ProgressionSuggestion({
       default:
         return {
           icon: Info,
-          color: "text-gray-400",
-          bg: "bg-gray-500/10",
-          border: "border-gray-500",
+          color: "text-[var(--text-2)]",
+          bg: "bg-[var(--accent-muted)]",
+          border: "border-[var(--border-2)]",
           title: "Maintain Current Load",
         };
     }
@@ -81,14 +81,14 @@ export function ProgressionSuggestion({
             {suggestion.type === "increase_weight" ||
             suggestion.type === "deload" ? (
               <div className="bg-black/30 rounded p-2">
-                <div className="text-xs text-gray-400">Suggested Weight</div>
+                <div className="text-xs text-[var(--text-2)]">Suggested Weight</div>
                 <div className="text-lg font-bold text-white">
                   {suggestion.weight} lbs
                 </div>
               </div>
             ) : null}
             <div className="bg-black/30 rounded p-2">
-              <div className="text-xs text-gray-400">Target Reps</div>
+              <div className="text-xs text-[var(--text-2)]">Target Reps</div>
               <div className="text-lg font-bold text-white">
                 {suggestion.reps.min}-{suggestion.reps.max}
               </div>
@@ -96,14 +96,14 @@ export function ProgressionSuggestion({
           </div>
 
           {lastSession && (
-            <div className="text-xs text-gray-400 border-t border-gray-700 pt-2">
+            <div className="text-xs text-[var(--text-2)] border-t border-[var(--border)] pt-2">
               Last session: {lastSession.avgWeight} lbs × {lastSession.avgReps}{" "}
               reps (Est. 1RM: {lastSession.avgEstimated1RM} lbs)
             </div>
           )}
 
           <div className="flex items-center gap-2 mt-2">
-            <div className="flex-1 bg-gray-800 rounded-full h-2">
+            <div className="flex-1 bg-[var(--surface-2)] rounded-full h-2">
               <div
                 className={`h-2 rounded-full ${
                   confidence >= 80
@@ -115,7 +115,7 @@ export function ProgressionSuggestion({
                 style={{ width: `${confidence}%` }}
               />
             </div>
-            <span className="text-xs text-gray-400">
+            <span className="text-xs text-[var(--text-2)]">
               {confidence}% confidence
             </span>
           </div>
