@@ -2,7 +2,7 @@
  * Gemini API integration for AI-powered workout programming
  */
 
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenerativeAI, SchemaType } from "@google/generative-ai";
 
 if (!process.env.GEMINI_API_KEY) {
   throw new Error("GEMINI_API_KEY is not set in environment variables");
@@ -695,6 +695,32 @@ Return ONLY valid JSON (no markdown, no code fences):
   "totalFat": 7
 }`;
 
+const NUTRITION_RESPONSE_SCHEMA = {
+  type: SchemaType.OBJECT,
+  properties: {
+    items: {
+      type: SchemaType.ARRAY,
+      items: {
+        type: SchemaType.OBJECT,
+        properties: {
+          name:         { type: SchemaType.STRING },
+          quantity:     { type: SchemaType.STRING },
+          calories:     { type: SchemaType.NUMBER },
+          proteinGrams: { type: SchemaType.NUMBER },
+          carbsGrams:   { type: SchemaType.NUMBER },
+          fatGrams:     { type: SchemaType.NUMBER },
+        },
+        required: ["name", "calories", "proteinGrams", "carbsGrams", "fatGrams"],
+      },
+    },
+    totalCalories: { type: SchemaType.NUMBER },
+    totalProtein:  { type: SchemaType.NUMBER },
+    totalCarbs:    { type: SchemaType.NUMBER },
+    totalFat:      { type: SchemaType.NUMBER },
+  },
+  required: ["items", "totalCalories", "totalProtein", "totalCarbs", "totalFat"],
+};
+
 /**
  * Analyze a food photo and return structured nutrition data.
  */
@@ -704,7 +730,12 @@ export async function analyzeNutritionFromPhoto(
 ): Promise<NutritionAnalysisResult> {
   const model = genAI.getGenerativeModel({
     model: "gemini-3-flash-preview",
-    generationConfig: { temperature: 0.3, maxOutputTokens: 2048 },
+    generationConfig: {
+      temperature: 0.3,
+      maxOutputTokens: 2048,
+      responseMimeType: "application/json",
+      responseSchema: NUTRITION_RESPONSE_SCHEMA,
+    },
   });
 
   let text: string;
@@ -714,7 +745,7 @@ export async function analyzeNutritionFromPhoto(
         role: "user",
         parts: [
           { inlineData: { data: base64Image, mimeType } },
-          { text: `${NUTRITION_ANALYSIS_PROMPT}\n\nAnalyze the food in this image. Return ONLY valid JSON.` },
+          { text: NUTRITION_ANALYSIS_PROMPT + "\n\nAnalyze the food in this image." },
         ],
       }],
     });
@@ -735,9 +766,9 @@ export async function analyzeNutritionFromPhoto(
 
   const parsed = parseNutritionJSON(text);
   if (parsed.items.length === 0) {
-    console.error("Gemini returned non-parseable nutrition response:", text.substring(0, 500));
+    console.error("Gemini photo nutrition — raw response:", text.substring(0, 500));
     throw new Error(
-      "Could not extract nutrition data from AI response. Please try a clearer, well-lit photo of your food."
+      "No food items detected. Please try a clearer, well-lit photo with the food visible."
     );
   }
   return parsed;
@@ -751,13 +782,18 @@ export async function analyzeNutritionFromText(
 ): Promise<NutritionAnalysisResult> {
   const model = genAI.getGenerativeModel({
     model: "gemini-3-flash-preview",
-    generationConfig: { temperature: 0.3, maxOutputTokens: 2048 },
+    generationConfig: {
+      temperature: 0.3,
+      maxOutputTokens: 2048,
+      responseMimeType: "application/json",
+      responseSchema: NUTRITION_RESPONSE_SCHEMA,
+    },
   });
 
   let text: string;
   try {
     const result = await model.generateContent(
-      `${NUTRITION_ANALYSIS_PROMPT}\n\nFood description:\n${description}\n\nReturn ONLY valid JSON.`
+      `${NUTRITION_ANALYSIS_PROMPT}\n\nFood description:\n${description}`
     );
     text = result.response.text();
   } catch (err: any) {
@@ -771,7 +807,7 @@ export async function analyzeNutritionFromText(
 
   const parsed = parseNutritionJSON(text);
   if (parsed.items.length === 0) {
-    console.error("Gemini returned non-parseable nutrition text response:", text.substring(0, 500));
+    console.error("Gemini text nutrition — raw response:", text.substring(0, 500));
     throw new Error("Could not parse food items from the description. Try being more specific (e.g., '200g chicken breast, 1 cup rice').");
   }
   return parsed;
