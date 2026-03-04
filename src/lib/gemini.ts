@@ -2,7 +2,7 @@
  * Gemini API integration for AI-powered workout programming
  */
 
-import { GoogleGenerativeAI, SchemaType } from "@google/generative-ai";
+import { GoogleGenerativeAI, SchemaType, type Schema } from "@google/generative-ai";
 
 if (!process.env.GEMINI_API_KEY) {
   throw new Error("GEMINI_API_KEY is not set in environment variables");
@@ -695,7 +695,7 @@ Return ONLY valid JSON (no markdown, no code fences):
   "totalFat": 7
 }`;
 
-const NUTRITION_RESPONSE_SCHEMA = {
+const NUTRITION_RESPONSE_SCHEMA: Schema = {
   type: SchemaType.OBJECT,
   properties: {
     items: {
