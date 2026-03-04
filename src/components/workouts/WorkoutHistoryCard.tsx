@@ -1,6 +1,6 @@
 "use client";
 
-import { Calendar, Dumbbell, Clock, TrendingUp } from "lucide-react";
+import { Dumbbell } from "lucide-react";
 import { Doc } from "convex/_generated/dataModel";
 
 interface WorkoutHistoryCardProps {
@@ -22,35 +22,76 @@ export function WorkoutHistoryCard({ session, onClick }: WorkoutHistoryCardProps
   return (
     <button
       onClick={onClick}
-      className="w-full text-left clip-corner bg-zinc-900 border border-zinc-800 hover:border-lime-400 p-4 transition-all active:scale-98"
+      className="w-full text-left rounded-2xl border p-4 transition-all duration-200 cursor-pointer group"
+      style={{ background: "var(--surface)", borderColor: "var(--border)" }}
+      onMouseEnter={(e) => {
+        const el = e.currentTarget as HTMLElement;
+        el.style.borderColor = "var(--accent)";
+        el.style.transform = "translateY(-1px)";
+        el.style.boxShadow = "0 8px 24px rgba(245,166,35,0.1)";
+      }}
+      onMouseLeave={(e) => {
+        const el = e.currentTarget as HTMLElement;
+        el.style.borderColor = "var(--border)";
+        el.style.transform = "translateY(0)";
+        el.style.boxShadow = "none";
+      }}
     >
       <div className="flex items-start justify-between mb-3">
         <div>
-          <h3 className="athletic-title text-xl mb-1">{session.templateName}</h3>
-          <div className="athletic-body text-sm text-zinc-500">
+          <h3
+            className="text-[17px] font-bold uppercase mb-1 leading-tight"
+            style={{ fontFamily: "var(--font-brand)", letterSpacing: "0.04em", color: "var(--text-1)" }}
+          >
+            {session.templateName}
+          </h3>
+          <div
+            className="text-[12px] font-medium"
+            style={{ color: "var(--text-2)", fontFamily: "var(--font-body)" }}
+          >
             {formattedDate} · {formattedTime}
           </div>
         </div>
-        <div className="w-10 h-10 clip-corner bg-lime-400/10 flex items-center justify-center">
-          <Dumbbell className="w-5 h-5 text-lime-400" />
+        <div
+          className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border transition-colors duration-200"
+          style={{
+            background: "var(--accent-muted)",
+            borderColor: "rgba(245,166,35,0.15)",
+          }}
+        >
+          <Dumbbell className="w-5 h-5" style={{ color: "var(--accent)" }} />
         </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-3 athletic-body text-sm">
-        <div className="bg-black/50 p-2 rounded">
-          <div className="text-zinc-500 text-xs mb-1">Volume</div>
-          <div className="text-lime-400 font-bold">
-            {session.totalVolume?.toLocaleString()} lbs
+      <div className="grid grid-cols-3 gap-2.5">
+        {[
+          { label: "Volume", value: `${session.totalVolume?.toLocaleString()} lbs`, accent: true },
+          { label: "Sets",   value: String(session.totalSets), accent: false },
+          { label: "Time",   value: `${session.durationMinutes}m`, accent: false },
+        ].map(({ label, value, accent }) => (
+          <div
+            key={label}
+            className="p-2.5 rounded-xl border"
+            style={{ background: "var(--surface-2)", borderColor: "var(--border)" }}
+          >
+            <div
+              className="text-[10px] font-bold uppercase tracking-[0.12em] mb-1"
+              style={{ color: "var(--text-2)", fontFamily: "var(--font-body)" }}
+            >
+              {label}
+            </div>
+            <div
+              className="text-[13px] font-bold"
+              style={{
+                color: accent ? "var(--accent)" : "var(--text-1)",
+                fontFamily: "var(--font-brand)",
+                letterSpacing: "0.02em",
+              }}
+            >
+              {value}
+            </div>
           </div>
-        </div>
-        <div className="bg-black/50 p-2 rounded">
-          <div className="text-zinc-500 text-xs mb-1">Sets</div>
-          <div className="text-white font-bold">{session.totalSets}</div>
-        </div>
-        <div className="bg-black/50 p-2 rounded">
-          <div className="text-zinc-500 text-xs mb-1">Time</div>
-          <div className="text-white font-bold">{session.durationMinutes}m</div>
-        </div>
+        ))}
       </div>
     </button>
   );

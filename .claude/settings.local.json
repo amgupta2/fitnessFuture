@@ -2,7 +2,11 @@
   "permissions": {
     "allow": [
       "Bash(npx create-next-app@latest:*)",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(cat \"/Users/amangupta/Desktop/ycHereICome/src/app/\\(app\\)/workouts/page.tsx\")",
+      "WebSearch",
+      "WebFetch(domain:github.com)",
+      "Bash(python3 /Users/amangupta/.claude/plugins/cache/ui-ux-pro-max-skill/ui-ux-pro-max/2.0.1/.claude/skills/ui-ux-pro-max/scripts/search.py \"fitness wellness athletic performance app inclusive all genders\" --design-system -p \"UniFit\" 2>&1)"
     ]
   }
 }

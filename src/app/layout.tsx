@@ -1,24 +1,28 @@
 import type { Metadata, Viewport } from "next";
-import { Barlow_Condensed, Outfit } from "next/font/google";
+import { Syne, Nunito } from "next/font/google";
 import "./globals.css";
 import { ConvexClientProvider } from "@/lib/convex";
 
 /**
- * Barlow Condensed — athletic, condensed display font for headings & logo
+ * Syne — bold, geometric, editorial display font for headings & logo.
+ * Distinctly modern, far from typical "gym-bro" condensed athleticism.
  */
-const barlowCondensed = Barlow_Condensed({
+const syne = Syne({
   variable: "--font-brand",
   subsets: ["latin"],
-  weight: ["500", "600", "700", "800"],
+  weight: ["400", "600", "700", "800"],
+  display: "swap",
 });
 
 /**
- * Outfit — refined, modern body font with just enough personality
+ * Nunito — friendly, rounded, highly readable body font.
+ * Warm and approachable without being childish.
  */
-const outfit = Outfit({
+const nunito = Nunito({
   variable: "--font-body",
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600"],
+  weight: ["300", "400", "500", "600", "700"],
+  display: "swap",
 });
 
 export const viewport: Viewport = {
@@ -40,7 +44,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
-      <body className={`${barlowCondensed.variable} ${outfit.variable} antialiased`}>
+      <body className={`${syne.variable} ${nunito.variable} antialiased`}>
         <ConvexClientProvider>{children}</ConvexClientProvider>
       </body>
     </html>

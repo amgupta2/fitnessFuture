@@ -42,8 +42,13 @@ export default function AppLayout({
 
   if (!user) {
     return (
-      <div className="flex h-screen items-center justify-center bg-black text-white">
-        <p>Loading...</p>
+      <div
+        className="flex h-screen items-center justify-center"
+        style={{ background: "var(--bg)", color: "var(--text-2)" }}
+      >
+        <p className="text-sm font-medium tracking-widest uppercase" style={{ fontFamily: "var(--font-body)" }}>
+          Loading…
+        </p>
       </div>
     );
   }
@@ -52,7 +57,7 @@ export default function AppLayout({
   const isWorkoutActive = pathname === "/workout-active";
 
   return (
-    <div className="flex h-screen bg-black text-white">
+    <div className="flex h-screen" style={{ background: "var(--bg)", color: "var(--text-1)" }}>
       {/* Sidebar — desktop always-visible + mobile drawer */}
       {!isWorkoutActive && (
         <Sidebar
@@ -72,7 +77,10 @@ export default function AppLayout({
         )}
 
         {/* Page content — pb-16 on mobile clears the bottom nav bar */}
-        <main className={`flex-1 overflow-y-auto bg-zinc-950 ${!isWorkoutActive ? "pb-16 lg:pb-0" : ""}`}>
+        <main
+          className={`flex-1 overflow-y-auto ${!isWorkoutActive ? "pb-16 lg:pb-0" : ""}`}
+          style={{ background: "var(--bg)" }}
+        >
           {children}
         </main>
       </div>

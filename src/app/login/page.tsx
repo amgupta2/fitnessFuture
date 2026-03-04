@@ -8,7 +8,6 @@ import { redirect } from "next/navigation";
 import { LoginForm } from "@/components/auth/LoginForm";
 
 export default async function LoginPage() {
-  // Redirect if already logged in
   const session = await getSession();
   if (session) {
     redirect("/dashboard");
@@ -16,38 +15,87 @@ export default async function LoginPage() {
 
   return (
     <div
-      className="min-h-screen flex items-center justify-center p-6"
-      style={{
-        background: `
-          radial-gradient(ellipse 90% 55% at 50% -5%, rgba(203, 255, 71, 0.06) 0%, transparent 65%),
-          var(--bg)
-        `,
-      }}
+      className="min-h-screen flex items-center justify-center p-6 relative overflow-hidden"
+      style={{ background: "var(--bg)" }}
     >
-      <div className="w-full max-w-md animate-fadeUp">
-        {/* Logo mark */}
+      {/* Ambient glow layers */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background: `
+            radial-gradient(ellipse 80% 50% at 50% -10%, rgba(245,166,35,0.07) 0%, transparent 60%),
+            radial-gradient(ellipse 50% 40% at 20% 100%, rgba(92,121,224,0.04) 0%, transparent 55%)
+          `,
+        }}
+      />
+      {/* Dot grid */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          backgroundImage: "radial-gradient(circle, rgba(255,255,255,0.05) 1px, transparent 1px)",
+          backgroundSize: "30px 30px",
+          maskImage: "radial-gradient(ellipse 80% 80% at 50% 50%, black 0%, transparent 100%)",
+        }}
+      />
+
+      <div className="w-full max-w-md relative animate-fadeUp">
+        {/* Logo / hero */}
         <div className="flex flex-col items-center mb-10">
-          <div className="flex items-center gap-3 mb-4">
-            <div
-              className="w-8 h-8 rounded-[4px] shrink-0"
-              style={{ background: "var(--accent)" }}
+          {/* Logo mark — three bars */}
+          <div className="flex items-end gap-[4px] mb-5 h-10">
+            <span
+              className="w-[10px] rounded-t-[3px]"
+              style={{ height: "45%", background: "var(--accent)", opacity: 0.4 }}
             />
-            <h1
-              className="text-[32px] font-bold tracking-[0.2em] uppercase leading-none"
-              style={{ fontFamily: "var(--font-brand)", color: "var(--text-1)" }}
-            >
-              UniFit
-            </h1>
+            <span
+              className="w-[10px] rounded-t-[3px]"
+              style={{ height: "70%", background: "var(--accent)", opacity: 0.7 }}
+            />
+            <span
+              className="w-[10px] rounded-t-[3px]"
+              style={{ height: "100%", background: "var(--accent)" }}
+            />
           </div>
+
+          <h1
+            className="text-[38px] font-bold tracking-[0.18em] uppercase leading-none mb-2"
+            style={{ fontFamily: "var(--font-brand)", color: "var(--text-1)" }}
+          >
+            UniFit
+          </h1>
           <p
-            className="text-sm tracking-wide text-center"
-            style={{ color: "var(--text-2)" }}
+            className="text-[11px] tracking-[0.22em] uppercase font-semibold mb-3"
+            style={{ color: "var(--accent)", fontFamily: "var(--font-body)" }}
+          >
+            Performance Platform
+          </p>
+          <p
+            className="text-[13px] text-center leading-relaxed max-w-[280px]"
+            style={{ color: "var(--text-2)", fontFamily: "var(--font-body)" }}
           >
             Where training data, intelligence, and coaching merge
           </p>
         </div>
 
         <LoginForm />
+
+        {/* Feature pills */}
+        <div className="flex flex-wrap justify-center gap-2 mt-8">
+          {["AI Coaching", "Progress Analytics", "Nutrition Tracking", "Form Analysis"].map((feat) => (
+            <span
+              key={feat}
+              className="text-[10px] font-semibold tracking-[0.12em] uppercase px-3 py-1.5 rounded-full border"
+              style={{
+                color: "var(--text-2)",
+                borderColor: "var(--border)",
+                background: "var(--surface)",
+                fontFamily: "var(--font-body)",
+              }}
+            >
+              {feat}
+            </span>
+          ))}
+        </div>
       </div>
     </div>
   );
