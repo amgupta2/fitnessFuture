@@ -212,11 +212,11 @@ export function LogMealModal({
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={handleClose} />
 
-      <div className="relative w-full max-w-lg bg-zinc-900 border border-zinc-800 rounded-t-2xl sm:rounded-2xl max-h-[85vh] flex flex-col overflow-hidden">
+      <div className="relative w-full max-w-lg bg-[var(--surface)] border border-[var(--border)] rounded-t-2xl sm:rounded-2xl max-h-[85vh] flex flex-col overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-zinc-800">
+        <div className="flex items-center justify-between p-4 border-b border-[var(--border)]">
           <h2 className="text-lg font-semibold">Log Meal</h2>
-          <button onClick={handleClose} className="p-1.5 rounded-lg hover:bg-zinc-800 text-zinc-400">
+          <button onClick={handleClose} className="p-1.5 rounded-lg hover:bg-[var(--surface-2)] text-[var(--text-2)]">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -230,7 +230,7 @@ export function LogMealModal({
               className={`flex-1 py-1.5 text-xs font-medium rounded-lg transition-colors ${
                 mealType === mt.id
                   ? "bg-white text-black"
-                  : "bg-zinc-800 text-zinc-400 hover:bg-zinc-700"
+                  : "bg-[var(--surface-2)] text-[var(--text-2)] hover:bg-[var(--surface-3)]"
               }`}
             >
               {mt.label}
@@ -240,7 +240,7 @@ export function LogMealModal({
 
         {/* Tabs */}
         {step === "input" && (
-          <div className="flex border-b border-zinc-800 mx-4 mt-3">
+          <div className="flex border-b border-[var(--border)] mx-4 mt-3">
             {tabs.map((t) => {
               const Icon = t.icon;
               return (
@@ -249,8 +249,8 @@ export function LogMealModal({
                   onClick={() => { setTab(t.id); setError(null); }}
                   className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-medium border-b-2 transition-colors ${
                     tab === t.id
-                      ? "border-lime-400 text-white"
-                      : "border-transparent text-zinc-500 hover:text-zinc-300"
+                      ? "border-[var(--accent)] text-white"
+                      : "border-transparent text-[var(--text-2)] hover:text-[var(--text-1)]"
                   }`}
                 >
                   <Icon className="w-3.5 h-3.5" />
@@ -266,33 +266,33 @@ export function LogMealModal({
           {step === "input" && tab === "photo" && (
             <>
               {isAnalyzing ? (
-                <div className="w-full border-2 border-dashed border-zinc-700 rounded-xl p-8 text-center">
+                <div className="w-full border-2 border-dashed border-[var(--border-2)] rounded-xl p-8 text-center">
                   <div className="flex flex-col items-center gap-2">
-                    <Loader2 className="w-8 h-8 animate-spin text-lime-400" />
-                    <p className="text-sm text-zinc-400">Analyzing your meal...</p>
+                    <Loader2 className="w-8 h-8 animate-spin text-[var(--accent)]" />
+                    <p className="text-sm text-[var(--text-2)]">Analyzing your meal...</p>
                   </div>
                 </div>
               ) : (
                 <div className="grid grid-cols-2 gap-3">
                   <button
                     onClick={() => cameraInputRef.current?.click()}
-                    className="flex flex-col items-center gap-2 border-2 border-dashed border-zinc-700 hover:border-lime-500/50 rounded-xl p-6 text-center transition-colors group"
+                    className="flex flex-col items-center gap-2 border-2 border-dashed border-[var(--border-2)] hover:border-[rgba(245,166,35,0.35)] rounded-xl p-6 text-center transition-colors group"
                   >
-                    <Camera className="w-7 h-7 text-zinc-500 group-hover:text-lime-400 transition-colors" />
-                    <p className="text-sm font-medium text-zinc-300">Take Photo</p>
-                    <p className="text-[10px] text-zinc-600">Open camera</p>
+                    <Camera className="w-7 h-7 text-[var(--text-2)] group-hover:text-[var(--accent)] transition-colors" />
+                    <p className="text-sm font-medium text-[var(--text-1)]">Take Photo</p>
+                    <p className="text-[10px] text-[var(--text-3)]">Open camera</p>
                   </button>
                   <button
                     onClick={() => fileInputRef.current?.click()}
-                    className="flex flex-col items-center gap-2 border-2 border-dashed border-zinc-700 hover:border-lime-500/50 rounded-xl p-6 text-center transition-colors group"
+                    className="flex flex-col items-center gap-2 border-2 border-dashed border-[var(--border-2)] hover:border-[rgba(245,166,35,0.35)] rounded-xl p-6 text-center transition-colors group"
                   >
-                    <ImageIcon className="w-7 h-7 text-zinc-500 group-hover:text-lime-400 transition-colors" />
-                    <p className="text-sm font-medium text-zinc-300">Choose Photo</p>
-                    <p className="text-[10px] text-zinc-600">From camera roll</p>
+                    <ImageIcon className="w-7 h-7 text-[var(--text-2)] group-hover:text-[var(--accent)] transition-colors" />
+                    <p className="text-sm font-medium text-[var(--text-1)]">Choose Photo</p>
+                    <p className="text-[10px] text-[var(--text-3)]">From camera roll</p>
                   </button>
                 </div>
               )}
-              <p className="text-xs text-zinc-600 text-center">JPEG, PNG, WebP — max 10 MB</p>
+              <p className="text-xs text-[var(--text-3)] text-center">JPEG, PNG, WebP — max 10 MB</p>
               <input
                 ref={cameraInputRef}
                 type="file"
@@ -326,12 +326,12 @@ export function LogMealModal({
                 onChange={(e) => setTextInput(e.target.value)}
                 placeholder="Describe what you ate, e.g.&#10;&#10;Grilled chicken breast 200g, cup of brown rice, steamed broccoli, tablespoon olive oil"
                 rows={4}
-                className="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 text-sm text-white placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-lime-500/40 resize-none"
+                className="w-full bg-[var(--surface-2)] border border-[var(--border-2)] rounded-xl px-4 py-3 text-sm text-white placeholder-[var(--text-3)] focus:outline-none focus:ring-2 focus:ring-[rgba(245,166,35,0.3)] resize-none"
               />
               <button
                 onClick={analyzeText}
                 disabled={!textInput.trim() || isAnalyzing}
-                className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-lime-500 hover:bg-lime-400 text-black font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-[var(--accent)] hover:bg-[var(--accent)] text-black font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isAnalyzing ? (
                   <>
@@ -351,54 +351,54 @@ export function LogMealModal({
                 value={manualName}
                 onChange={(e) => setManualName(e.target.value)}
                 placeholder="Food name"
-                className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 text-sm text-white placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-lime-500/40"
+                className="w-full bg-[var(--surface-2)] border border-[var(--border-2)] rounded-lg px-3 py-2.5 text-sm text-white placeholder-[var(--text-3)] focus:outline-none focus:ring-2 focus:ring-[rgba(245,166,35,0.3)]"
               />
               <div className="grid grid-cols-4 gap-2">
                 <div>
-                  <label className="text-[10px] text-zinc-500 uppercase">Cals</label>
+                  <label className="text-[10px] text-[var(--text-2)] uppercase">Cals</label>
                   <input
                     type="number"
                     value={manualCals}
                     onChange={(e) => setManualCals(e.target.value)}
                     placeholder="0"
-                    className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-2 py-2 text-sm text-white text-center placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-lime-500/40"
+                    className="w-full bg-[var(--surface-2)] border border-[var(--border-2)] rounded-lg px-2 py-2 text-sm text-white text-center placeholder-[var(--text-3)] focus:outline-none focus:ring-2 focus:ring-[rgba(245,166,35,0.3)]"
                   />
                 </div>
                 <div>
-                  <label className="text-[10px] text-zinc-500 uppercase">Protein</label>
+                  <label className="text-[10px] text-[var(--text-2)] uppercase">Protein</label>
                   <input
                     type="number"
                     value={manualP}
                     onChange={(e) => setManualP(e.target.value)}
                     placeholder="0"
-                    className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-2 py-2 text-sm text-white text-center placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-lime-500/40"
+                    className="w-full bg-[var(--surface-2)] border border-[var(--border-2)] rounded-lg px-2 py-2 text-sm text-white text-center placeholder-[var(--text-3)] focus:outline-none focus:ring-2 focus:ring-[rgba(245,166,35,0.3)]"
                   />
                 </div>
                 <div>
-                  <label className="text-[10px] text-zinc-500 uppercase">Carbs</label>
+                  <label className="text-[10px] text-[var(--text-2)] uppercase">Carbs</label>
                   <input
                     type="number"
                     value={manualC}
                     onChange={(e) => setManualC(e.target.value)}
                     placeholder="0"
-                    className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-2 py-2 text-sm text-white text-center placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-lime-500/40"
+                    className="w-full bg-[var(--surface-2)] border border-[var(--border-2)] rounded-lg px-2 py-2 text-sm text-white text-center placeholder-[var(--text-3)] focus:outline-none focus:ring-2 focus:ring-[rgba(245,166,35,0.3)]"
                   />
                 </div>
                 <div>
-                  <label className="text-[10px] text-zinc-500 uppercase">Fat</label>
+                  <label className="text-[10px] text-[var(--text-2)] uppercase">Fat</label>
                   <input
                     type="number"
                     value={manualF}
                     onChange={(e) => setManualF(e.target.value)}
                     placeholder="0"
-                    className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-2 py-2 text-sm text-white text-center placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-lime-500/40"
+                    className="w-full bg-[var(--surface-2)] border border-[var(--border-2)] rounded-lg px-2 py-2 text-sm text-white text-center placeholder-[var(--text-3)] focus:outline-none focus:ring-2 focus:ring-[rgba(245,166,35,0.3)]"
                   />
                 </div>
               </div>
               <button
                 onClick={addManualItem}
                 disabled={!manualName.trim()}
-                className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-white font-medium transition-colors disabled:opacity-40"
+                className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-[var(--surface-2)] hover:bg-[var(--surface-3)] text-white font-medium transition-colors disabled:opacity-40"
               >
                 <Plus className="w-4 h-4" />
                 Add Item
@@ -409,27 +409,27 @@ export function LogMealModal({
           {/* Review step */}
           {step === "review" && (
             <div className="space-y-3">
-              <p className="text-xs text-zinc-500 uppercase tracking-wider font-medium">
+              <p className="text-xs text-[var(--text-2)] uppercase tracking-wider font-medium">
                 Review Items
               </p>
               {items.map((item, idx) => (
-                <div key={idx} className="flex items-center justify-between bg-zinc-800/60 rounded-lg px-3 py-2.5">
+                <div key={idx} className="flex items-center justify-between bg-[var(--surface-2)]/60 rounded-lg px-3 py-2.5">
                   <div className="min-w-0 flex-1">
                     <p className="text-sm text-white truncate">{item.name}</p>
                     {item.quantity && (
-                      <p className="text-xs text-zinc-500">{item.quantity}</p>
+                      <p className="text-xs text-[var(--text-2)]">{item.quantity}</p>
                     )}
                   </div>
                   <div className="flex items-center gap-3 shrink-0">
                     <div className="text-right">
-                      <p className="text-xs text-zinc-300 tabular-nums">{item.calories} kcal</p>
-                      <p className="text-[10px] text-zinc-600 tabular-nums">
+                      <p className="text-xs text-[var(--text-1)] tabular-nums">{item.calories} kcal</p>
+                      <p className="text-[10px] text-[var(--text-3)] tabular-nums">
                         P{item.proteinGrams} C{item.carbsGrams} F{item.fatGrams}
                       </p>
                     </div>
                     <button
                       onClick={() => removeItem(idx)}
-                      className="p-1 rounded hover:bg-zinc-700 text-zinc-600 hover:text-red-400 transition-colors"
+                      className="p-1 rounded hover:bg-[var(--surface-3)] text-[var(--text-3)] hover:text-red-400 transition-colors"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
@@ -439,8 +439,8 @@ export function LogMealModal({
 
               {/* Totals */}
               {items.length > 0 && (
-                <div className="border-t border-zinc-800 pt-3 flex items-center justify-between text-sm">
-                  <span className="text-zinc-400 font-medium">Total</span>
+                <div className="border-t border-[var(--border)] pt-3 flex items-center justify-between text-sm">
+                  <span className="text-[var(--text-2)] font-medium">Total</span>
                   <span className="text-white tabular-nums font-semibold">
                     {items.reduce((s, i) => s + i.calories, 0)} kcal
                   </span>
@@ -459,16 +459,16 @@ export function LogMealModal({
 
         {/* Footer actions */}
         {step === "review" && items.length > 0 && (
-          <div className="p-4 border-t border-zinc-800 flex gap-3">
+          <div className="p-4 border-t border-[var(--border)] flex gap-3">
             <button
               onClick={() => { reset(); setStep("input"); }}
-              className="flex-1 py-3 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-white font-medium transition-colors"
+              className="flex-1 py-3 rounded-xl bg-[var(--surface-2)] hover:bg-[var(--surface-3)] text-white font-medium transition-colors"
             >
               Back
             </button>
             <button
               onClick={handleConfirm}
-              className="flex-1 py-3 rounded-xl bg-lime-500 hover:bg-lime-400 text-black font-semibold transition-colors"
+              className="flex-1 py-3 rounded-xl bg-[var(--accent)] hover:bg-[var(--accent)] text-black font-semibold transition-colors"
             >
               Log Meal
             </button>

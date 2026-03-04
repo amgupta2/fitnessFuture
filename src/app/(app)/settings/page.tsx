@@ -160,10 +160,10 @@ export default function SettingsPage() {
       <div className="p-6">
         <div className="max-w-4xl mx-auto">
           <div className="animate-pulse">
-            <div className="h-8 bg-zinc-800 rounded w-48 mb-6"></div>
+            <div className="h-8 bg-[var(--surface-2)] rounded w-48 mb-6"></div>
             <div className="space-y-4">
-              <div className="h-40 bg-zinc-800 rounded"></div>
-              <div className="h-40 bg-zinc-800 rounded"></div>
+              <div className="h-40 bg-[var(--surface-2)] rounded"></div>
+              <div className="h-40 bg-[var(--surface-2)] rounded"></div>
             </div>
           </div>
         </div>
@@ -176,8 +176,8 @@ export default function SettingsPage() {
       <div className="p-6">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-3xl font-bold mb-6">Settings</h1>
-          <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-8 text-center">
-            <p className="text-zinc-400">Please log in to access settings</p>
+          <div className="bg-[var(--surface)] border border-[var(--border)] rounded-lg p-8 text-center">
+            <p className="text-[var(--text-2)]">Please log in to access settings</p>
           </div>
         </div>
       </div>
@@ -190,10 +190,10 @@ export default function SettingsPage() {
       disabled={isSaving || saveSuccess}
       className={`px-6 py-3 font-medium flex items-center justify-center gap-2 transition-all athletic-body uppercase text-sm ${
         saveSuccess
-          ? "bg-lime-400 text-black"
+          ? "bg-[var(--accent)] text-black"
           : isSaving
-          ? "bg-zinc-700 text-zinc-400"
-          : "bg-lime-400 text-black hover:bg-lime-300"
+          ? "bg-[var(--surface-3)] text-[var(--text-2)]"
+          : "bg-[var(--accent)] text-black hover:bg-[var(--accent)]"
       } ${className ?? ""}`}
     >
       {saveSuccess ? (
@@ -218,7 +218,7 @@ export default function SettingsPage() {
         {/* Header */}
         <div className="mb-6">
           <h1 className="athletic-title text-4xl text-white tracking-wide">SETTINGS</h1>
-          <p className="text-zinc-400 text-sm mt-1">Manage your profile and preferences</p>
+          <p className="text-[var(--text-2)] text-sm mt-1">Manage your profile and preferences</p>
         </div>
 
         {/* Save Button - Top */}
@@ -228,10 +228,10 @@ export default function SettingsPage() {
 
         <div className="space-y-6">
           {/* ── Profile ──────────────────────────────── */}
-          <SectionCard icon={<User className="w-4 h-4 text-lime-400" />} title="Profile">
+          <SectionCard icon={<User className="w-4 h-4 text-[var(--accent)]" />} title="Profile">
             <div className="space-y-4">
               <div>
-                <label className="block text-xs text-zinc-500 athletic-body uppercase tracking-wider mb-2">
+                <label className="block text-xs text-[var(--text-2)] athletic-body uppercase tracking-wider mb-2">
                   Name
                 </label>
                 <input
@@ -239,30 +239,30 @@ export default function SettingsPage() {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Enter your name"
-                  className="w-full bg-zinc-950 border border-zinc-700 px-4 py-3 text-white placeholder-zinc-600 focus:outline-none focus:border-lime-400 transition-colors"
+                  className="w-full bg-[var(--bg)] border border-[var(--border-2)] px-4 py-3 text-white placeholder-zinc-600 focus:outline-none focus:border-[var(--accent)] transition-colors"
                 />
               </div>
               <div>
-                <label className="block text-xs text-zinc-500 athletic-body uppercase tracking-wider mb-2">
+                <label className="block text-xs text-[var(--text-2)] athletic-body uppercase tracking-wider mb-2">
                   Email
                 </label>
                 <input
                   type="email"
                   value={user.email}
                   readOnly
-                  className="w-full bg-zinc-950 border border-zinc-800 px-4 py-3 text-zinc-500 cursor-not-allowed"
+                  className="w-full bg-[var(--bg)] border border-[var(--border)] px-4 py-3 text-[var(--text-2)] cursor-not-allowed"
                 />
-                <p className="text-xs text-zinc-600 mt-1">Managed by WorkOS — cannot be changed here</p>
+                <p className="text-xs text-[var(--text-3)] mt-1">Managed by WorkOS — cannot be changed here</p>
               </div>
             </div>
           </SectionCard>
 
           {/* ── Training Profile ─────────────────────── */}
-          <SectionCard icon={<Trophy className="w-4 h-4 text-lime-400" />} title="Training Profile">
+          <SectionCard icon={<Trophy className="w-4 h-4 text-[var(--accent)]" />} title="Training Profile">
             <div className="space-y-5">
               {/* Experience level */}
               <div>
-                <label className="block text-xs text-zinc-500 athletic-body uppercase tracking-wider mb-3">
+                <label className="block text-xs text-[var(--text-2)] athletic-body uppercase tracking-wider mb-3">
                   Experience Level
                 </label>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -276,14 +276,14 @@ export default function SettingsPage() {
                       onClick={() => setExperienceLevel(level.value)}
                       className={`p-4 border-2 transition-all text-left ${
                         experienceLevel === level.value
-                          ? "border-lime-400 bg-lime-400/10"
-                          : "border-zinc-700 bg-zinc-900 hover:border-zinc-600"
+                          ? "border-[var(--accent)] bg-[var(--accent-muted)]"
+                          : "border-[var(--border-2)] bg-[var(--surface)] hover:border-zinc-600"
                       }`}
                     >
                       <div className="font-bold text-white athletic-body text-sm uppercase tracking-wider">
                         {level.label}
                       </div>
-                      <div className="text-xs text-zinc-400 mt-1">{level.desc}</div>
+                      <div className="text-xs text-[var(--text-2)] mt-1">{level.desc}</div>
                     </button>
                   ))}
                 </div>
@@ -291,7 +291,7 @@ export default function SettingsPage() {
 
               {/* Primary Goal */}
               <div>
-                <label className="block text-xs text-zinc-500 athletic-body uppercase tracking-wider mb-3">
+                <label className="block text-xs text-[var(--text-2)] athletic-body uppercase tracking-wider mb-3">
                   Primary Goal
                 </label>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
@@ -308,8 +308,8 @@ export default function SettingsPage() {
                       onClick={() => setPrimaryGoal(g.value)}
                       className={`py-3 px-4 border-2 text-sm transition-all athletic-body text-center ${
                         primaryGoal === g.value
-                          ? "border-lime-400 bg-lime-400/10 text-white"
-                          : "border-zinc-700 text-zinc-400 hover:border-zinc-600"
+                          ? "border-[var(--accent)] bg-[var(--accent-muted)] text-white"
+                          : "border-[var(--border-2)] text-[var(--text-2)] hover:border-zinc-600"
                       }`}
                     >
                       {g.label}
@@ -321,8 +321,8 @@ export default function SettingsPage() {
           </SectionCard>
 
           {/* ── Equipment ────────────────────────────── */}
-          <SectionCard icon={<Target className="w-4 h-4 text-lime-400" />} title="Available Equipment">
-            <p className="text-xs text-zinc-500 mb-3">AI will only prescribe exercises you can do.</p>
+          <SectionCard icon={<Target className="w-4 h-4 text-[var(--accent)]" />} title="Available Equipment">
+            <p className="text-xs text-[var(--text-2)] mb-3">AI will only prescribe exercises you can do.</p>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
               {(
                 [
@@ -341,8 +341,8 @@ export default function SettingsPage() {
                   onClick={() => toggleEquipment(o.value)}
                   className={`py-3 px-3 border-2 text-xs transition-all athletic-body text-center ${
                     equipment.includes(o.value)
-                      ? "border-lime-400 bg-lime-400/10 text-white"
-                      : "border-zinc-700 text-zinc-400 hover:border-zinc-600"
+                      ? "border-[var(--accent)] bg-[var(--accent-muted)] text-white"
+                      : "border-[var(--border-2)] text-[var(--text-2)] hover:border-zinc-600"
                   }`}
                 >
                   {o.label}
@@ -352,19 +352,19 @@ export default function SettingsPage() {
           </SectionCard>
 
           {/* ── Target Muscles ───────────────────────── */}
-          <SectionCard icon={<Target className="w-4 h-4 text-lime-400" />} title="Target Muscle Groups">
-            <p className="text-xs text-zinc-500 mb-4">AI will prioritize these muscles in program design.</p>
+          <SectionCard icon={<Target className="w-4 h-4 text-[var(--accent)]" />} title="Target Muscle Groups">
+            <p className="text-xs text-[var(--text-2)] mb-4">AI will prioritize these muscles in program design.</p>
             <MuscleSelector selected={targetMuscleGroups} onChange={setTargetMuscleGroups} />
           </SectionCard>
 
           {/* ── Physical Profile ─────────────────────── */}
-          <SectionCard icon={<User className="w-4 h-4 text-lime-400" />} title="Physical Profile">
+          <SectionCard icon={<User className="w-4 h-4 text-[var(--accent)]" />} title="Physical Profile">
             <div className="space-y-4">
               <div>
-                <label className="block text-xs text-zinc-500 athletic-body uppercase tracking-wider mb-3">
+                <label className="block text-xs text-[var(--text-2)] athletic-body uppercase tracking-wider mb-3">
                   Gender
                 </label>
-                <p className="text-[10px] text-zinc-600 -mt-2 mb-2">
+                <p className="text-[10px] text-[var(--text-3)] -mt-2 mb-2">
                   Used for accurate BMR &amp; nutrition calculations
                 </p>
                 <div className="grid grid-cols-3 gap-2">
@@ -378,8 +378,8 @@ export default function SettingsPage() {
                       onClick={() => setGender(o.value)}
                       className={`py-3 px-3 border-2 text-xs transition-all athletic-body text-center ${
                         gender === o.value
-                          ? "border-lime-400 bg-lime-400/10 text-white"
-                          : "border-zinc-700 text-zinc-400 hover:border-zinc-600"
+                          ? "border-[var(--accent)] bg-[var(--accent-muted)] text-white"
+                          : "border-[var(--border-2)] text-[var(--text-2)] hover:border-zinc-600"
                       }`}
                     >
                       {o.label}
@@ -389,7 +389,7 @@ export default function SettingsPage() {
               </div>
               <div className="grid grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-xs text-zinc-500 athletic-body uppercase tracking-wider mb-2">
+                  <label className="block text-xs text-[var(--text-2)] athletic-body uppercase tracking-wider mb-2">
                     Age
                   </label>
                   <input
@@ -399,11 +399,11 @@ export default function SettingsPage() {
                     value={age}
                     onChange={(e) => setAge(e.target.value)}
                     placeholder="e.g. 28"
-                    className="w-full bg-zinc-950 border border-zinc-700 px-3 py-3 text-white placeholder-zinc-600 focus:outline-none focus:border-lime-400 transition-colors text-sm"
+                    className="w-full bg-[var(--bg)] border border-[var(--border-2)] px-3 py-3 text-white placeholder-zinc-600 focus:outline-none focus:border-[var(--accent)] transition-colors text-sm"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs text-zinc-500 athletic-body uppercase tracking-wider mb-2">
+                  <label className="block text-xs text-[var(--text-2)] athletic-body uppercase tracking-wider mb-2">
                     Height (cm)
                   </label>
                   <input
@@ -413,11 +413,11 @@ export default function SettingsPage() {
                     value={height}
                     onChange={(e) => setHeight(e.target.value)}
                     placeholder="e.g. 175"
-                    className="w-full bg-zinc-950 border border-zinc-700 px-3 py-3 text-white placeholder-zinc-600 focus:outline-none focus:border-lime-400 transition-colors text-sm"
+                    className="w-full bg-[var(--bg)] border border-[var(--border-2)] px-3 py-3 text-white placeholder-zinc-600 focus:outline-none focus:border-[var(--accent)] transition-colors text-sm"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs text-zinc-500 athletic-body uppercase tracking-wider mb-2">
+                  <label className="block text-xs text-[var(--text-2)] athletic-body uppercase tracking-wider mb-2">
                     Body Weight
                   </label>
                   <input
@@ -427,7 +427,7 @@ export default function SettingsPage() {
                     value={bodyWeight}
                     onChange={(e) => setBodyWeight(e.target.value)}
                     placeholder="lbs / kg"
-                    className="w-full bg-zinc-950 border border-zinc-700 px-3 py-3 text-white placeholder-zinc-600 focus:outline-none focus:border-lime-400 transition-colors text-sm"
+                    className="w-full bg-[var(--bg)] border border-[var(--border-2)] px-3 py-3 text-white placeholder-zinc-600 focus:outline-none focus:border-[var(--accent)] transition-colors text-sm"
                   />
                 </div>
               </div>
@@ -435,8 +435,8 @@ export default function SettingsPage() {
           </SectionCard>
 
           {/* ── Injuries ─────────────────────────────── */}
-          <SectionCard icon={<Shield className="w-4 h-4 text-lime-400" />} title="Injuries & Limitations">
-            <p className="text-xs text-zinc-500 mb-3">AI will avoid exercises that aggravate these areas.</p>
+          <SectionCard icon={<Shield className="w-4 h-4 text-[var(--accent)]" />} title="Injuries & Limitations">
+            <p className="text-xs text-[var(--text-2)] mb-3">AI will avoid exercises that aggravate these areas.</p>
             <div className="flex flex-wrap gap-2 mb-3">
               {INJURY_PRESETS.map((p) => (
                 <button
@@ -445,7 +445,7 @@ export default function SettingsPage() {
                   className={`px-3 py-1 text-xs border transition-all athletic-body ${
                     injuries.includes(p)
                       ? "border-red-400 bg-red-400/10 text-red-400"
-                      : "border-zinc-700 text-zinc-400 hover:border-zinc-600"
+                      : "border-[var(--border-2)] text-[var(--text-2)] hover:border-zinc-600"
                   }`}
                 >
                   {p}
@@ -459,11 +459,11 @@ export default function SettingsPage() {
                 onChange={(e) => setInjuryInput(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && addCustomInjury()}
                 placeholder="Add custom limitation..."
-                className="flex-1 bg-zinc-950 border border-zinc-700 px-3 py-2 text-white placeholder-zinc-600 focus:outline-none focus:border-lime-400 text-xs"
+                className="flex-1 bg-[var(--bg)] border border-[var(--border-2)] px-3 py-2 text-white placeholder-zinc-600 focus:outline-none focus:border-[var(--accent)] text-xs"
               />
               <button
                 onClick={addCustomInjury}
-                className="px-3 py-2 bg-zinc-800 text-zinc-300 text-xs hover:bg-zinc-700 transition-colors"
+                className="px-3 py-2 bg-[var(--surface-2)] text-[var(--text-1)] text-xs hover:bg-[var(--surface-3)] transition-colors"
               >
                 Add
               </button>
@@ -489,8 +489,8 @@ export default function SettingsPage() {
           </SectionCard>
 
           {/* ── Lifestyle ────────────────────────────── */}
-          <SectionCard icon={<Moon className="w-4 h-4 text-lime-400" />} title="Lifestyle">
-            <p className="text-xs text-zinc-500 mb-4">Helps the AI calibrate recovery volume.</p>
+          <SectionCard icon={<Moon className="w-4 h-4 text-[var(--accent)]" />} title="Lifestyle">
+            <p className="text-xs text-[var(--text-2)] mb-4">Helps the AI calibrate recovery volume.</p>
             <div className="space-y-4">
               <PillRow
                 label="Sleep quality"
@@ -526,10 +526,10 @@ export default function SettingsPage() {
           </SectionCard>
 
           {/* ── Preferences ──────────────────────────── */}
-          <SectionCard icon={<SettingsIcon className="w-4 h-4 text-lime-400" />} title="Preferences">
+          <SectionCard icon={<SettingsIcon className="w-4 h-4 text-[var(--accent)]" />} title="Preferences">
             <div className="space-y-6">
               <div>
-                <label className="block text-xs text-zinc-500 athletic-body uppercase tracking-wider mb-3">
+                <label className="block text-xs text-[var(--text-2)] athletic-body uppercase tracking-wider mb-3">
                   Weight Unit
                 </label>
                 <div className="grid grid-cols-2 gap-3">
@@ -542,8 +542,8 @@ export default function SettingsPage() {
                       onClick={() => setWeightUnit(unit.value)}
                       className={`p-4 border-2 transition-all ${
                         weightUnit === unit.value
-                          ? "border-lime-400 bg-lime-400/10 text-white"
-                          : "border-zinc-700 bg-zinc-900 text-zinc-400 hover:border-zinc-600"
+                          ? "border-[var(--accent)] bg-[var(--accent-muted)] text-white"
+                          : "border-[var(--border-2)] bg-[var(--surface)] text-[var(--text-2)] hover:border-zinc-600"
                       }`}
                     >
                       {unit.label}
@@ -553,7 +553,7 @@ export default function SettingsPage() {
               </div>
 
               <div>
-                <label className="block text-xs text-zinc-500 athletic-body uppercase tracking-wider mb-3">
+                <label className="block text-xs text-[var(--text-2)] athletic-body uppercase tracking-wider mb-3">
                   Default Rest Time
                 </label>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -563,14 +563,14 @@ export default function SettingsPage() {
                       onClick={() => setDefaultRestSeconds(seconds)}
                       className={`p-4 border-2 transition-all ${
                         defaultRestSeconds === seconds
-                          ? "border-lime-400 bg-lime-400/10 text-white"
-                          : "border-zinc-700 bg-zinc-900 text-zinc-400 hover:border-zinc-600"
+                          ? "border-[var(--accent)] bg-[var(--accent-muted)] text-white"
+                          : "border-[var(--border-2)] bg-[var(--surface)] text-[var(--text-2)] hover:border-zinc-600"
                       }`}
                     >
                       <div className="font-bold">
                         {Math.floor(seconds / 60)}:{String(seconds % 60).padStart(2, "0")}
                       </div>
-                      <div className="text-xs text-zinc-500 mt-1">{seconds}s</div>
+                      <div className="text-xs text-[var(--text-2)] mt-1">{seconds}s</div>
                     </button>
                   ))}
                 </div>
@@ -579,10 +579,10 @@ export default function SettingsPage() {
           </SectionCard>
 
           {/* ── Account ──────────────────────────────── */}
-          <SectionCard icon={<User className="w-4 h-4 text-zinc-500" />} title="Account Information">
+          <SectionCard icon={<User className="w-4 h-4 text-[var(--text-2)]" />} title="Account Information">
             <div className="space-y-3 text-sm">
               <div className="flex justify-between">
-                <span className="text-zinc-400">Member Since</span>
+                <span className="text-[var(--text-2)]">Member Since</span>
                 <span className="text-white">
                   {new Date(user.createdAt).toLocaleDateString("en-US", {
                     month: "long",
@@ -592,7 +592,7 @@ export default function SettingsPage() {
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-zinc-400">Last Updated</span>
+                <span className="text-[var(--text-2)]">Last Updated</span>
                 <span className="text-white">
                   {user.updatedAt > 0
                     ? new Date(user.updatedAt).toLocaleDateString("en-US", {
@@ -626,7 +626,7 @@ function SectionCard({
   children: React.ReactNode;
 }) {
   return (
-    <div className="bg-zinc-900 border border-zinc-800 p-6">
+    <div className="bg-[var(--surface)] border border-[var(--border)] p-6">
       <div className="flex items-center gap-3 mb-5">
         {icon}
         <h2 className="athletic-title text-xl text-white tracking-wide">{title}</h2>
@@ -649,7 +649,7 @@ function PillRow({
 }) {
   return (
     <div className="space-y-1">
-      <span className="text-xs text-zinc-500 athletic-body uppercase tracking-wider">
+      <span className="text-xs text-[var(--text-2)] athletic-body uppercase tracking-wider">
         {label}
       </span>
       <div className="flex gap-2">
@@ -659,8 +659,8 @@ function PillRow({
             onClick={() => onChange(o.value)}
             className={`flex-1 py-2 text-xs font-medium border-2 transition-all athletic-body ${
               selected === o.value
-                ? "border-lime-400 bg-lime-400/10 text-lime-400"
-                : "border-zinc-800 text-zinc-500 hover:border-zinc-700"
+                ? "border-[var(--accent)] bg-[var(--accent-muted)] text-[var(--accent)]"
+                : "border-[var(--border)] text-[var(--text-2)] hover:border-[var(--border-2)]"
             }`}
           >
             {o.label}

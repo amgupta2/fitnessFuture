@@ -152,6 +152,22 @@ h1, h2, h3, h4, h5 {
 .pb-safe-4     { padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0px)); }
 .pb-bottom-nav { padding-bottom: calc(4rem + env(safe-area-inset-bottom, 0px)); }
 
+/* ─── Legacy class aliases — font remapping (preserves classnames across pages) ─── */
+/* These classes are used in many pages; redirect them to the new design system fonts */
+.athletic-title {
+  font-family: var(--font-brand), 'Syne', sans-serif !important;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.athletic-body {
+  font-family: var(--font-body), 'Nunito', sans-serif !important;
+}
+
+/* clip-corner → rounded corners in new aesthetic */
+.clip-corner        { border-radius: 1rem; }
+.clip-corner-bottom { border-radius: 0 0 1rem 1rem; }
+
 /* ─── Accent text + glow utilities ─────────────────────────────────────────── */
 .text-accent  { color: var(--accent); }
 .bg-accent    { background: var(--accent); }

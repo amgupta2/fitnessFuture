@@ -324,28 +324,8 @@ export default function WorkoutsPage() {
 
   if (selectedTemplate && getTemplateDetail) {
     return (
-      <div className="min-h-screen bg-black text-white">
+      <div className="min-h-screen" style={{ background: "var(--bg)", color: "var(--text-1)" }}>
         <style jsx global>{`
-          @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Roboto+Condensed:wght@400;700&display=swap');
-
-          .athletic-title {
-            font-family: 'Bebas Neue', sans-serif;
-            letter-spacing: 0.05em;
-            text-transform: uppercase;
-          }
-
-          .athletic-body {
-            font-family: 'Roboto Condensed', sans-serif;
-          }
-
-          .clip-corner {
-            clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 0 100%);
-          }
-
-          .clip-corner-bottom {
-            clip-path: polygon(0 0, 100% 0, 100% calc(100% - 16px), calc(100% - 16px) 100%, 0 100%);
-          }
-
           @keyframes slideInRight {
             from {
               transform: translateX(100%);
@@ -371,12 +351,12 @@ export default function WorkoutsPage() {
         `}</style>
 
         {/* Header */}
-        <div className="border-b-2 border-lime-400 bg-zinc-950">
+        <div className="border-b-2 border-[var(--accent)] bg-[var(--bg)]">
           <div className="p-4">
             <div className="flex items-center justify-between mb-4">
               <button
                 onClick={() => setSelectedTemplate(null)}
-                className="text-lime-400 hover:text-lime-300 athletic-body font-bold uppercase text-sm"
+                className="text-[var(--accent)] hover:text-[var(--accent)] athletic-body font-bold uppercase text-sm"
               >
                 ← Templates
               </button>
@@ -384,14 +364,14 @@ export default function WorkoutsPage() {
               <div className="flex gap-2">
                 <button
                   onClick={() => handleDuplicateTemplate(getTemplateDetail._id)}
-                  className="text-zinc-500 hover:text-lime-400 transition-colors p-2"
+                  className="text-[var(--text-2)] hover:text-[var(--accent)] transition-colors p-2"
                   title="Duplicate template"
                 >
                   <Copy className="w-5 h-5" />
                 </button>
                 <button
                   onClick={() => handleDeleteTemplate(getTemplateDetail._id)}
-                  className="text-zinc-500 hover:text-red-400 transition-colors p-2"
+                  className="text-[var(--text-2)] hover:text-red-400 transition-colors p-2"
                   title="Delete template"
                 >
                   <Trash2 className="w-5 h-5" />
@@ -400,7 +380,7 @@ export default function WorkoutsPage() {
             </div>
             <button
               onClick={() => handleStartWorkout(getTemplateDetail._id, getTemplateDetail.name)}
-              className="w-full clip-corner bg-lime-400 text-black py-4 athletic-title text-xl hover:bg-lime-300 active:scale-98 transition-transform flex items-center justify-center gap-3"
+              className="w-full clip-corner bg-[var(--accent)] text-black py-4 athletic-title text-xl hover:bg-[var(--accent)] active:scale-98 transition-transform flex items-center justify-center gap-3"
             >
               <Play className="w-6 h-6" fill="currentColor" />
               Start Workout
@@ -416,7 +396,7 @@ export default function WorkoutsPage() {
               draggable={false}
               onDragOver={(e) => handleDragOver(e, idx)}
               onDrop={(e) => handleDrop(e, idx)}
-              className={`exercise-item clip-corner bg-zinc-900 border-l-4 border-lime-400 relative group ${
+              className={`exercise-item clip-corner bg-[var(--surface)] border-l-4 border-[var(--accent)] relative group ${
                 draggedExercise === idx ? 'opacity-50' : ''
               }`}
             >
@@ -425,7 +405,7 @@ export default function WorkoutsPage() {
                   <div 
                     draggable
                     onDragStart={() => handleDragStart(idx)}
-                    className="mt-1 text-zinc-600 cursor-grab active:cursor-grabbing"
+                    className="mt-1 text-[var(--text-3)] cursor-grab active:cursor-grabbing"
                   >
                     <GripVertical className="w-5 h-5" />
                   </div>
@@ -435,17 +415,17 @@ export default function WorkoutsPage() {
                         {exercise.exerciseName}
                       </h3>
                       {exercise.standardizedExerciseId && (
-                        <span className="px-2 py-0.5 text-xs bg-lime-400/20 text-lime-400 athletic-body uppercase border border-lime-400/30 rounded">
+                        <span className="px-2 py-0.5 text-xs bg-[var(--accent-muted)] text-[var(--accent)] athletic-body uppercase border border-[rgba(245,166,35,0.3)] rounded">
                           Verified
                         </span>
                       )}
                       {getTemplateDetail.exercises.filter(e => e.exerciseName.toLowerCase() === exercise.exerciseName.toLowerCase()).length > 1 && (
-                        <span className="px-2 py-0.5 text-xs bg-zinc-800 text-zinc-400 athletic-body rounded">
+                        <span className="px-2 py-0.5 text-xs bg-[var(--surface-2)] text-[var(--text-2)] athletic-body rounded">
                           In template {getTemplateDetail.exercises.filter(e => e.exerciseName.toLowerCase() === exercise.exerciseName.toLowerCase()).length}x
                         </span>
                       )}
                     </div>
-                    <div className="flex gap-4 mt-2 text-sm athletic-body text-zinc-400">
+                    <div className="flex gap-4 mt-2 text-sm athletic-body text-[var(--text-2)]">
                       {exercise.targetSets && (
                         <span>{exercise.targetSets} sets</span>
                       )}
@@ -466,7 +446,7 @@ export default function WorkoutsPage() {
                           e.stopPropagation();
                           setShowExerciseDetails(exercise.standardizedExerciseId!);
                         }}
-                        className="p-3 sm:p-2 text-zinc-500 hover:text-blue-400 transition-colors touch-manipulation"
+                        className="p-3 sm:p-2 text-[var(--text-2)] hover:text-blue-400 transition-colors touch-manipulation"
                         title="View exercise details"
                         type="button"
                       >
@@ -478,7 +458,7 @@ export default function WorkoutsPage() {
                         e.stopPropagation();
                         setEditingExercise(exercise);
                       }}
-                      className="p-3 sm:p-2 text-zinc-500 hover:text-lime-400 transition-colors touch-manipulation"
+                      className="p-3 sm:p-2 text-[var(--text-2)] hover:text-[var(--accent)] transition-colors touch-manipulation"
                       title="Edit exercise"
                     >
                       <Edit2 className="w-5 h-5 sm:w-4 sm:h-4" />
@@ -488,7 +468,7 @@ export default function WorkoutsPage() {
                         e.stopPropagation();
                         handleDeleteExercise(exercise._id);
                       }}
-                      className="p-3 sm:p-2 text-zinc-500 hover:text-red-400 transition-colors touch-manipulation"
+                      className="p-3 sm:p-2 text-[var(--text-2)] hover:text-red-400 transition-colors touch-manipulation"
                       title="Remove exercise"
                     >
                       <X className="w-6 h-6 sm:w-5 sm:h-5" />
@@ -500,7 +480,7 @@ export default function WorkoutsPage() {
           ))}
 
           {getTemplateDetail.exercises.length === 0 && (
-            <div className="text-center py-16 text-zinc-600">
+            <div className="text-center py-16 text-[var(--text-3)]">
               <Dumbbell className="w-12 h-12 mx-auto mb-4 opacity-50" />
               <p className="athletic-body uppercase text-sm">No exercises yet</p>
             </div>
@@ -511,7 +491,7 @@ export default function WorkoutsPage() {
         <div className="fixed bottom-20 right-6 lg:bottom-6">
           <button
             onClick={() => setShowAddExercise(true)}
-            className="clip-corner-bottom bg-lime-400 text-black px-8 py-4 athletic-title text-xl hover:bg-lime-300 active:scale-95 transition-transform shadow-2xl"
+            className="clip-corner-bottom bg-[var(--accent)] text-black px-8 py-4 athletic-title text-xl hover:bg-[var(--accent)] active:scale-95 transition-transform shadow-2xl"
           >
             <Plus className="w-6 h-6 inline mr-2" />
             Add Exercise
@@ -521,12 +501,12 @@ export default function WorkoutsPage() {
         {/* Add Exercise Modal */}
         {showAddExercise && (
           <div className="fixed inset-0 bg-black/90 z-[60] flex items-end sm:items-center justify-center p-4">
-            <div className="animate-slide-in w-full max-w-lg bg-zinc-900 clip-corner border-2 border-lime-400">
-              <div className="border-b-2 border-lime-400 bg-zinc-950 p-4 flex items-center justify-between">
+            <div className="animate-slide-in w-full max-w-lg bg-[var(--surface)] clip-corner border-2 border-[var(--accent)]">
+              <div className="border-b-2 border-[var(--accent)] bg-[var(--bg)] p-4 flex items-center justify-between">
                 <h2 className="athletic-title text-xl">Add Exercise</h2>
                 <button
                   onClick={() => setShowAddExercise(false)}
-                  className="text-zinc-400 hover:text-white"
+                  className="text-[var(--text-2)] hover:text-white"
                 >
                   <X className="w-6 h-6" />
                 </button>
@@ -534,7 +514,7 @@ export default function WorkoutsPage() {
 
               <form onSubmit={handleAddExercise} className="p-6 space-y-4" key={selectedExerciseId || "new"}>
                 <div className="relative" ref={searchContainerRef}>
-                  <label className="athletic-body uppercase text-xs text-lime-400 block mb-2">
+                  <label className="athletic-body uppercase text-xs text-[var(--accent)] block mb-2">
                     Exercise Name
                   </label>
                   <div className="relative">
@@ -550,16 +530,16 @@ export default function WorkoutsPage() {
                       }}
                       onFocus={() => setShowExerciseDropdown(true)}
                       onKeyDown={handleKeyDown}
-                      className="w-full bg-black border-2 border-zinc-800 focus:border-lime-400 px-4 py-3 pr-10 athletic-body text-lg outline-none transition-colors"
+                      className="w-full bg-[var(--surface)] border-2 border-[var(--border)] focus:border-[var(--accent)] px-4 py-3 pr-10 athletic-body text-lg outline-none transition-colors"
                       placeholder="Search exercises... (e.g., bench, squat)"
                       autoComplete="off"
                     />
-                    <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-600" />
+                    <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--text-3)]" />
                   </div>
                   
                   {/* Exercise Search Dropdown */}
                   {showExerciseDropdown && exerciseSearchQuery.length > 0 && exerciseSearchResults && exerciseSearchResults.length > 0 && (
-                    <div className="absolute z-10 w-full mt-1 bg-zinc-900 border-2 border-lime-400 clip-corner max-h-64 overflow-y-auto">
+                    <div className="absolute z-10 w-full mt-1 bg-[var(--surface)] border-2 border-[var(--accent)] clip-corner max-h-64 overflow-y-auto">
                       {exerciseSearchResults.map((exercise, idx) => (
                         <button
                           key={exercise._id}
@@ -570,8 +550,8 @@ export default function WorkoutsPage() {
                             setShowExerciseDropdown(false);
                             setSelectedDropdownIndex(-1);
                           }}
-                          className={`w-full text-left px-4 py-3 transition-colors border-b border-zinc-800 last:border-b-0 ${
-                            selectedDropdownIndex === idx ? 'bg-lime-400/20' : 'hover:bg-zinc-800'
+                          className={`w-full text-left px-4 py-3 transition-colors border-b border-[var(--border)] last:border-b-0 ${
+                            selectedDropdownIndex === idx ? 'bg-[var(--accent-muted)]' : 'hover:bg-[var(--surface-2)]'
                           }`}
                         >
                           <div className="flex gap-3 items-start">
@@ -586,11 +566,11 @@ export default function WorkoutsPage() {
                             <div className="flex-1">
                               <div className="athletic-body text-white">{exercise.name}</div>
                               <div className="flex gap-2 mt-1 flex-wrap">
-                                <span className="text-xs px-2 py-0.5 bg-zinc-800 text-lime-400 uppercase athletic-body">
+                                <span className="text-xs px-2 py-0.5 bg-[var(--surface-2)] text-[var(--accent)] uppercase athletic-body">
                                   {exercise.equipmentType}
                                 </span>
                                 {exercise.muscleGroups.map((mg: string) => (
-                                  <span key={mg} className="text-xs px-2 py-0.5 bg-zinc-800 text-zinc-400 athletic-body">
+                                  <span key={mg} className="text-xs px-2 py-0.5 bg-[var(--surface-2)] text-[var(--text-2)] athletic-body">
                                     {mg}
                                   </span>
                                 ))}
@@ -604,11 +584,11 @@ export default function WorkoutsPage() {
                   
                   {/* Recent & Popular Exercises */}
                   {showExerciseDropdown && exerciseSearchQuery.length === 0 && (
-                    <div className="absolute z-10 w-full mt-1 bg-zinc-900 border-2 border-lime-400 clip-corner max-h-64 overflow-y-auto">
+                    <div className="absolute z-10 w-full mt-1 bg-[var(--surface)] border-2 border-[var(--accent)] clip-corner max-h-64 overflow-y-auto">
                       {/* Recent Exercises */}
                       {recentExercises.length > 0 && (
                         <>
-                          <div className="px-4 py-2 bg-zinc-950 athletic-body uppercase text-xs text-lime-400">
+                          <div className="px-4 py-2 bg-[var(--bg)] athletic-body uppercase text-xs text-[var(--accent)]">
                             Recent
                           </div>
                           {recentExercises.slice(0, 5).map((name) => (
@@ -619,7 +599,7 @@ export default function WorkoutsPage() {
                                 setExerciseSearchQuery(name);
                                 setShowExerciseDropdown(false);
                               }}
-                              className="w-full text-left px-4 py-3 hover:bg-zinc-800 transition-colors border-b border-zinc-800"
+                              className="w-full text-left px-4 py-3 hover:bg-[var(--surface-2)] transition-colors border-b border-[var(--border)]"
                             >
                               <div className="athletic-body text-white">{name}</div>
                             </button>
@@ -630,7 +610,7 @@ export default function WorkoutsPage() {
                       {/* Popular Exercises */}
                       {popularExercises && popularExercises.length > 0 && (
                         <>
-                          <div className="px-4 py-2 bg-zinc-950 athletic-body uppercase text-xs text-lime-400">
+                          <div className="px-4 py-2 bg-[var(--bg)] athletic-body uppercase text-xs text-[var(--accent)]">
                             Popular
                           </div>
                           {popularExercises.slice(0, 6).map((exercise) => (
@@ -642,7 +622,7 @@ export default function WorkoutsPage() {
                                 setSelectedExerciseId(exercise._id);
                                 setShowExerciseDropdown(false);
                               }}
-                              className="w-full text-left px-4 py-3 hover:bg-zinc-800 transition-colors border-b border-zinc-800 last:border-b-0"
+                              className="w-full text-left px-4 py-3 hover:bg-[var(--surface-2)] transition-colors border-b border-[var(--border)] last:border-b-0"
                             >
                               <div className="flex gap-3 items-start">
                                 {exercise.imageUrl && (
@@ -656,11 +636,11 @@ export default function WorkoutsPage() {
                                 <div className="flex-1">
                                   <div className="athletic-body text-white">{exercise.name}</div>
                                   <div className="flex gap-2 mt-1 flex-wrap">
-                                    <span className="text-xs px-2 py-0.5 bg-zinc-800 text-lime-400 uppercase athletic-body">
+                                    <span className="text-xs px-2 py-0.5 bg-[var(--surface-2)] text-[var(--accent)] uppercase athletic-body">
                                       {exercise.equipmentType}
                                     </span>
                                     {exercise.muscleGroups.map((mg: string) => (
-                                      <span key={mg} className="text-xs px-2 py-0.5 bg-zinc-800 text-zinc-400 athletic-body">
+                                      <span key={mg} className="text-xs px-2 py-0.5 bg-[var(--surface-2)] text-[var(--text-2)] athletic-body">
                                         {mg}
                                       </span>
                                     ))}
@@ -676,8 +656,8 @@ export default function WorkoutsPage() {
                   
                   {/* No results message */}
                   {showExerciseDropdown && exerciseSearchQuery.length > 2 && exerciseSearchResults && exerciseSearchResults.length === 0 && (
-                    <div className="absolute z-10 w-full mt-1 bg-zinc-900 border-2 border-zinc-700 clip-corner px-4 py-3">
-                      <div className="athletic-body text-zinc-500 text-sm">
+                    <div className="absolute z-10 w-full mt-1 bg-[var(--surface)] border-2 border-[var(--border-2)] clip-corner px-4 py-3">
+                      <div className="athletic-body text-[var(--text-2)] text-sm">
                         No exercises found. You can still add "{exerciseSearchQuery}" as a custom exercise.
                       </div>
                     </div>
@@ -686,7 +666,7 @@ export default function WorkoutsPage() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="athletic-body uppercase text-xs text-lime-400 block mb-2">
+                    <label className="athletic-body uppercase text-xs text-[var(--accent)] block mb-2">
                       Sets
                     </label>
                     <input
@@ -694,11 +674,11 @@ export default function WorkoutsPage() {
                       name="targetSets"
                       min="1"
                       defaultValue={getExerciseDefaults().sets}
-                      className="w-full bg-black border-2 border-zinc-800 focus:border-lime-400 px-4 py-3 athletic-body text-lg outline-none transition-colors"
+                      className="w-full bg-[var(--surface)] border-2 border-[var(--border)] focus:border-[var(--accent)] px-4 py-3 athletic-body text-lg outline-none transition-colors"
                     />
                   </div>
                   <div>
-                    <label className="athletic-body uppercase text-xs text-lime-400 block mb-2">
+                    <label className="athletic-body uppercase text-xs text-[var(--accent)] block mb-2">
                       Rest (sec)
                     </label>
                     <input
@@ -707,14 +687,14 @@ export default function WorkoutsPage() {
                       min="0"
                       step="15"
                       defaultValue={getExerciseDefaults().rest}
-                      className="w-full bg-black border-2 border-zinc-800 focus:border-lime-400 px-4 py-3 athletic-body text-lg outline-none transition-colors"
+                      className="w-full bg-[var(--surface)] border-2 border-[var(--border)] focus:border-[var(--accent)] px-4 py-3 athletic-body text-lg outline-none transition-colors"
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="athletic-body uppercase text-xs text-lime-400 block mb-2">
+                    <label className="athletic-body uppercase text-xs text-[var(--accent)] block mb-2">
                       Min Reps
                     </label>
                     <input
@@ -722,11 +702,11 @@ export default function WorkoutsPage() {
                       name="targetRepsMin"
                       min="1"
                       defaultValue={getExerciseDefaults().repsMin}
-                      className="w-full bg-black border-2 border-zinc-800 focus:border-lime-400 px-4 py-3 athletic-body text-lg outline-none transition-colors"
+                      className="w-full bg-[var(--surface)] border-2 border-[var(--border)] focus:border-[var(--accent)] px-4 py-3 athletic-body text-lg outline-none transition-colors"
                     />
                   </div>
                   <div>
-                    <label className="athletic-body uppercase text-xs text-lime-400 block mb-2">
+                    <label className="athletic-body uppercase text-xs text-[var(--accent)] block mb-2">
                       Max Reps
                     </label>
                     <input
@@ -734,7 +714,7 @@ export default function WorkoutsPage() {
                       name="targetRepsMax"
                       min="1"
                       defaultValue={getExerciseDefaults().repsMax}
-                      className="w-full bg-black border-2 border-zinc-800 focus:border-lime-400 px-4 py-3 athletic-body text-lg outline-none transition-colors"
+                      className="w-full bg-[var(--surface)] border-2 border-[var(--border)] focus:border-[var(--accent)] px-4 py-3 athletic-body text-lg outline-none transition-colors"
                     />
                   </div>
                 </div>
@@ -742,7 +722,7 @@ export default function WorkoutsPage() {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full clip-corner-bottom bg-lime-400 text-black px-6 py-4 athletic-title text-xl hover:bg-lime-300 active:scale-98 transition-transform mt-6 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full clip-corner-bottom bg-[var(--accent)] text-black px-6 py-4 athletic-title text-xl hover:bg-[var(--accent)] active:scale-98 transition-transform mt-6 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isSubmitting ? "Adding..." : "Add to Template"}
                 </button>
@@ -754,12 +734,12 @@ export default function WorkoutsPage() {
         {/* Edit Exercise Modal */}
         {editingExercise && (
           <div className="fixed inset-0 bg-black/90 z-[60] flex items-end sm:items-center justify-center p-4">
-            <div className="animate-slide-in w-full max-w-lg bg-zinc-900 clip-corner border-2 border-lime-400">
-              <div className="border-b-2 border-lime-400 bg-zinc-950 p-4 flex items-center justify-between">
+            <div className="animate-slide-in w-full max-w-lg bg-[var(--surface)] clip-corner border-2 border-[var(--accent)]">
+              <div className="border-b-2 border-[var(--accent)] bg-[var(--bg)] p-4 flex items-center justify-between">
                 <h2 className="athletic-title text-xl">Edit Exercise</h2>
                 <button
                   onClick={() => setEditingExercise(null)}
-                  className="text-zinc-400 hover:text-white"
+                  className="text-[var(--text-2)] hover:text-white"
                 >
                   <X className="w-6 h-6" />
                 </button>
@@ -767,7 +747,7 @@ export default function WorkoutsPage() {
 
               <form onSubmit={handleEditExercise} className="p-6 space-y-4">
                 <div>
-                  <label className="athletic-body uppercase text-xs text-lime-400 block mb-2">
+                  <label className="athletic-body uppercase text-xs text-[var(--accent)] block mb-2">
                     Exercise Name
                   </label>
                   <input
@@ -775,14 +755,14 @@ export default function WorkoutsPage() {
                     name="exerciseName"
                     required
                     defaultValue={editingExercise.exerciseName}
-                    className="w-full bg-black border-2 border-zinc-800 focus:border-lime-400 px-4 py-3 athletic-body text-lg outline-none transition-colors"
+                    className="w-full bg-[var(--surface)] border-2 border-[var(--border)] focus:border-[var(--accent)] px-4 py-3 athletic-body text-lg outline-none transition-colors"
                     placeholder="Bench Press"
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="athletic-body uppercase text-xs text-lime-400 block mb-2">
+                    <label className="athletic-body uppercase text-xs text-[var(--accent)] block mb-2">
                       Sets
                     </label>
                     <input
@@ -790,12 +770,12 @@ export default function WorkoutsPage() {
                       name="targetSets"
                       min="1"
                       defaultValue={editingExercise.targetSets}
-                      className="w-full bg-black border-2 border-zinc-800 focus:border-lime-400 px-4 py-3 athletic-body text-lg outline-none transition-colors"
+                      className="w-full bg-[var(--surface)] border-2 border-[var(--border)] focus:border-[var(--accent)] px-4 py-3 athletic-body text-lg outline-none transition-colors"
                       placeholder="3"
                     />
                   </div>
                   <div>
-                    <label className="athletic-body uppercase text-xs text-lime-400 block mb-2">
+                    <label className="athletic-body uppercase text-xs text-[var(--accent)] block mb-2">
                       Rest (sec)
                     </label>
                     <input
@@ -804,7 +784,7 @@ export default function WorkoutsPage() {
                       min="0"
                       step="15"
                       defaultValue={editingExercise.restSeconds}
-                      className="w-full bg-black border-2 border-zinc-800 focus:border-lime-400 px-4 py-3 athletic-body text-lg outline-none transition-colors"
+                      className="w-full bg-[var(--surface)] border-2 border-[var(--border)] focus:border-[var(--accent)] px-4 py-3 athletic-body text-lg outline-none transition-colors"
                       placeholder="90"
                     />
                   </div>
@@ -812,7 +792,7 @@ export default function WorkoutsPage() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="athletic-body uppercase text-xs text-lime-400 block mb-2">
+                    <label className="athletic-body uppercase text-xs text-[var(--accent)] block mb-2">
                       Min Reps
                     </label>
                     <input
@@ -820,12 +800,12 @@ export default function WorkoutsPage() {
                       name="targetRepsMin"
                       min="1"
                       defaultValue={editingExercise.targetRepsMin}
-                      className="w-full bg-black border-2 border-zinc-800 focus:border-lime-400 px-4 py-3 athletic-body text-lg outline-none transition-colors"
+                      className="w-full bg-[var(--surface)] border-2 border-[var(--border)] focus:border-[var(--accent)] px-4 py-3 athletic-body text-lg outline-none transition-colors"
                       placeholder="8"
                     />
                   </div>
                   <div>
-                    <label className="athletic-body uppercase text-xs text-lime-400 block mb-2">
+                    <label className="athletic-body uppercase text-xs text-[var(--accent)] block mb-2">
                       Max Reps
                     </label>
                     <input
@@ -833,7 +813,7 @@ export default function WorkoutsPage() {
                       name="targetRepsMax"
                       min="1"
                       defaultValue={editingExercise.targetRepsMax}
-                      className="w-full bg-black border-2 border-zinc-800 focus:border-lime-400 px-4 py-3 athletic-body text-lg outline-none transition-colors"
+                      className="w-full bg-[var(--surface)] border-2 border-[var(--border)] focus:border-[var(--accent)] px-4 py-3 athletic-body text-lg outline-none transition-colors"
                       placeholder="12"
                     />
                   </div>
@@ -842,7 +822,7 @@ export default function WorkoutsPage() {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full clip-corner-bottom bg-lime-400 text-black px-6 py-4 athletic-title text-xl hover:bg-lime-300 active:scale-98 transition-transform mt-6 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full clip-corner-bottom bg-[var(--accent)] text-black px-6 py-4 athletic-title text-xl hover:bg-[var(--accent)] active:scale-98 transition-transform mt-6 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isSubmitting ? "Saving..." : "Save Changes"}
                 </button>
@@ -854,42 +834,42 @@ export default function WorkoutsPage() {
         {/* Exercise Details Modal */}
         {showExerciseDetails && (
           <div className="fixed inset-0 bg-black/90 z-[70] flex items-center justify-center p-4" onClick={() => setShowExerciseDetails(null)}>
-            <div className="w-full max-w-2xl bg-zinc-900 clip-corner border-2 border-lime-400" onClick={(e) => e.stopPropagation()}>
-              <div className="border-b-2 border-lime-400 bg-zinc-950 p-4 flex items-center justify-between">
+            <div className="w-full max-w-2xl bg-[var(--surface)] clip-corner border-2 border-[var(--accent)]" onClick={(e) => e.stopPropagation()}>
+              <div className="border-b-2 border-[var(--accent)] bg-[var(--bg)] p-4 flex items-center justify-between">
                 <h2 className="athletic-title text-2xl">{exerciseDetails ? exerciseDetails.name : "Loading..."}</h2>
                 <button
                   onClick={() => setShowExerciseDetails(null)}
-                  className="text-zinc-400 hover:text-white"
+                  className="text-[var(--text-2)] hover:text-white"
                 >
                   <X className="w-6 h-6" />
                 </button>
               </div>
               
               {!exerciseDetails ? (
-                <div className="p-6 text-center athletic-body text-zinc-400">
+                <div className="p-6 text-center athletic-body text-[var(--text-2)]">
                   Loading exercise details...
                 </div>
               ) : (
               <div className="p-6 space-y-4">
                 {/* Tags */}
                 <div className="flex flex-wrap gap-2">
-                  <span className="px-3 py-1 bg-lime-400/20 text-lime-400 athletic-body uppercase text-xs border border-lime-400/30">
+                  <span className="px-3 py-1 bg-[var(--accent-muted)] text-[var(--accent)] athletic-body uppercase text-xs border border-[rgba(245,166,35,0.3)]">
                     {exerciseDetails.category}
                   </span>
-                  <span className="px-3 py-1 bg-zinc-800 text-lime-400 athletic-body uppercase text-xs">
+                  <span className="px-3 py-1 bg-[var(--surface-2)] text-[var(--accent)] athletic-body uppercase text-xs">
                     {exerciseDetails.equipmentType}
                   </span>
-                  <span className="px-3 py-1 bg-zinc-800 text-blue-400 athletic-body uppercase text-xs">
+                  <span className="px-3 py-1 bg-[var(--surface-2)] text-blue-400 athletic-body uppercase text-xs">
                     {exerciseDetails.movementPattern.replace(/_/g, ' ')}
                   </span>
                 </div>
                 
                 {/* Muscle Groups */}
                 <div>
-                  <h3 className="athletic-body uppercase text-xs text-lime-400 mb-2">Target Muscles</h3>
+                  <h3 className="athletic-body uppercase text-xs text-[var(--accent)] mb-2">Target Muscles</h3>
                   <div className="flex flex-wrap gap-2">
                     {exerciseDetails.muscleGroups.map((mg: string) => (
-                      <span key={mg} className="px-3 py-1 bg-zinc-800 text-white athletic-body text-sm">
+                      <span key={mg} className="px-3 py-1 bg-[var(--surface-2)] text-white athletic-body text-sm">
                         {mg}
                       </span>
                     ))}
@@ -899,8 +879,8 @@ export default function WorkoutsPage() {
                 {/* Aliases */}
                 {exerciseDetails.aliases.length > 1 && (
                   <div>
-                    <h3 className="athletic-body uppercase text-xs text-lime-400 mb-2">Also known as</h3>
-                    <div className="athletic-body text-zinc-400 text-sm">
+                    <h3 className="athletic-body uppercase text-xs text-[var(--accent)] mb-2">Also known as</h3>
+                    <div className="athletic-body text-[var(--text-2)] text-sm">
                       {exerciseDetails.aliases.slice(1).join(", ")}
                     </div>
                   </div>
@@ -908,12 +888,12 @@ export default function WorkoutsPage() {
                 
                 {/* 1RM Tracking */}
                 <div>
-                  <h3 className="athletic-body uppercase text-xs text-lime-400 mb-2">Tracking</h3>
-                  <div className="athletic-body text-sm text-zinc-300">
+                  <h3 className="athletic-body uppercase text-xs text-[var(--accent)] mb-2">Tracking</h3>
+                  <div className="athletic-body text-sm text-[var(--text-1)]">
                     {exerciseDetails.is1RMTracked ? (
-                      <span className="text-lime-400">✓ 1RM tracking enabled</span>
+                      <span className="text-[var(--accent)]">✓ 1RM tracking enabled</span>
                     ) : (
-                      <span className="text-zinc-500">1RM tracking not recommended for this exercise</span>
+                      <span className="text-[var(--text-2)]">1RM tracking not recommended for this exercise</span>
                     )}
                   </div>
                 </div>
@@ -927,39 +907,23 @@ export default function WorkoutsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white p-6">
+    <div className="min-h-screen p-6">
       <style jsx global>{`
-        @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Roboto+Condensed:wght@400;700&display=swap');
-
-        .athletic-title {
-          font-family: 'Bebas Neue', sans-serif;
-          letter-spacing: 0.05em;
-          text-transform: uppercase;
-        }
-
-        .athletic-body {
-          font-family: 'Roboto Condensed', sans-serif;
-        }
-
-        .clip-corner {
-          clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 0 100%);
-        }
-
-        .clip-corner-bottom {
-          clip-path: polygon(0 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%);
-        }
-
         @keyframes pulse-glow {
           0%, 100% {
-            box-shadow: 0 0 20px rgba(163, 230, 53, 0.3);
+            box-shadow: 0 0 20px rgba(245, 166, 35, 0.25);
           }
           50% {
-            box-shadow: 0 0 40px rgba(163, 230, 53, 0.6);
+            box-shadow: 0 0 40px rgba(245, 166, 35, 0.5);
           }
         }
 
         .pulse-glow {
           animation: pulse-glow 2s ease-in-out infinite;
+        }
+
+        .template-card:hover {
+          border-color: var(--accent) !important;
         }
 
         @keyframes fadeIn {
@@ -983,7 +947,7 @@ export default function WorkoutsPage() {
 
         .template-card:hover {
           transform: translateY(-4px);
-          border-color: rgb(163, 230, 53);
+          border-color: var(--accent);
         }
 
         .template-card:active {
@@ -993,8 +957,8 @@ export default function WorkoutsPage() {
 
       {/* Header */}
       <div className="mb-8">
-        <h1 className="athletic-title text-5xl mb-2 text-lime-400">Templates</h1>
-        <p className="athletic-body text-zinc-500 uppercase text-sm">
+        <h1 className="athletic-title text-5xl mb-2 text-[var(--accent)]">Templates</h1>
+        <p className="athletic-body text-[var(--text-2)] uppercase text-sm">
           Your training blueprints
         </p>
       </div>
@@ -1002,7 +966,7 @@ export default function WorkoutsPage() {
       {/* Create Template CTA */}
       <button
         onClick={() => setShowCreateModal(true)}
-        className="w-full clip-corner bg-gradient-to-br from-lime-400 to-lime-500 text-black p-6 mb-8 hover:from-lime-300 hover:to-lime-400 active:scale-98 transition-all pulse-glow"
+        className="w-full clip-corner bg-gradient-to-br from-[var(--accent)] to-[var(--accent-dim)] text-black p-6 mb-8 hover:from-[var(--accent)] hover:to-[var(--accent)] active:scale-98 transition-all pulse-glow"
       >
         <div className="flex items-center justify-between">
           <div className="text-left">
@@ -1019,25 +983,25 @@ export default function WorkoutsPage() {
           <button
             key={template._id}
             onClick={() => setSelectedTemplate(template._id)}
-            className="template-card fade-in clip-corner bg-zinc-900 border-2 border-zinc-800 p-6 text-left"
+            className="template-card fade-in clip-corner bg-[var(--surface)] border-2 border-[var(--border)] p-6 text-left"
             style={{ animationDelay: `${idx * 0.1}s` }}
           >
             <div className="flex items-start justify-between mb-4">
-              <div className="w-10 h-10 clip-corner bg-lime-400/20 flex items-center justify-center">
-                <Dumbbell className="w-5 h-5 text-lime-400" />
+              <div className="w-10 h-10 clip-corner bg-[var(--accent-muted)] flex items-center justify-center">
+                <Dumbbell className="w-5 h-5 text-[var(--accent)]" />
               </div>
-              <ChevronRight className="w-5 h-5 text-zinc-600" />
+              <ChevronRight className="w-5 h-5 text-[var(--text-3)]" />
             </div>
 
             <h3 className="athletic-title text-2xl mb-2">{template.name}</h3>
 
             {template.category && (
-              <div className="inline-block px-3 py-1 bg-black border border-zinc-800 athletic-body text-xs uppercase text-lime-400 mb-3">
+              <div className="inline-block px-3 py-1 bg-[var(--surface)] border border-[var(--border)] athletic-body text-xs uppercase text-[var(--accent)] mb-3">
                 {template.category}
               </div>
             )}
 
-            <div className="athletic-body text-sm text-zinc-500 mt-4">
+            <div className="athletic-body text-sm text-[var(--text-2)] mt-4">
               Tap to edit
             </div>
           </button>
@@ -1046,13 +1010,13 @@ export default function WorkoutsPage() {
 
       {templates && templates.length === 0 && (
         <div className="text-center py-20">
-          <div className="w-20 h-20 clip-corner bg-zinc-900 mx-auto mb-6 flex items-center justify-center">
-            <Dumbbell className="w-10 h-10 text-zinc-700" />
+          <div className="w-20 h-20 clip-corner bg-[var(--surface)] mx-auto mb-6 flex items-center justify-center">
+            <Dumbbell className="w-10 h-10 text-[var(--text-3)]" />
           </div>
-          <p className="athletic-title text-3xl text-zinc-700 mb-2">
+          <p className="athletic-title text-3xl text-[var(--text-3)] mb-2">
             No Templates Yet
           </p>
-          <p className="athletic-body text-zinc-600">
+          <p className="athletic-body text-[var(--text-3)]">
             Create your first workout template to get started
           </p>
         </div>
@@ -1061,12 +1025,12 @@ export default function WorkoutsPage() {
       {/* Create Template Modal */}
       {showCreateModal && (
         <div className="fixed inset-0 bg-black/90 z-[60] flex items-end sm:items-center justify-center p-4">
-          <div className="w-full max-w-md bg-zinc-900 clip-corner border-2 border-lime-400">
-            <div className="border-b-2 border-lime-400 bg-zinc-950 p-4 flex items-center justify-between">
+          <div className="w-full max-w-md bg-[var(--surface)] clip-corner border-2 border-[var(--accent)]">
+            <div className="border-b-2 border-[var(--accent)] bg-[var(--bg)] p-4 flex items-center justify-between">
               <h2 className="athletic-title text-xl">New Template</h2>
               <button
                 onClick={() => setShowCreateModal(false)}
-                className="text-zinc-400 hover:text-white"
+                className="text-[var(--text-2)] hover:text-white"
               >
                 <X className="w-6 h-6" />
               </button>
@@ -1074,7 +1038,7 @@ export default function WorkoutsPage() {
 
             <form onSubmit={handleCreateTemplate} className="p-6 space-y-6">
               <div>
-                <label className="athletic-body uppercase text-xs text-lime-400 block mb-2">
+                <label className="athletic-body uppercase text-xs text-[var(--accent)] block mb-2">
                   Template Name
                 </label>
                 <input
@@ -1082,13 +1046,13 @@ export default function WorkoutsPage() {
                   name="name"
                   required
                   autoFocus
-                  className="w-full bg-black border-2 border-zinc-800 focus:border-lime-400 px-4 py-3 athletic-body text-lg outline-none transition-colors"
+                  className="w-full bg-[var(--surface)] border-2 border-[var(--border)] focus:border-[var(--accent)] px-4 py-3 athletic-body text-lg outline-none transition-colors"
                   placeholder="Push Day A"
                 />
               </div>
 
               <div>
-                <label className="athletic-body uppercase text-xs text-lime-400 block mb-3">
+                <label className="athletic-body uppercase text-xs text-[var(--accent)] block mb-3">
                   Category
                 </label>
                 <div className="grid grid-cols-2 gap-2">
@@ -1100,7 +1064,7 @@ export default function WorkoutsPage() {
                         value={cat}
                         className="peer sr-only"
                       />
-                      <div className="clip-corner bg-zinc-950 border-2 border-zinc-800 px-4 py-3 cursor-pointer peer-checked:border-lime-400 peer-checked:bg-lime-400/10 transition-all athletic-body text-sm uppercase text-center">
+                      <div className="clip-corner bg-[var(--bg)] border-2 border-[var(--border)] px-4 py-3 cursor-pointer peer-checked:border-[var(--accent)] peer-checked:bg-[var(--accent-muted)] transition-all athletic-body text-sm uppercase text-center">
                         {cat.replace("_", " ")}
                       </div>
                     </label>
@@ -1110,7 +1074,7 @@ export default function WorkoutsPage() {
 
               <button
                 type="submit"
-                className="w-full clip-corner-bottom bg-lime-400 text-black px-6 py-4 athletic-title text-xl hover:bg-lime-300 active:scale-98 transition-transform"
+                className="w-full clip-corner-bottom bg-[var(--accent)] text-black px-6 py-4 athletic-title text-xl hover:bg-[var(--accent)] active:scale-98 transition-transform"
               >
                 Create Template
               </button>
@@ -1122,42 +1086,42 @@ export default function WorkoutsPage() {
       {/* Exercise Details Modal */}
       {showExerciseDetails && (
         <div className="fixed inset-0 bg-black/90 z-[70] flex items-center justify-center p-4" onClick={() => setShowExerciseDetails(null)}>
-          <div className="w-full max-w-2xl bg-zinc-900 clip-corner border-2 border-lime-400" onClick={(e) => e.stopPropagation()}>
-            <div className="border-b-2 border-lime-400 bg-zinc-950 p-4 flex items-center justify-between">
+          <div className="w-full max-w-2xl bg-[var(--surface)] clip-corner border-2 border-[var(--accent)]" onClick={(e) => e.stopPropagation()}>
+            <div className="border-b-2 border-[var(--accent)] bg-[var(--bg)] p-4 flex items-center justify-between">
               <h2 className="athletic-title text-2xl">{exerciseDetails ? exerciseDetails.name : "Loading..."}</h2>
               <button
                 onClick={() => setShowExerciseDetails(null)}
-                className="text-zinc-400 hover:text-white"
+                className="text-[var(--text-2)] hover:text-white"
               >
                 <X className="w-6 h-6" />
               </button>
             </div>
             
             {!exerciseDetails ? (
-              <div className="p-6 text-center athletic-body text-zinc-400">
+              <div className="p-6 text-center athletic-body text-[var(--text-2)]">
                 Loading exercise details...
               </div>
             ) : (
             <div className="p-6 space-y-4">
               {/* Tags */}
               <div className="flex flex-wrap gap-2">
-                <span className="px-3 py-1 bg-lime-400/20 text-lime-400 athletic-body uppercase text-xs border border-lime-400/30">
+                <span className="px-3 py-1 bg-[var(--accent-muted)] text-[var(--accent)] athletic-body uppercase text-xs border border-[rgba(245,166,35,0.3)]">
                   {exerciseDetails.category}
                 </span>
-                <span className="px-3 py-1 bg-zinc-800 text-lime-400 athletic-body uppercase text-xs">
+                <span className="px-3 py-1 bg-[var(--surface-2)] text-[var(--accent)] athletic-body uppercase text-xs">
                   {exerciseDetails.equipmentType}
                 </span>
-                <span className="px-3 py-1 bg-zinc-800 text-blue-400 athletic-body uppercase text-xs">
+                <span className="px-3 py-1 bg-[var(--surface-2)] text-blue-400 athletic-body uppercase text-xs">
                   {exerciseDetails.movementPattern.replace(/_/g, ' ')}
                 </span>
               </div>
               
               {/* Muscle Groups */}
               <div>
-                <h3 className="athletic-body uppercase text-xs text-lime-400 mb-2">Target Muscles</h3>
+                <h3 className="athletic-body uppercase text-xs text-[var(--accent)] mb-2">Target Muscles</h3>
                 <div className="flex flex-wrap gap-2">
                   {exerciseDetails.muscleGroups.map((mg: string) => (
-                    <span key={mg} className="px-3 py-1 bg-zinc-800 text-white athletic-body text-sm">
+                    <span key={mg} className="px-3 py-1 bg-[var(--surface-2)] text-white athletic-body text-sm">
                       {mg}
                     </span>
                   ))}
@@ -1167,8 +1131,8 @@ export default function WorkoutsPage() {
               {/* Aliases */}
               {exerciseDetails.aliases.length > 1 && (
                 <div>
-                  <h3 className="athletic-body uppercase text-xs text-lime-400 mb-2">Also known as</h3>
-                  <div className="athletic-body text-zinc-400 text-sm">
+                  <h3 className="athletic-body uppercase text-xs text-[var(--accent)] mb-2">Also known as</h3>
+                  <div className="athletic-body text-[var(--text-2)] text-sm">
                     {exerciseDetails.aliases.slice(1).join(", ")}
                   </div>
                 </div>
@@ -1176,12 +1140,12 @@ export default function WorkoutsPage() {
               
               {/* 1RM Tracking */}
               <div>
-                <h3 className="athletic-body uppercase text-xs text-lime-400 mb-2">Tracking</h3>
-                <div className="athletic-body text-sm text-zinc-300">
+                <h3 className="athletic-body uppercase text-xs text-[var(--accent)] mb-2">Tracking</h3>
+                <div className="athletic-body text-sm text-[var(--text-1)]">
                   {exerciseDetails.is1RMTracked ? (
-                    <span className="text-lime-400">✓ 1RM tracking enabled</span>
+                    <span className="text-[var(--accent)]">✓ 1RM tracking enabled</span>
                   ) : (
-                    <span className="text-zinc-500">1RM tracking not recommended for this exercise</span>
+                    <span className="text-[var(--text-2)]">1RM tracking not recommended for this exercise</span>
                   )}
                 </div>
               </div>
@@ -1195,7 +1159,7 @@ export default function WorkoutsPage() {
       {toast && (
         <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-[80] lg:bottom-6 animate-slide-in">
           <div className={`clip-corner px-6 py-4 athletic-body ${
-            toast.type === "success" ? "bg-lime-400 text-black" : "bg-red-500 text-white"
+            toast.type === "success" ? "bg-[var(--accent)] text-black" : "bg-red-500 text-white"
           }`}>
             {toast.message}
           </div>

@@ -41,8 +41,8 @@ export default function NutritionPage() {
       <div className="p-6">
         <div className="max-w-2xl mx-auto">
           <h1 className="text-3xl font-bold mb-6">Nutrition</h1>
-          <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-12 text-center">
-            <p className="text-zinc-400">Loading...</p>
+          <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-12 text-center">
+            <p className="text-[var(--text-2)]">Loading...</p>
           </div>
         </div>
       </div>
@@ -125,7 +125,7 @@ export default function NutritionPage() {
         {/* Header */}
         <div>
           <h1 className="text-3xl font-bold mb-1">Nutrition</h1>
-          <p className="text-zinc-400 text-sm">Track your meals and hit your macro targets</p>
+          <p className="text-[var(--text-2)] text-sm">Track your meals and hit your macro targets</p>
         </div>
 
         {/* Targets setup (first-time) */}
@@ -150,12 +150,12 @@ export default function NutritionPage() {
         {hasTargets && (
           <>
             {/* Date navigation */}
-            <div className="bg-zinc-900/60 border border-zinc-800 rounded-xl px-4 py-2">
+            <div className="bg-[var(--surface)]/60 border border-[var(--border)] rounded-xl px-4 py-2">
               <DateStrip selectedDate={selectedDate} onDateChange={setSelectedDate} />
             </div>
 
             {/* Summary card */}
-            <div className="bg-zinc-900/60 border border-zinc-800 rounded-2xl p-5 space-y-5">
+            <div className="bg-[var(--surface)]/60 border border-[var(--border)] rounded-2xl p-5 space-y-5">
               <CalorieSummary
                 consumed={dayTotals.calories}
                 target={targets.dailyCalories}
@@ -203,7 +203,7 @@ export default function NutritionPage() {
             <div className="fixed bottom-20 right-4 lg:bottom-6 lg:right-6 z-30">
               <button
                 onClick={() => handleOpenModal()}
-                className="w-14 h-14 rounded-full bg-lime-500 hover:bg-lime-400 text-black shadow-lg shadow-lime-500/20 flex items-center justify-center transition-colors"
+                className="w-14 h-14 rounded-full bg-[var(--accent)] hover:bg-[var(--accent)] text-black shadow-lg shadow-[rgba(245,166,35,0.2)] flex items-center justify-center transition-colors"
               >
                 <Plus className="w-6 h-6" />
               </button>

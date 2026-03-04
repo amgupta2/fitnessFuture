@@ -34,14 +34,14 @@ export function DateStrip({ selectedDate, onDateChange }: DateStripProps) {
     <div className="flex items-center justify-between">
       <button
         onClick={() => onDateChange(shiftDate(selectedDate, -1))}
-        className="p-2 rounded-lg hover:bg-zinc-800 transition-colors text-zinc-400 hover:text-white"
+        className="p-2 rounded-lg hover:bg-[var(--surface-2)] transition-colors text-[var(--text-2)] hover:text-white"
       >
         <ChevronLeft className="w-5 h-5" />
       </button>
 
       <button
         onClick={() => onDateChange(getToday())}
-        className="text-sm font-medium px-3 py-1.5 rounded-lg hover:bg-zinc-800 transition-colors"
+        className="text-sm font-medium px-3 py-1.5 rounded-lg hover:bg-[var(--surface-2)] transition-colors"
       >
         {formatDate(selectedDate)}
       </button>
@@ -49,7 +49,7 @@ export function DateStrip({ selectedDate, onDateChange }: DateStripProps) {
       <button
         onClick={() => onDateChange(shiftDate(selectedDate, 1))}
         disabled={isToday}
-        className="p-2 rounded-lg hover:bg-zinc-800 transition-colors text-zinc-400 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed"
+        className="p-2 rounded-lg hover:bg-[var(--surface-2)] transition-colors text-[var(--text-2)] hover:text-white disabled:opacity-30 disabled:cursor-not-allowed"
       >
         <ChevronRight className="w-5 h-5" />
       </button>

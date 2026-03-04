@@ -60,8 +60,8 @@ export function MuscleSelector({ selected, onChange }: MuscleSelectorProps) {
           onClick={() => setView("anterior")}
           className={`px-6 py-2 athletic-body uppercase text-sm font-medium transition-colors ${
             view === "anterior"
-              ? "bg-lime-400 text-black"
-              : "bg-zinc-800 text-zinc-400 hover:text-zinc-300"
+              ? "bg-[var(--accent)] text-black"
+              : "bg-[var(--surface-2)] text-[var(--text-2)] hover:text-[var(--text-1)]"
           }`}
         >
           Front
@@ -71,8 +71,8 @@ export function MuscleSelector({ selected, onChange }: MuscleSelectorProps) {
           onClick={() => setView("posterior")}
           className={`px-6 py-2 athletic-body uppercase text-sm font-medium transition-colors ${
             view === "posterior"
-              ? "bg-lime-400 text-black"
-              : "bg-zinc-800 text-zinc-400 hover:text-zinc-300"
+              ? "bg-[var(--accent)] text-black"
+              : "bg-[var(--surface-2)] text-[var(--text-2)] hover:text-[var(--text-1)]"
           }`}
         >
           Back
@@ -87,7 +87,7 @@ export function MuscleSelector({ selected, onChange }: MuscleSelectorProps) {
           onClick={handleClick}
           style={{ width: "16rem", maxWidth: "100%" }}
           svgStyle={{ fill: "#27272a", stroke: "#52525b" }}
-          highlightedColors={["#a3e635", "#84cc16"]}
+          highlightedColors={["#F5A623", "#C47F10"]}
         />
       </div>
 
@@ -99,7 +99,7 @@ export function MuscleSelector({ selected, onChange }: MuscleSelectorProps) {
               key={m}
               type="button"
               onClick={() => onChange(selected.filter((s) => s !== m))}
-              className="px-3 py-1 bg-lime-400/20 text-lime-400 text-sm athletic-body border border-lime-400/50 hover:bg-lime-400/30 transition-colors"
+              className="px-3 py-1 bg-[var(--accent-muted)] text-[var(--accent)] text-sm athletic-body border border-[var(--accent)]/50 hover:bg-[var(--accent-muted)] transition-colors"
             >
               {MUSCLE_LABELS[m] ?? m} ×
             </button>

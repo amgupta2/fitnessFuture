@@ -22,12 +22,12 @@ function Bar({
   return (
     <div className="space-y-1">
       <div className="flex items-center justify-between text-xs">
-        <span className="text-zinc-400">{label}</span>
-        <span className="tabular-nums text-zinc-300">
-          {consumed}g <span className="text-zinc-600">/ {target}g</span>
+        <span className="text-[var(--text-2)]">{label}</span>
+        <span className="tabular-nums text-[var(--text-1)]">
+          {consumed}g <span className="text-[var(--text-3)]">/ {target}g</span>
         </span>
       </div>
-      <div className="h-2 bg-zinc-800 rounded-full overflow-hidden">
+      <div className="h-2 bg-[var(--surface-2)] rounded-full overflow-hidden">
         <div
           className={`h-full rounded-full transition-all duration-500 ${color}`}
           style={{ width: `${pct}%` }}

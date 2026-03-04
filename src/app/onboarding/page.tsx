@@ -19,7 +19,7 @@ export default async function OnboardingPage() {
       className="min-h-screen flex items-center justify-center p-6"
       style={{
         background: `
-          radial-gradient(ellipse 90% 55% at 50% -5%, rgba(203, 255, 71, 0.06) 0%, transparent 65%),
+          radial-gradient(ellipse 90% 55% at 50% -5%, rgba(245, 166, 35, 0.06) 0%, transparent 65%),
           var(--bg)
         `,
       }}
@@ -31,7 +31,7 @@ export default async function OnboardingPage() {
             className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-bold tracking-[0.18em] uppercase mb-5 border"
             style={{
               color: "var(--accent)",
-              borderColor: "rgba(203, 255, 71, 0.25)",
+              borderColor: "rgba(245, 166, 35, 0.25)",
               background: "var(--accent-muted)",
               fontFamily: "var(--font-brand)",
             }}

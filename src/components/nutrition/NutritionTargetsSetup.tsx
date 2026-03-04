@@ -116,28 +116,28 @@ export function NutritionTargetsSetup({ userProfile, onSave }: NutritionTargetsS
   };
 
   return (
-    <div className="bg-zinc-900/60 border border-zinc-800 rounded-2xl p-6 space-y-5">
+    <div className="bg-[var(--surface)]/60 border border-[var(--border)] rounded-2xl p-6 space-y-5">
       <div>
         <h2 className="text-lg font-semibold mb-1">Set Your Nutrition Targets</h2>
-        <p className="text-sm text-zinc-400">
+        <p className="text-sm text-[var(--text-2)]">
           Daily calorie and macro goals personalized to your training. Adjust anytime.
         </p>
       </div>
 
       {/* Goal context card */}
-      <div className="bg-zinc-800/50 border border-zinc-700/50 rounded-xl p-4">
+      <div className="bg-[var(--surface-2)]/50 border border-[var(--border-2)]/50 rounded-xl p-4">
         <div className="flex items-center gap-2 mb-1.5">
-          <Target className="w-4 h-4 text-lime-400" />
-          <span className="text-xs text-zinc-500 uppercase tracking-wider font-medium">Your Goal</span>
+          <Target className="w-4 h-4 text-[var(--accent)]" />
+          <span className="text-xs text-[var(--text-2)] uppercase tracking-wider font-medium">Your Goal</span>
         </div>
         <div className="flex items-center gap-2">
           <span className="text-lg">{goal.emoji}</span>
           <span className="font-semibold text-white">{goal.label}</span>
         </div>
-        <p className="text-xs text-zinc-400 mt-1">{goal.desc}</p>
+        <p className="text-xs text-[var(--text-2)] mt-1">{goal.desc}</p>
         {!userProfile.primaryGoal && (
-          <p className="text-[10px] text-zinc-600 mt-2">
-            No goal set — <a href="/settings" className="underline hover:text-zinc-400">update in Settings</a> for better recommendations.
+          <p className="text-[10px] text-[var(--text-3)] mt-2">
+            No goal set — <a href="/settings" className="underline hover:text-[var(--text-2)]">update in Settings</a> for better recommendations.
           </p>
         )}
       </div>
@@ -147,7 +147,7 @@ export function NutritionTargetsSetup({ userProfile, onSave }: NutritionTargetsS
       <button
         onClick={handleAISuggest}
         disabled={loading}
-        className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-white font-medium transition-colors disabled:opacity-50"
+        className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-[var(--surface-2)] hover:bg-[var(--surface-3)] text-white font-medium transition-colors disabled:opacity-50"
       >
         {loading ? (
           <>
@@ -156,14 +156,14 @@ export function NutritionTargetsSetup({ userProfile, onSave }: NutritionTargetsS
           </>
         ) : (
           <>
-            <Sparkles className="w-4 h-4 text-lime-400" />
+            <Sparkles className="w-4 h-4 text-[var(--accent)]" />
             AI-Suggested Targets
           </>
         )}
       </button>
 
       {suggested && (
-        <p className="text-xs text-lime-400/70 text-center -mt-2">
+        <p className="text-xs text-[var(--accent)]/70 text-center -mt-2">
           Tailored for your {goal.label.toLowerCase()} goal
           {userProfile.bodyWeight ? ` at ${userProfile.bodyWeight} ${userProfile.weightUnit ?? "lbs"}` : ""}
           {userProfile.height ? `, ${userProfile.height} cm` : ""}
@@ -172,43 +172,43 @@ export function NutritionTargetsSetup({ userProfile, onSave }: NutritionTargetsS
 
       <div className="grid grid-cols-2 gap-3">
         <div className="col-span-2">
-          <label className="text-xs text-zinc-500 uppercase tracking-wider">Daily Calories</label>
+          <label className="text-xs text-[var(--text-2)] uppercase tracking-wider">Daily Calories</label>
           <input
             type="number"
             value={calories}
             onChange={(e) => { setCalories(e.target.value); setSuggested(false); }}
             placeholder="e.g. 2400"
-            className="w-full mt-1 bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 text-white text-sm placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-lime-500/40"
+            className="w-full mt-1 bg-[var(--surface-2)] border border-[var(--border-2)] rounded-lg px-3 py-2.5 text-white text-sm placeholder-[var(--text-3)] focus:outline-none focus:ring-2 focus:ring-[rgba(245,166,35,0.3)]"
           />
         </div>
         <div>
-          <label className="text-xs text-zinc-500 uppercase tracking-wider">Protein (g)</label>
+          <label className="text-xs text-[var(--text-2)] uppercase tracking-wider">Protein (g)</label>
           <input
             type="number"
             value={protein}
             onChange={(e) => { setProtein(e.target.value); setSuggested(false); }}
             placeholder="160"
-            className="w-full mt-1 bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 text-white text-sm placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-lime-500/40"
+            className="w-full mt-1 bg-[var(--surface-2)] border border-[var(--border-2)] rounded-lg px-3 py-2.5 text-white text-sm placeholder-[var(--text-3)] focus:outline-none focus:ring-2 focus:ring-[rgba(245,166,35,0.3)]"
           />
         </div>
         <div>
-          <label className="text-xs text-zinc-500 uppercase tracking-wider">Carbs (g)</label>
+          <label className="text-xs text-[var(--text-2)] uppercase tracking-wider">Carbs (g)</label>
           <input
             type="number"
             value={carbs}
             onChange={(e) => { setCarbs(e.target.value); setSuggested(false); }}
             placeholder="270"
-            className="w-full mt-1 bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 text-white text-sm placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-lime-500/40"
+            className="w-full mt-1 bg-[var(--surface-2)] border border-[var(--border-2)] rounded-lg px-3 py-2.5 text-white text-sm placeholder-[var(--text-3)] focus:outline-none focus:ring-2 focus:ring-[rgba(245,166,35,0.3)]"
           />
         </div>
         <div>
-          <label className="text-xs text-zinc-500 uppercase tracking-wider">Fat (g)</label>
+          <label className="text-xs text-[var(--text-2)] uppercase tracking-wider">Fat (g)</label>
           <input
             type="number"
             value={fat}
             onChange={(e) => { setFat(e.target.value); setSuggested(false); }}
             placeholder="75"
-            className="w-full mt-1 bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 text-white text-sm placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-lime-500/40"
+            className="w-full mt-1 bg-[var(--surface-2)] border border-[var(--border-2)] rounded-lg px-3 py-2.5 text-white text-sm placeholder-[var(--text-3)] focus:outline-none focus:ring-2 focus:ring-[rgba(245,166,35,0.3)]"
           />
         </div>
       </div>
@@ -216,7 +216,7 @@ export function NutritionTargetsSetup({ userProfile, onSave }: NutritionTargetsS
       <button
         onClick={handleSave}
         disabled={!calories || parseInt(calories) <= 0}
-        className="w-full py-3 rounded-xl bg-lime-500 hover:bg-lime-400 text-black font-semibold transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+        className="w-full py-3 rounded-xl bg-[var(--accent)] hover:bg-[var(--accent)] text-black font-semibold transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
       >
         Save Targets
       </button>

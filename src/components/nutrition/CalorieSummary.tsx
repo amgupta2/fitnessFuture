@@ -38,25 +38,25 @@ export function CalorieSummary({ consumed, target }: CalorieSummaryProps) {
             strokeLinecap="round"
             strokeDasharray={circumference}
             strokeDashoffset={strokeDashoffset}
-            className={overBudget ? "text-red-400" : "text-lime-400"}
+            className={overBudget ? "text-red-400" : "text-[var(--accent)]"}
             style={{ transition: "stroke-dashoffset 0.6s ease" }}
           />
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
           <span className="text-2xl font-bold tabular-nums">{consumed}</span>
-          <span className="text-[10px] text-zinc-500 uppercase tracking-wider">kcal</span>
+          <span className="text-[10px] text-[var(--text-2)] uppercase tracking-wider">kcal</span>
         </div>
       </div>
 
       {/* Numbers */}
       <div className="space-y-1.5">
         <div>
-          <p className="text-xs text-zinc-500">Target</p>
+          <p className="text-xs text-[var(--text-2)]">Target</p>
           <p className="text-lg font-semibold tabular-nums">{target.toLocaleString()} kcal</p>
         </div>
         <div>
-          <p className="text-xs text-zinc-500">{overBudget ? "Over by" : "Remaining"}</p>
-          <p className={`text-lg font-semibold tabular-nums ${overBudget ? "text-red-400" : "text-lime-400"}`}>
+          <p className="text-xs text-[var(--text-2)]">{overBudget ? "Over by" : "Remaining"}</p>
+          <p className={`text-lg font-semibold tabular-nums ${overBudget ? "text-red-400" : "text-[var(--accent)]"}`}>
             {overBudget ? `+${(consumed - target).toLocaleString()}` : remaining.toLocaleString()} kcal
           </p>
         </div>

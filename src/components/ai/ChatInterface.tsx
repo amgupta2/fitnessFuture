@@ -501,7 +501,7 @@ export default function ChatInterface({ userId }: ChatInterfaceProps) {
       <div className="mb-2 flex justify-end">
         <button
           onClick={() => setShowRawStream(!showRawStream)}
-          className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
+          className="text-xs text-[var(--text-2)] hover:text-[var(--text-1)] transition-colors"
           title="Toggle raw JSON stream view (for debugging)"
         >
           {showRawStream ? "🐛 Debug: ON" : "🐛 Debug: OFF"}
@@ -509,7 +509,7 @@ export default function ChatInterface({ userId }: ChatInterfaceProps) {
       </div>
 
       {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto space-y-4 p-4 bg-zinc-950 border border-zinc-800 rounded-t-lg">
+      <div className="flex-1 overflow-y-auto space-y-4 p-4 bg-[var(--bg)] border border-[var(--border)] rounded-t-lg">
         {messages.map((message) => (
           <div
             key={message.id}
@@ -521,7 +521,7 @@ export default function ChatInterface({ userId }: ChatInterfaceProps) {
               className={`max-w-[80%] rounded-lg p-4 ${
                 message.role === "user"
                   ? "bg-blue-600 text-white"
-                  : "bg-zinc-800 text-zinc-100"
+                  : "bg-[var(--surface-2)] text-zinc-100"
               }`}
             >
               {/* Message content with markdown rendering */}
@@ -570,12 +570,12 @@ export default function ChatInterface({ userId }: ChatInterfaceProps) {
                       <em className="italic">{children}</em>
                     ),
                     code: ({ children }) => (
-                      <code className="bg-zinc-700 px-1.5 py-0.5 rounded text-sm">
+                      <code className="bg-[var(--surface-3)] px-1.5 py-0.5 rounded text-sm">
                         {children}
                       </code>
                     ),
                     pre: ({ children }) => (
-                      <pre className="bg-zinc-700 p-3 rounded mb-2 overflow-x-auto">
+                      <pre className="bg-[var(--surface-3)] p-3 rounded mb-2 overflow-x-auto">
                         {children}
                       </pre>
                     ),
@@ -602,13 +602,13 @@ export default function ChatInterface({ userId }: ChatInterfaceProps) {
 
               {/* Metadata */}
               {message.templatesGenerated && (
-                <div className="mt-2 pt-2 border-t border-zinc-700 text-sm text-zinc-400">
+                <div className="mt-2 pt-2 border-t border-[var(--border-2)] text-sm text-[var(--text-2)]">
                   🎉 {message.templatesGenerated} template(s) added to your
                   account
                 </div>
               )}
 
-              <div className="text-xs text-zinc-500 mt-2">
+              <div className="text-xs text-[var(--text-2)] mt-2">
                 {new Date(message.timestamp).toLocaleTimeString()}
               </div>
             </div>
@@ -617,7 +617,7 @@ export default function ChatInterface({ userId }: ChatInterfaceProps) {
 
         {isLoading && (
           <div className="flex justify-start">
-            <div className="bg-zinc-800 text-zinc-100 rounded-lg p-4 max-w-[80%]">
+            <div className="bg-[var(--surface-2)] text-zinc-100 rounded-lg p-4 max-w-[80%]">
               <div className="flex items-center space-x-2">
                 <div className="animate-pulse">💭</div>
                 <span>Thinking...</span>
@@ -632,7 +632,7 @@ export default function ChatInterface({ userId }: ChatInterfaceProps) {
       {/* Input Area */}
       <form
         onSubmit={handleSubmit}
-        className="border-x border-b border-zinc-800 bg-zinc-900 p-4 rounded-b-lg"
+        className="border-x border-b border-[var(--border)] bg-[var(--surface)] p-4 rounded-b-lg"
       >
         <div className="flex gap-2">
           <input
@@ -641,7 +641,7 @@ export default function ChatInterface({ userId }: ChatInterfaceProps) {
             onChange={(e) => setInput(e.target.value)}
             placeholder="Ask a question or describe your workout goals..."
             disabled={isLoading || !trainingContext}
-            className="flex-1 bg-zinc-800 text-white border border-zinc-700 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+            className="flex-1 bg-[var(--surface-2)] text-white border border-[var(--border-2)] rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
           />
           <button
             type="submit"
@@ -655,7 +655,7 @@ export default function ChatInterface({ userId }: ChatInterfaceProps) {
         {/* Suggestions */}
         {messages.length === 1 && (
           <div className="mt-3 space-y-2">
-            <p className="text-xs text-zinc-500">Program Generation:</p>
+            <p className="text-xs text-[var(--text-2)]">Program Generation:</p>
             <div className="flex flex-wrap gap-2 max-w-full">
               <button
                 type="button"
@@ -664,7 +664,7 @@ export default function ChatInterface({ userId }: ChatInterfaceProps) {
                     "Create a 4-day Push/Pull/Legs split for intermediate lifter focusing on hypertrophy"
                   )
                 }
-                className="text-sm bg-zinc-800 text-zinc-300 px-3 py-1.5 rounded-full hover:bg-zinc-700 transition-colors shrink-0"
+                className="text-sm bg-[var(--surface-2)] text-[var(--text-1)] px-3 py-1.5 rounded-full hover:bg-[var(--surface-3)] transition-colors shrink-0"
               >
                 💪 4-day PPL split
               </button>
@@ -675,7 +675,7 @@ export default function ChatInterface({ userId }: ChatInterfaceProps) {
                     "I'm a beginner, create a 3-day full body program for strength"
                   )
                 }
-                className="text-sm bg-zinc-800 text-zinc-300 px-3 py-1.5 rounded-full hover:bg-zinc-700 transition-colors shrink-0"
+                className="text-sm bg-[var(--surface-2)] text-[var(--text-1)] px-3 py-1.5 rounded-full hover:bg-[var(--surface-3)] transition-colors shrink-0"
               >
                 🏋️ Beginner full-body
               </button>
@@ -686,32 +686,32 @@ export default function ChatInterface({ userId }: ChatInterfaceProps) {
                     "Design a 5-day bodybuilding split for advanced lifter"
                   )
                 }
-                className="text-sm bg-zinc-800 text-zinc-300 px-3 py-1.5 rounded-full hover:bg-zinc-700 transition-colors shrink-0"
+                className="text-sm bg-[var(--surface-2)] text-[var(--text-1)] px-3 py-1.5 rounded-full hover:bg-[var(--surface-3)] transition-colors shrink-0"
               >
                 🔥 Advanced bodybuilding
               </button>
             </div>
 
-            <p className="text-xs text-zinc-500 mt-3">Training Questions:</p>
+            <p className="text-xs text-[var(--text-2)] mt-3">Training Questions:</p>
             <div className="flex flex-wrap gap-2 max-w-full">
               <button
                 type="button"
                 onClick={() => setInput("How do I improve my squat depth?")}
-                className="text-sm bg-zinc-800 text-zinc-300 px-3 py-1.5 rounded-full hover:bg-zinc-700 transition-colors shrink-0"
+                className="text-sm bg-[var(--surface-2)] text-[var(--text-1)] px-3 py-1.5 rounded-full hover:bg-[var(--surface-3)] transition-colors shrink-0"
               >
                 🤔 Improve squat depth
               </button>
               <button
                 type="button"
                 onClick={() => setInput("Why is my bench press stalling?")}
-                className="text-sm bg-zinc-800 text-zinc-300 px-3 py-1.5 rounded-full hover:bg-zinc-700 transition-colors shrink-0"
+                className="text-sm bg-[var(--surface-2)] text-[var(--text-1)] px-3 py-1.5 rounded-full hover:bg-[var(--surface-3)] transition-colors shrink-0"
               >
                 📊 Diagnose plateau
               </button>
               <button
                 type="button"
                 onClick={() => setInput("What muscles does deadlift target?")}
-                className="text-sm bg-zinc-800 text-zinc-300 px-3 py-1.5 rounded-full hover:bg-zinc-700 transition-colors shrink-0"
+                className="text-sm bg-[var(--surface-2)] text-[var(--text-1)] px-3 py-1.5 rounded-full hover:bg-[var(--surface-3)] transition-colors shrink-0"
               >
                 💪 Muscle breakdown
               </button>

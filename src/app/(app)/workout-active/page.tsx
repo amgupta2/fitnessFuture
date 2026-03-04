@@ -122,18 +122,15 @@ export default function WorkoutActivePage() {
 
   if (!activeSession) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center text-white p-6">
-        <style jsx global>{`
-          @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Roboto+Condensed:wght@400;700&display=swap');
-        `}</style>
+      <div
+        className="min-h-screen flex items-center justify-center p-6"
+        style={{ background: "var(--bg)", color: "var(--text-1)" }}
+      >
         <div className="text-center">
-          <p className="text-2xl" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>
-            No Active Workout
-          </p>
+          <p className="text-2xl athletic-title">No Active Workout</p>
           <button
             onClick={() => router.push("/workouts")}
-            className="mt-4 px-6 py-3 bg-lime-400 text-black"
-            style={{ fontFamily: "'Roboto Condensed', sans-serif" }}
+            className="mt-4 px-6 py-3 bg-[var(--accent)] text-black athletic-body font-bold"
           >
             Start a Workout
           </button>
@@ -148,26 +145,14 @@ export default function WorkoutActivePage() {
 
   return (
     <div
-      className="min-h-screen bg-black text-white"
-      style={{ paddingBottom: "calc(260px + env(safe-area-inset-bottom, 0px))" }}
+      className="min-h-screen"
+      style={{
+        background: "var(--bg)",
+        color: "var(--text-1)",
+        paddingBottom: "calc(260px + env(safe-area-inset-bottom, 0px))",
+      }}
     >
       <style jsx global>{`
-        @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Roboto+Condensed:wght@400;700&display=swap');
-
-        .athletic-title {
-          font-family: 'Bebas Neue', sans-serif;
-          letter-spacing: 0.05em;
-          text-transform: uppercase;
-        }
-
-        .athletic-body {
-          font-family: 'Roboto Condensed', sans-serif;
-        }
-
-        .clip-corner {
-          clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%);
-        }
-
         @keyframes prPulse {
           0%, 100% {
             transform: scale(1);
@@ -282,7 +267,7 @@ export default function WorkoutActivePage() {
               const x = Math.cos(angle) * distance;
               const y = Math.sin(angle) * distance;
               const delay = Math.random() * 0.5;
-              const color = ['#a3e635', '#ffffff', '#fbbf24', '#f59e0b'][Math.floor(Math.random() * 4)];
+              const color = ['#F5A623', '#ffffff', '#10B981', '#5C79E0'][Math.floor(Math.random() * 4)];
               
               return (
                 <div
@@ -305,7 +290,7 @@ export default function WorkoutActivePage() {
               const x = Math.cos(angle) * distance;
               const y = Math.sin(angle) * distance;
               const delay = Math.random() * 0.5 + 0.3;
-              const color = ['#a3e635', '#ffffff', '#fbbf24', '#f59e0b'][Math.floor(Math.random() * 4)];
+              const color = ['#F5A623', '#ffffff', '#10B981', '#5C79E0'][Math.floor(Math.random() * 4)];
               
               return (
                 <div
@@ -328,7 +313,7 @@ export default function WorkoutActivePage() {
               const x = Math.cos(angle) * distance;
               const y = Math.sin(angle) * distance;
               const delay = Math.random() * 0.5 + 0.6;
-              const color = ['#a3e635', '#ffffff', '#fbbf24', '#f59e0b'][Math.floor(Math.random() * 4)];
+              const color = ['#F5A623', '#ffffff', '#10B981', '#5C79E0'][Math.floor(Math.random() * 4)];
               
               return (
                 <div
@@ -348,7 +333,7 @@ export default function WorkoutActivePage() {
           </div>
 
           {/* Main celebration card */}
-          <div className="pr-celebration bg-lime-400 text-black px-12 py-8 clip-corner relative z-10">
+          <div className="pr-celebration bg-[var(--accent)] text-black px-12 py-8 clip-corner relative z-10">
             <Trophy className="w-16 h-16 mx-auto mb-4" />
             <p className="athletic-title text-5xl">NEW PR!</p>
           </div>
@@ -357,14 +342,14 @@ export default function WorkoutActivePage() {
 
       {/* Rest Timer */}
       {isResting && (
-        <div className="fixed top-0 left-0 right-0 z-40 bg-lime-400 text-black">
+        <div className="fixed top-0 left-0 right-0 z-40 bg-[var(--accent)] text-black">
           <div className="p-6 text-center timer-active relative">
             <button
               onClick={() => {
                 setIsResting(false);
                 setRestTimer(0);
               }}
-              className="absolute top-4 right-4 athletic-body uppercase text-xs px-3 py-2 bg-black text-lime-400 hover:bg-zinc-900 active:scale-95 transition-all"
+              className="absolute top-4 right-4 athletic-body uppercase text-xs px-3 py-2 bg-[var(--bg)] text-[var(--accent)] hover:bg-[var(--surface)] active:scale-95 transition-all"
             >
               Skip
             </button>
@@ -372,7 +357,7 @@ export default function WorkoutActivePage() {
             <div className="athletic-body uppercase text-sm">Rest</div>
           </div>
           <div
-            className="h-1 bg-black transition-all duration-1000"
+            className="h-1 bg-[var(--bg)] transition-all duration-1000"
             style={{
               width: `${((restTimerTotal - restTimer) / restTimerTotal) * 100}%`,
             }}
@@ -382,7 +367,7 @@ export default function WorkoutActivePage() {
 
       {/* Header */}
       <div
-        className="border-b-2 border-lime-400 bg-zinc-950 sticky top-0 z-30"
+        className="border-b-2 border-[var(--accent)] bg-[var(--bg)] sticky top-0 z-30"
         style={isResting ? { marginTop: "calc(6rem + env(safe-area-inset-top, 0px))" } : undefined}
       >
         <div className="p-4">
@@ -390,7 +375,7 @@ export default function WorkoutActivePage() {
             <h1 className="athletic-title text-xl">{activeSession.templateName}</h1>
             <button
               onClick={handleFinishWorkout}
-              className="athletic-body uppercase text-xs text-lime-400 px-4 py-2 border border-lime-400 hover:bg-lime-400 hover:text-black transition-colors"
+              className="athletic-body uppercase text-xs text-[var(--accent)] px-4 py-2 border border-[var(--accent)] hover:bg-[var(--accent)] hover:text-black transition-colors"
             >
               Finish
             </button>
@@ -402,8 +387,8 @@ export default function WorkoutActivePage() {
                 onClick={() => setCurrentExerciseId(exercise._id)}
                 className={`athletic-body text-sm px-4 py-3 whitespace-nowrap transition-colors min-h-[44px] ${
                   currentExerciseId === exercise._id
-                    ? 'bg-lime-400 text-black'
-                    : 'bg-zinc-900 text-zinc-400'
+                    ? 'bg-[var(--accent)] text-black'
+                    : 'bg-[var(--surface)] text-[var(--text-2)]'
                 }`}
               >
                 {exercise.exerciseName}
@@ -429,7 +414,7 @@ export default function WorkoutActivePage() {
                 />
               )}
             </div>
-            <div className="flex gap-4 athletic-body text-zinc-500">
+            <div className="flex gap-4 athletic-body text-[var(--text-2)]">
               <span>Set {progress + 1} of {targetSets}</span>
             </div>
           </div>
@@ -457,18 +442,18 @@ export default function WorkoutActivePage() {
                 return (
                   <div
                     key={set._id}
-                    className={`clip-corner bg-zinc-900 p-4 flex items-center justify-between ${
-                      set.isPR ? 'border-2 border-lime-400' : ''
+                    className={`clip-corner bg-[var(--surface)] p-4 flex items-center justify-between ${
+                      set.isPR ? 'border-2 border-[var(--accent)]' : ''
                     } ${set.isWarmup ? 'opacity-75' : ''}`}
                   >
-                    <div className="athletic-body text-zinc-500">{setLabel}</div>
+                    <div className="athletic-body text-[var(--text-2)]">{setLabel}</div>
                     <div className="flex gap-6 athletic-title text-xl">
                       <span>{set.weight} lbs</span>
                       <span>×</span>
                       <span>{set.reps} reps</span>
                     </div>
                     {set.isPR && (
-                      <Trophy className="w-5 h-5 text-lime-400" />
+                      <Trophy className="w-5 h-5 text-[var(--accent)]" />
                     )}
                   </div>
                 );
@@ -478,7 +463,7 @@ export default function WorkoutActivePage() {
 
           {/* Input Area */}
           <div
-            className="fixed bottom-0 left-0 right-0 bg-black border-t-2 border-lime-400 px-6 pt-4"
+            className="fixed bottom-0 left-0 right-0 bg-[var(--surface)] border-t-2 border-[var(--accent)] px-6 pt-4"
             style={{ paddingBottom: "calc(1.5rem + env(safe-area-inset-bottom, 0px))" }}
           >
             {/* Warmup Toggle */}
@@ -486,8 +471,8 @@ export default function WorkoutActivePage() {
               onClick={() => setIsWarmup(!isWarmup)}
               className={`w-full mb-4 px-4 py-2 athletic-body text-sm uppercase transition-colors ${
                 isWarmup
-                  ? 'bg-zinc-800 text-lime-400 border-2 border-lime-400'
-                  : 'bg-zinc-900 text-zinc-500 border-2 border-zinc-800'
+                  ? 'bg-[var(--surface-2)] text-[var(--accent)] border-2 border-[var(--accent)]'
+                  : 'bg-[var(--surface)] text-[var(--text-2)] border-2 border-[var(--border)]'
               }`}
             >
               {isWarmup ? '🔥 Warmup Set' : 'Working Set'}
@@ -495,27 +480,27 @@ export default function WorkoutActivePage() {
 
             <div className="grid grid-cols-2 gap-4 mb-4">
               <div>
-                <label className="athletic-body uppercase text-xs text-lime-400 block mb-2 text-center">
+                <label className="athletic-body uppercase text-xs text-[var(--accent)] block mb-2 text-center">
                   Weight (lbs)
                 </label>
                 <input
                   type="number"
                   value={weight}
                   onChange={(e) => setWeight(e.target.value)}
-                  className="mega-input w-full bg-zinc-900 border-2 border-zinc-800 focus:border-lime-400 py-4 athletic-title text-lime-400 outline-none"
+                  className="mega-input w-full bg-[var(--surface)] border-2 border-[var(--border)] focus:border-[var(--accent)] py-4 athletic-title text-[var(--accent)] outline-none"
                   placeholder="135"
                   inputMode="decimal"
                 />
               </div>
               <div>
-                <label className="athletic-body uppercase text-xs text-lime-400 block mb-2 text-center">
+                <label className="athletic-body uppercase text-xs text-[var(--accent)] block mb-2 text-center">
                   Reps
                 </label>
                 <input
                   type="number"
                   value={reps}
                   onChange={(e) => setReps(e.target.value)}
-                  className="mega-input w-full bg-zinc-900 border-2 border-zinc-800 focus:border-lime-400 py-4 athletic-title text-lime-400 outline-none"
+                  className="mega-input w-full bg-[var(--surface)] border-2 border-[var(--border)] focus:border-[var(--accent)] py-4 athletic-title text-[var(--accent)] outline-none"
                   placeholder="10"
                   inputMode="numeric"
                 />
@@ -525,7 +510,7 @@ export default function WorkoutActivePage() {
             <button
               onClick={handleLogSet}
               disabled={!weight || !reps}
-              className="w-full clip-corner bg-lime-400 text-black py-6 athletic-title text-3xl hover:bg-lime-300 active:scale-98 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full clip-corner bg-[var(--accent)] text-black py-6 athletic-title text-3xl hover:bg-[var(--accent)] active:scale-98 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Check className="w-8 h-8 inline mr-3 mb-1" />
               Log Set

@@ -89,7 +89,7 @@ function VideoPreview({
   }, [file]);
 
   return (
-    <div className="relative rounded-xl overflow-hidden bg-black border border-zinc-800">
+    <div className="relative rounded-xl overflow-hidden bg-[var(--surface)] border border-[var(--border)]">
       <video
         src={url}
         controls
@@ -102,7 +102,7 @@ function VideoPreview({
       >
         <X className="w-4 h-4" />
       </button>
-      <div className="absolute bottom-2 left-2 px-2 py-1 rounded bg-black/70 text-xs text-zinc-300">
+      <div className="absolute bottom-2 left-2 px-2 py-1 rounded bg-black/70 text-xs text-[var(--text-1)]">
         {(file.size / (1024 * 1024)).toFixed(1)} MB
       </div>
     </div>
@@ -116,16 +116,16 @@ function HistoryCard({ item }: { item: PastAnalysis }) {
     item.exerciseName;
 
   return (
-    <div className="bg-zinc-900/60 border border-zinc-800 rounded-xl overflow-hidden">
+    <div className="bg-[var(--surface)]/60 border border-[var(--border)] rounded-xl overflow-hidden">
       <button
         onClick={() => setExpanded(!expanded)}
-        className="w-full flex items-center justify-between p-4 text-left hover:bg-zinc-800/40 transition-colors"
+        className="w-full flex items-center justify-between p-4 text-left hover:bg-[var(--surface-2)]/40 transition-colors"
       >
         <div className="flex items-center gap-3 min-w-0">
-          <Dumbbell className="w-4 h-4 text-zinc-500 shrink-0" />
+          <Dumbbell className="w-4 h-4 text-[var(--text-2)] shrink-0" />
           <div className="min-w-0">
             <p className="font-medium text-sm truncate">{exerciseLabel}</p>
-            <p className="text-xs text-zinc-500">
+            <p className="text-xs text-[var(--text-2)]">
               {new Date(item.createdAt).toLocaleDateString(undefined, {
                 month: "short",
                 day: "numeric",
@@ -137,12 +137,12 @@ function HistoryCard({ item }: { item: PastAnalysis }) {
         <div className="flex items-center gap-2 shrink-0">
           {item.formScore != null && <ScoreBadge score={item.formScore} />}
           <ChevronDown
-            className={`w-4 h-4 text-zinc-500 transition-transform ${expanded ? "rotate-180" : ""}`}
+            className={`w-4 h-4 text-[var(--text-2)] transition-transform ${expanded ? "rotate-180" : ""}`}
           />
         </div>
       </button>
       {expanded && (
-        <div className="px-4 pb-4 border-t border-zinc-800/60 pt-3">
+        <div className="px-4 pb-4 border-t border-[var(--border)]/60 pt-3">
           <div className="prose prose-invert prose-sm max-w-none">
             <ReactMarkdown remarkPlugins={[remarkGfm]}>
               {item.analysis}
@@ -352,8 +352,8 @@ export default function FormCheckPage() {
       <div className="p-6">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-3xl font-bold mb-6">Form Check</h1>
-          <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-12 text-center">
-            <p className="text-zinc-400">Loading...</p>
+          <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-12 text-center">
+            <p className="text-[var(--text-2)]">Loading...</p>
           </div>
         </div>
       </div>
@@ -369,7 +369,7 @@ export default function FormCheckPage() {
         <div className="flex items-start justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold mb-1">Form Check</h1>
-            <p className="text-zinc-400 text-sm">
+            <p className="text-[var(--text-2)] text-sm">
               Upload a video of your lift and get AI-powered form analysis
             </p>
           </div>
@@ -379,7 +379,7 @@ export default function FormCheckPage() {
               className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors shrink-0 ${
                 showHistory
                   ? "bg-white text-black"
-                  : "bg-zinc-800 text-zinc-300 hover:bg-zinc-700"
+                  : "bg-[var(--surface-2)] text-[var(--text-1)] hover:bg-[var(--surface-3)]"
               }`}
             >
               <History className="w-4 h-4" />
@@ -391,7 +391,7 @@ export default function FormCheckPage() {
         {/* History panel */}
         {showHistory && pastAnalyses && pastAnalyses.length > 0 && (
           <div className="space-y-2">
-            <h2 className="text-sm font-semibold text-zinc-400 uppercase tracking-wider">
+            <h2 className="text-sm font-semibold text-[var(--text-2)] uppercase tracking-wider">
               Past Analyses
             </h2>
             <div className="space-y-2 max-h-[500px] overflow-y-auto pr-1">
@@ -403,10 +403,10 @@ export default function FormCheckPage() {
         )}
 
         {/* Main card */}
-        <div className="bg-zinc-900/60 border border-zinc-800 rounded-2xl overflow-hidden">
+        <div className="bg-[var(--surface)]/60 border border-[var(--border)] rounded-2xl overflow-hidden">
           {/* Exercise selector */}
-          <div className="p-5 border-b border-zinc-800/60">
-            <label className="block text-sm font-medium text-zinc-400 mb-2">
+          <div className="p-5 border-b border-[var(--border)]/60">
+            <label className="block text-sm font-medium text-[var(--text-2)] mb-2">
               Exercise
             </label>
             <div className="relative">
@@ -414,7 +414,7 @@ export default function FormCheckPage() {
                 value={selectedExercise}
                 onChange={(e) => setSelectedExercise(e.target.value)}
                 disabled={analysisState === "analyzing"}
-                className="w-full appearance-none bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-3 pr-10 text-white font-medium focus:outline-none focus:ring-2 focus:ring-lime-500/40 focus:border-lime-500/40 transition-colors disabled:opacity-50"
+                className="w-full appearance-none bg-[var(--surface-2)] border border-[var(--border-2)] rounded-lg px-4 py-3 pr-10 text-white font-medium focus:outline-none focus:ring-2 focus:ring-[rgba(245,166,35,0.3)] focus:border-[rgba(245,166,35,0.4)] transition-colors disabled:opacity-50"
               >
                 {EXERCISES.map((ex) => (
                   <option key={ex.id} value={ex.id}>
@@ -422,7 +422,7 @@ export default function FormCheckPage() {
                   </option>
                 ))}
               </select>
-              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500 pointer-events-none" />
+              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-2)] pointer-events-none" />
             </div>
           </div>
 
@@ -435,17 +435,17 @@ export default function FormCheckPage() {
                   onDragOver={(e) => e.preventDefault()}
                   onDrop={handleDrop}
                   onClick={() => fileInputRef.current?.click()}
-                  className="hidden sm:flex border-2 border-dashed border-zinc-700 hover:border-zinc-500 rounded-xl p-10 text-center cursor-pointer transition-colors group"
+                  className="hidden sm:flex border-2 border-dashed border-[var(--border-2)] hover:border-zinc-500 rounded-xl p-10 text-center cursor-pointer transition-colors group"
                 >
                   <div className="flex flex-col items-center gap-3 w-full">
-                    <div className="w-14 h-14 rounded-full bg-zinc-800 group-hover:bg-zinc-700 flex items-center justify-center transition-colors">
-                      <Upload className="w-6 h-6 text-zinc-400" />
+                    <div className="w-14 h-14 rounded-full bg-[var(--surface-2)] group-hover:bg-[var(--surface-3)] flex items-center justify-center transition-colors">
+                      <Upload className="w-6 h-6 text-[var(--text-2)]" />
                     </div>
                     <div>
-                      <p className="font-medium text-zinc-300">
+                      <p className="font-medium text-[var(--text-1)]">
                         Drop your video here or click to browse
                       </p>
-                      <p className="text-sm text-zinc-500 mt-1">
+                      <p className="text-sm text-[var(--text-2)] mt-1">
                         MP4, WebM, or MOV &middot; Max 20 MB &middot; Max 30 seconds
                       </p>
                     </div>
@@ -456,23 +456,23 @@ export default function FormCheckPage() {
                 <div className="grid grid-cols-2 gap-3 sm:hidden">
                   <button
                     onClick={() => cameraInputRef.current?.click()}
-                    className="flex flex-col items-center gap-2 border-2 border-dashed border-zinc-700 hover:border-lime-500/50 rounded-xl p-6 text-center transition-colors group"
+                    className="flex flex-col items-center gap-2 border-2 border-dashed border-[var(--border-2)] hover:border-[rgba(245,166,35,0.35)] rounded-xl p-6 text-center transition-colors group"
                   >
-                    <Video className="w-7 h-7 text-zinc-500 group-hover:text-lime-400 transition-colors" />
-                    <p className="text-sm font-medium text-zinc-300">Record Video</p>
-                    <p className="text-[10px] text-zinc-600">Open camera</p>
+                    <Video className="w-7 h-7 text-[var(--text-2)] group-hover:text-[var(--accent)] transition-colors" />
+                    <p className="text-sm font-medium text-[var(--text-1)]">Record Video</p>
+                    <p className="text-[10px] text-[var(--text-3)]">Open camera</p>
                   </button>
                   <button
                     onClick={() => fileInputRef.current?.click()}
-                    className="flex flex-col items-center gap-2 border-2 border-dashed border-zinc-700 hover:border-lime-500/50 rounded-xl p-6 text-center transition-colors group"
+                    className="flex flex-col items-center gap-2 border-2 border-dashed border-[var(--border-2)] hover:border-[rgba(245,166,35,0.35)] rounded-xl p-6 text-center transition-colors group"
                   >
-                    <Upload className="w-7 h-7 text-zinc-500 group-hover:text-lime-400 transition-colors" />
-                    <p className="text-sm font-medium text-zinc-300">Choose Video</p>
-                    <p className="text-[10px] text-zinc-600">From camera roll</p>
+                    <Upload className="w-7 h-7 text-[var(--text-2)] group-hover:text-[var(--accent)] transition-colors" />
+                    <p className="text-sm font-medium text-[var(--text-1)]">Choose Video</p>
+                    <p className="text-[10px] text-[var(--text-3)]">From camera roll</p>
                   </button>
                 </div>
 
-                <p className="text-xs text-zinc-600 text-center sm:hidden">
+                <p className="text-xs text-[var(--text-3)] text-center sm:hidden">
                   MP4, WebM, or MOV &middot; Max 20 MB &middot; Max 30 seconds
                 </p>
 
@@ -514,7 +514,7 @@ export default function FormCheckPage() {
                       analysisState === "analyzing" ||
                       analysisState === "uploading"
                     }
-                    className="flex-1 flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-lime-500 hover:bg-lime-400 text-black font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex-1 flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-[var(--accent)] hover:bg-[var(--accent)] text-black font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {analysisState === "analyzing" ||
                     analysisState === "uploading" ? (
@@ -538,7 +538,7 @@ export default function FormCheckPage() {
                   {analysisState === "done" && !savedId && (
                     <button
                       onClick={handleSave}
-                      className="flex items-center gap-2 px-5 py-3 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-white font-medium transition-colors"
+                      className="flex items-center gap-2 px-5 py-3 rounded-xl bg-[var(--surface-2)] hover:bg-[var(--surface-3)] text-white font-medium transition-colors"
                     >
                       <Save className="w-4 h-4" />
                       Save
@@ -567,12 +567,12 @@ export default function FormCheckPage() {
 
         {/* Analysis results */}
         {(analysisState === "analyzing" || analysisText) && (
-          <div ref={resultRef} className="bg-zinc-900/60 border border-zinc-800 rounded-2xl overflow-hidden">
-            <div className="flex items-center justify-between p-5 border-b border-zinc-800/60">
+          <div ref={resultRef} className="bg-[var(--surface)]/60 border border-[var(--border)] rounded-2xl overflow-hidden">
+            <div className="flex items-center justify-between p-5 border-b border-[var(--border)]/60">
               <div className="flex items-center gap-3">
                 <h2 className="text-lg font-semibold">Analysis</h2>
                 {analysisState === "analyzing" && (
-                  <span className="flex items-center gap-1.5 text-xs text-lime-400 bg-lime-500/10 px-2.5 py-1 rounded-full">
+                  <span className="flex items-center gap-1.5 text-xs text-[var(--accent)] bg-[var(--accent)]/10 px-2.5 py-1 rounded-full">
                     <Loader2 className="w-3 h-3 animate-spin" />
                     Analyzing
                   </span>
@@ -589,12 +589,12 @@ export default function FormCheckPage() {
                   <span>{analysisText}</span>
                 </div>
               ) : (
-                <div className="prose prose-invert prose-sm max-w-none prose-headings:text-white prose-h2:text-xl prose-h3:text-base prose-strong:text-white prose-li:text-zinc-300">
+                <div className="prose prose-invert prose-sm max-w-none prose-headings:text-white prose-h2:text-xl prose-h3:text-base prose-strong:text-white prose-li:text-[var(--text-1)]">
                   <ReactMarkdown remarkPlugins={[remarkGfm]}>
                     {analysisText || "Waiting for first response..."}
                   </ReactMarkdown>
                   {analysisState === "analyzing" && (
-                    <span className="inline-block w-2 h-4 bg-lime-400 animate-pulse rounded-sm ml-0.5 align-text-bottom" />
+                    <span className="inline-block w-2 h-4 bg-[var(--accent)] animate-pulse rounded-sm ml-0.5 align-text-bottom" />
                   )}
                 </div>
               )}
@@ -604,25 +604,25 @@ export default function FormCheckPage() {
 
         {/* Tips card */}
         {analysisState === "idle" && !videoFile && (
-          <div className="bg-zinc-900/40 border border-zinc-800/60 rounded-xl p-5">
-            <h3 className="text-sm font-semibold text-zinc-400 uppercase tracking-wider mb-3">
+          <div className="bg-[var(--surface)]/40 border border-[var(--border)]/60 rounded-xl p-5">
+            <h3 className="text-sm font-semibold text-[var(--text-2)] uppercase tracking-wider mb-3">
               Tips for best results
             </h3>
-            <ul className="space-y-2 text-sm text-zinc-500">
+            <ul className="space-y-2 text-sm text-[var(--text-2)]">
               <li className="flex items-start gap-2">
-                <Clock className="w-4 h-4 shrink-0 mt-0.5 text-zinc-600" />
+                <Clock className="w-4 h-4 shrink-0 mt-0.5 text-[var(--text-3)]" />
                 Record 1-3 reps (10-20 seconds is ideal)
               </li>
               <li className="flex items-start gap-2">
-                <Video className="w-4 h-4 shrink-0 mt-0.5 text-zinc-600" />
+                <Video className="w-4 h-4 shrink-0 mt-0.5 text-[var(--text-3)]" />
                 Film from the side at hip height for squats and deadlifts
               </li>
               <li className="flex items-start gap-2">
-                <Video className="w-4 h-4 shrink-0 mt-0.5 text-zinc-600" />
+                <Video className="w-4 h-4 shrink-0 mt-0.5 text-[var(--text-3)]" />
                 Film from a 45-degree angle for bench press
               </li>
               <li className="flex items-start gap-2">
-                <Dumbbell className="w-4 h-4 shrink-0 mt-0.5 text-zinc-600" />
+                <Dumbbell className="w-4 h-4 shrink-0 mt-0.5 text-[var(--text-3)]" />
                 Use a working weight (not max effort) for clearer form assessment
               </li>
             </ul>

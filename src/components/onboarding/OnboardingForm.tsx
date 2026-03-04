@@ -178,13 +178,13 @@ export function OnboardingForm({ workosId }: OnboardingFormProps) {
     <div className="space-y-6">
       {/* Progress bar */}
       <div className="space-y-2">
-        <div className="flex justify-between text-xs text-zinc-500 athletic-body uppercase">
+        <div className="flex justify-between text-xs text-[var(--text-2)] athletic-body uppercase">
           <span>Step {step + 1} of {TOTAL_STEPS + 1}</span>
           <span>{Math.round(progress)}%</span>
         </div>
-        <div className="h-1 bg-zinc-800 w-full overflow-hidden">
+        <div className="h-1 bg-[var(--surface-2)] w-full overflow-hidden">
           <div
-            className="h-full bg-lime-400 transition-all duration-500"
+            className="h-full bg-[var(--accent)] transition-all duration-500"
             style={{ width: `${progress}%` }}
           />
         </div>
@@ -251,7 +251,7 @@ export function OnboardingForm({ workosId }: OnboardingFormProps) {
           <button
             type="button"
             onClick={handleBack}
-            className="flex items-center gap-2 px-5 py-3 bg-zinc-800 text-zinc-300 hover:text-white hover:bg-zinc-700 transition-colors athletic-body uppercase text-sm"
+            className="flex items-center gap-2 px-5 py-3 bg-[var(--surface-2)] text-[var(--text-1)] hover:text-white hover:bg-[var(--surface-3)] transition-colors athletic-body uppercase text-sm"
           >
             <ChevronLeft className="w-4 h-4" />
             Back
@@ -263,7 +263,7 @@ export function OnboardingForm({ workosId }: OnboardingFormProps) {
             type="button"
             onClick={handleNext}
             disabled={!canProceed()}
-            className="flex-1 flex items-center justify-center gap-2 py-3 bg-lime-400 text-black font-bold athletic-body uppercase text-sm hover:bg-lime-300 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            className="flex-1 flex items-center justify-center gap-2 py-3 bg-[var(--accent)] text-black font-bold athletic-body uppercase text-sm hover:bg-[var(--accent)] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           >
             Continue
             <ChevronRight className="w-4 h-4" />
@@ -273,7 +273,7 @@ export function OnboardingForm({ workosId }: OnboardingFormProps) {
             type="button"
             onClick={handleSubmit}
             disabled={isSubmitting}
-            className="flex-1 flex items-center justify-center gap-2 py-3 bg-lime-400 text-black font-bold athletic-body uppercase text-sm hover:bg-lime-300 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            className="flex-1 flex items-center justify-center gap-2 py-3 bg-[var(--accent)] text-black font-bold athletic-body uppercase text-sm hover:bg-[var(--accent)] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           >
             {isSubmitting ? "Setting up..." : "Complete Setup →"}
           </button>
@@ -285,7 +285,7 @@ export function OnboardingForm({ workosId }: OnboardingFormProps) {
         <button
           type="button"
           onClick={handleNext}
-          className="w-full text-center text-zinc-500 text-sm hover:text-zinc-400 transition-colors py-1"
+          className="w-full text-center text-[var(--text-2)] text-sm hover:text-[var(--text-2)] transition-colors py-1"
         >
           Skip this step
         </button>
@@ -309,12 +309,12 @@ function StepName({
         <h2 className="athletic-title text-3xl text-white tracking-wide">
           LET'S BUILD YOUR PROFILE
         </h2>
-        <p className="text-zinc-400 text-sm mt-1">
+        <p className="text-[var(--text-2)] text-sm mt-1">
           Personalized programming starts here.
         </p>
       </div>
       <div className="space-y-2">
-        <label className="text-zinc-400 text-sm athletic-body uppercase tracking-wider">
+        <label className="text-[var(--text-2)] text-sm athletic-body uppercase tracking-wider">
           What should we call you?
         </label>
         <input
@@ -323,7 +323,7 @@ function StepName({
           onChange={(e) => onChange(e.target.value)}
           placeholder="Your name"
           autoFocus
-          className="w-full bg-zinc-900 border border-zinc-700 px-4 py-3 text-white placeholder-zinc-600 focus:outline-none focus:border-lime-400 transition-colors text-lg"
+          className="w-full bg-[var(--surface)] border border-[var(--border-2)] px-4 py-3 text-white placeholder-zinc-600 focus:outline-none focus:border-[var(--accent)] transition-colors text-lg"
         />
       </div>
     </div>
@@ -364,7 +364,7 @@ function StepExperience({
         <h2 className="athletic-title text-3xl text-white tracking-wide">
           EXPERIENCE LEVEL
         </h2>
-        <p className="text-zinc-400 text-sm mt-1">
+        <p className="text-[var(--text-2)] text-sm mt-1">
           This shapes your programming volume and intensity.
         </p>
       </div>
@@ -376,8 +376,8 @@ function StepExperience({
             onClick={() => onChange(o.value)}
             className={`w-full text-left p-4 border-2 transition-all ${
               selected === o.value
-                ? "border-lime-400 bg-lime-400/10"
-                : "border-zinc-800 hover:border-zinc-700"
+                ? "border-[var(--accent)] bg-[var(--accent-muted)]"
+                : "border-[var(--border)] hover:border-[var(--border-2)]"
             }`}
           >
             <div className="flex items-center gap-3">
@@ -386,7 +386,7 @@ function StepExperience({
                 <div className="font-bold text-white athletic-body uppercase text-sm tracking-wider">
                   {o.label}
                 </div>
-                <div className="text-xs text-zinc-400 mt-0.5">{o.desc}</div>
+                <div className="text-xs text-[var(--text-2)] mt-0.5">{o.desc}</div>
               </div>
             </div>
           </button>
@@ -453,7 +453,7 @@ function StepGoal({
         <h2 className="athletic-title text-3xl text-white tracking-wide">
           PRIMARY GOAL
         </h2>
-        <p className="text-zinc-400 text-sm mt-1">
+        <p className="text-[var(--text-2)] text-sm mt-1">
           Your AI coach will tailor programs to this objective.
         </p>
       </div>
@@ -465,19 +465,19 @@ function StepGoal({
             onClick={() => onChange(o.value)}
             className={`text-left p-4 border-2 transition-all ${
               selected === o.value
-                ? "border-lime-400 bg-lime-400/10"
-                : "border-zinc-800 hover:border-zinc-700"
+                ? "border-[var(--accent)] bg-[var(--accent-muted)]"
+                : "border-[var(--border)] hover:border-[var(--border-2)]"
             }`}
           >
             <div
-              className={`mb-2 ${selected === o.value ? "text-lime-400" : "text-zinc-400"}`}
+              className={`mb-2 ${selected === o.value ? "text-[var(--accent)]" : "text-[var(--text-2)]"}`}
             >
               {o.icon}
             </div>
             <div className="font-bold text-white text-sm athletic-body uppercase tracking-wide">
               {o.label}
             </div>
-            <div className="text-xs text-zinc-500 mt-0.5">{o.desc}</div>
+            <div className="text-xs text-[var(--text-2)] mt-0.5">{o.desc}</div>
           </button>
         ))}
       </div>
@@ -511,13 +511,13 @@ function StepSchedule({
         <h2 className="athletic-title text-3xl text-white tracking-wide">
           TRAINING SCHEDULE
         </h2>
-        <p className="text-zinc-400 text-sm mt-1">
+        <p className="text-[var(--text-2)] text-sm mt-1">
           Helps the AI design the right split for your availability.
         </p>
       </div>
 
       <div className="space-y-3">
-        <div className="flex items-center gap-2 text-zinc-400">
+        <div className="flex items-center gap-2 text-[var(--text-2)]">
           <Calendar className="w-4 h-4" />
           <span className="text-sm athletic-body uppercase tracking-wider">
             Days per week
@@ -531,8 +531,8 @@ function StepSchedule({
               onClick={() => onDaysChange(d)}
               className={`px-5 py-2 text-sm font-bold athletic-body border-2 transition-all ${
                 days === d
-                  ? "border-lime-400 bg-lime-400 text-black"
-                  : "border-zinc-700 text-zinc-400 hover:border-zinc-600"
+                  ? "border-[var(--accent)] bg-[var(--accent)] text-black"
+                  : "border-[var(--border-2)] text-[var(--text-2)] hover:border-zinc-600"
               }`}
             >
               {d}
@@ -542,7 +542,7 @@ function StepSchedule({
       </div>
 
       <div className="space-y-3">
-        <div className="flex items-center gap-2 text-zinc-400">
+        <div className="flex items-center gap-2 text-[var(--text-2)]">
           <Activity className="w-4 h-4" />
           <span className="text-sm athletic-body uppercase tracking-wider">
             Session duration
@@ -556,8 +556,8 @@ function StepSchedule({
               onClick={() => onDurationChange(d.value)}
               className={`px-4 py-2 text-sm font-bold athletic-body border-2 transition-all ${
                 duration === d.value
-                  ? "border-lime-400 bg-lime-400 text-black"
-                  : "border-zinc-700 text-zinc-400 hover:border-zinc-600"
+                  ? "border-[var(--accent)] bg-[var(--accent)] text-black"
+                  : "border-[var(--border-2)] text-[var(--text-2)] hover:border-zinc-600"
               }`}
             >
               {d.label}
@@ -593,7 +593,7 @@ function StepEquipment({
         <h2 className="athletic-title text-3xl text-white tracking-wide">
           AVAILABLE EQUIPMENT
         </h2>
-        <p className="text-zinc-400 text-sm mt-1">
+        <p className="text-[var(--text-2)] text-sm mt-1">
           Select all that you have access to. AI will only prescribe what you can use.
         </p>
       </div>
@@ -605,14 +605,14 @@ function StepEquipment({
             onClick={() => onToggle(o.value)}
             className={`flex items-center gap-3 p-3 border-2 text-left transition-all ${
               selected.includes(o.value)
-                ? "border-lime-400 bg-lime-400/10"
-                : "border-zinc-800 hover:border-zinc-700"
+                ? "border-[var(--accent)] bg-[var(--accent-muted)]"
+                : "border-[var(--border)] hover:border-[var(--border-2)]"
             }`}
           >
             <span className="text-lg">{o.icon}</span>
             <span
               className={`text-sm font-medium athletic-body ${
-                selected.includes(o.value) ? "text-white" : "text-zinc-400"
+                selected.includes(o.value) ? "text-white" : "text-[var(--text-2)]"
               }`}
             >
               {o.label}
@@ -642,7 +642,7 @@ function StepMuscles({
         <h2 className="athletic-title text-3xl text-white tracking-wide">
           MUSCLE FOCUS
         </h2>
-        <p className="text-zinc-400 text-sm mt-1">
+        <p className="text-[var(--text-2)] text-sm mt-1">
           Tap muscle groups on the diagram — front and back.
         </p>
       </div>
@@ -700,17 +700,17 @@ function StepLifestyle({
         <h2 className="athletic-title text-3xl text-white tracking-wide">
           PROFILE & LIFESTYLE
         </h2>
-        <p className="text-zinc-400 text-sm mt-1">
+        <p className="text-[var(--text-2)] text-sm mt-1">
           Optional — helps calibrate recovery, volume, and nutrition recommendations.
         </p>
       </div>
 
       {/* Gender */}
       <div className="space-y-1">
-        <span className="text-xs text-zinc-500 athletic-body uppercase tracking-wider">
+        <span className="text-xs text-[var(--text-2)] athletic-body uppercase tracking-wider">
           Gender
         </span>
-        <p className="text-[10px] text-zinc-600 mb-1">
+        <p className="text-[10px] text-[var(--text-3)] mb-1">
           Used for accurate BMR &amp; nutrition calculations
         </p>
         <div className="flex gap-2">
@@ -725,8 +725,8 @@ function StepLifestyle({
               onClick={() => onGender(o.value)}
               className={`flex-1 py-2 text-xs font-medium border-2 transition-all athletic-body ${
                 gender === o.value
-                  ? "border-lime-400 bg-lime-400/10 text-lime-400"
-                  : "border-zinc-800 text-zinc-500 hover:border-zinc-700"
+                  ? "border-[var(--accent)] bg-[var(--accent-muted)] text-[var(--accent)]"
+                  : "border-[var(--border)] text-[var(--text-2)] hover:border-[var(--border-2)]"
               }`}
             >
               {o.label}
@@ -738,7 +738,7 @@ function StepLifestyle({
       {/* Age + Body weight + Height */}
       <div className="grid grid-cols-3 gap-3">
         <div className="space-y-1">
-          <label className="text-xs text-zinc-500 athletic-body uppercase tracking-wider">
+          <label className="text-xs text-[var(--text-2)] athletic-body uppercase tracking-wider">
             Age
           </label>
           <input
@@ -748,11 +748,11 @@ function StepLifestyle({
             value={age}
             onChange={(e) => onAge(e.target.value)}
             placeholder="e.g. 28"
-            className="w-full bg-zinc-900 border border-zinc-700 px-3 py-2 text-white placeholder-zinc-600 focus:outline-none focus:border-lime-400 transition-colors text-sm"
+            className="w-full bg-[var(--surface)] border border-[var(--border-2)] px-3 py-2 text-white placeholder-zinc-600 focus:outline-none focus:border-[var(--accent)] transition-colors text-sm"
           />
         </div>
         <div className="space-y-1">
-          <label className="text-xs text-zinc-500 athletic-body uppercase tracking-wider">
+          <label className="text-xs text-[var(--text-2)] athletic-body uppercase tracking-wider">
             Height (cm)
           </label>
           <input
@@ -762,11 +762,11 @@ function StepLifestyle({
             value={height}
             onChange={(e) => onHeight(e.target.value)}
             placeholder="e.g. 175"
-            className="w-full bg-zinc-900 border border-zinc-700 px-3 py-2 text-white placeholder-zinc-600 focus:outline-none focus:border-lime-400 transition-colors text-sm"
+            className="w-full bg-[var(--surface)] border border-[var(--border-2)] px-3 py-2 text-white placeholder-zinc-600 focus:outline-none focus:border-[var(--accent)] transition-colors text-sm"
           />
         </div>
         <div className="space-y-1">
-          <label className="text-xs text-zinc-500 athletic-body uppercase tracking-wider">
+          <label className="text-xs text-[var(--text-2)] athletic-body uppercase tracking-wider">
             Body Weight
           </label>
           <input
@@ -776,14 +776,14 @@ function StepLifestyle({
             value={bodyWeight}
             onChange={(e) => onBodyWeight(e.target.value)}
             placeholder="lbs / kg"
-            className="w-full bg-zinc-900 border border-zinc-700 px-3 py-2 text-white placeholder-zinc-600 focus:outline-none focus:border-lime-400 transition-colors text-sm"
+            className="w-full bg-[var(--surface)] border border-[var(--border-2)] px-3 py-2 text-white placeholder-zinc-600 focus:outline-none focus:border-[var(--accent)] transition-colors text-sm"
           />
         </div>
       </div>
 
       {/* Injuries */}
       <div className="space-y-2">
-        <div className="flex items-center gap-2 text-zinc-400">
+        <div className="flex items-center gap-2 text-[var(--text-2)]">
           <Shield className="w-4 h-4" />
           <span className="text-xs athletic-body uppercase tracking-wider">
             Injuries / Limitations
@@ -798,7 +798,7 @@ function StepLifestyle({
               className={`px-3 py-1 text-xs border transition-all athletic-body ${
                 injuries.includes(p)
                   ? "border-red-400 bg-red-400/10 text-red-400"
-                  : "border-zinc-700 text-zinc-400 hover:border-zinc-600"
+                  : "border-[var(--border-2)] text-[var(--text-2)] hover:border-zinc-600"
               }`}
             >
               {p}
@@ -812,12 +812,12 @@ function StepLifestyle({
             onChange={(e) => onInjuryInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && onAddInjury()}
             placeholder="Add custom limitation..."
-            className="flex-1 bg-zinc-900 border border-zinc-700 px-3 py-2 text-white placeholder-zinc-600 focus:outline-none focus:border-lime-400 text-xs"
+            className="flex-1 bg-[var(--surface)] border border-[var(--border-2)] px-3 py-2 text-white placeholder-zinc-600 focus:outline-none focus:border-[var(--accent)] text-xs"
           />
           <button
             type="button"
             onClick={onAddInjury}
-            className="px-3 py-2 bg-zinc-800 text-zinc-300 text-xs hover:bg-zinc-700 transition-colors"
+            className="px-3 py-2 bg-[var(--surface-2)] text-[var(--text-1)] text-xs hover:bg-[var(--surface-3)] transition-colors"
           >
             Add
           </button>
@@ -893,7 +893,7 @@ function PillRow({
 }) {
   return (
     <div className="space-y-1">
-      <span className="text-xs text-zinc-500 athletic-body uppercase tracking-wider">
+      <span className="text-xs text-[var(--text-2)] athletic-body uppercase tracking-wider">
         {label}
       </span>
       <div className="flex gap-2">
@@ -904,8 +904,8 @@ function PillRow({
             onClick={() => onChange(o.value)}
             className={`flex-1 py-2 text-xs font-medium border-2 transition-all athletic-body ${
               selected === o.value
-                ? "border-lime-400 bg-lime-400/10 text-lime-400"
-                : "border-zinc-800 text-zinc-500 hover:border-zinc-700"
+                ? "border-[var(--accent)] bg-[var(--accent-muted)] text-[var(--accent)]"
+                : "border-[var(--border)] text-[var(--text-2)] hover:border-[var(--border-2)]"
             }`}
           >
             {o.label}
@@ -929,7 +929,7 @@ function StepWeightUnit({
         <h2 className="athletic-title text-3xl text-white tracking-wide">
           WEIGHT UNIT
         </h2>
-        <p className="text-zinc-400 text-sm mt-1">
+        <p className="text-[var(--text-2)] text-sm mt-1">
           All weights in the app will use this unit.
         </p>
       </div>
@@ -944,20 +944,20 @@ function StepWeightUnit({
             onClick={() => onChange(o.value)}
             className={`flex-1 p-6 border-2 transition-all text-center ${
               selected === o.value
-                ? "border-lime-400 bg-lime-400/10"
-                : "border-zinc-800 hover:border-zinc-700"
+                ? "border-[var(--accent)] bg-[var(--accent-muted)]"
+                : "border-[var(--border)] hover:border-[var(--border-2)]"
             }`}
           >
             <div className="text-2xl font-bold athletic-title text-white">
               {o.sub}
             </div>
-            <div className="text-sm text-zinc-400 mt-1">{o.label}</div>
+            <div className="text-sm text-[var(--text-2)] mt-1">{o.label}</div>
           </button>
         ))}
       </div>
 
-      <div className="bg-zinc-900 border border-zinc-800 p-4 mt-4">
-        <p className="text-sm text-zinc-400 text-center">
+      <div className="bg-[var(--surface)] border border-[var(--border)] p-4 mt-4">
+        <p className="text-sm text-[var(--text-2)] text-center">
           You&apos;re all set! Your AI coach will use everything you&apos;ve shared to
           design programs specifically for you.
         </p>
